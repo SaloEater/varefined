@@ -31,7 +31,7 @@
 - уровень жажды/сонливости/пси здоровья/выносливости.
 
 ## **EN**
-The mod adds Actor voice lines with voices from EFT, depending on the conditions. The mod [Voiced Actor Expanded 2.1] (https://www.moddb.com/mods/stalker-anomaly/addons/voiced-actor-expanded) is used as the codebase authored by [LuxoSVK] (https://www.moddb.com/members/luxosvk).
+The mod adds Actor voice lines with voices from EFT, depending on the conditions. The mod [Voiced Actor Expanded 2.1](https://www.moddb.com/mods/stalker-anomaly/addons/voiced-actor-expanded) is used as the codebase authored by [LuxoSVK](https://www.moddb.com/members/luxosvk).
 Other authors developments were used: Ayykyu, Grokitach, Dhatri and other authors of the STALKER ANOMALY community (if you saw your development in the mod code and I didn't mention you, please write to me in Discord werwolf969 and I will correct this misunderstanding. The mod made with GAMMA modpack in mind.
 
 **New compared to Voiced Actor Expanded 2.1:**
