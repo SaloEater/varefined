@@ -1,4 +1,4 @@
-[English version](EN)
+[English version](#en)
 ## **РУ**
 Мод добавляет озвучку ГГ голосами из EFT в зависимости от условий. В качестве кодовой базы использован мод [Voiced Actor Expanded 2.1](https://www.moddb.com/mods/stalker-anomaly/addons/voiced-actor-expanded) за авторством [LuxoSVK](https://www.moddb.com/members/luxosvk).
 Использованы наработки других авторов: Ayykyu , Grokitach, Dhatri и других авторов сообщества STALKER ANOMALY (если увидели свою разработку в коде мода и я не упомянул вас - просьба написать мне в Дискорд werwolf969 и я исправлю это недоразумение. МОд рассчитан на работу со сборкой GAMMA.
