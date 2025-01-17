@@ -518,11 +518,11 @@ function actor_on_update(binder, delta) -- thinker function, handles conditional
 
         elseif arszi_psy.get_psy_health() < 0.4 and psy_volume > 0 then -- new citically psy-hurt sound 
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "sanity_" .. math.random(9), psy_volume,
-                sanity_pause, 2000, false, false, false, true)
+                sanity_pause, 2000, false, false, false, false, false, true)
 
         elseif arszi_psy.get_psy_health() < 1.0 and psy_volume > 0 then -- new psy-hurt sound (weak psy)
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "fear_" .. math.random(7), psy_volume,
-                fear_pause, 100, false, false, false, true) -- plays the psy wounded sound
+                fear_pause, 100, false, false, false, false, false, true) -- plays the psy wounded sound
 
         elseif db.actor.power < 0.10 and sprint_volume > 0 and hurt_volume < sprint_volume and hurt_pause > sprint_pause then -- exhaustion state will only play if it has both longer pause and higher volume than the hurt sound
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "exhausted_" .. math.random(62),
