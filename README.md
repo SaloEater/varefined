@@ -43,7 +43,7 @@ Added MCM menu (VARefined) for fine-tuning the mod, customization options:
 - Adjust the voice output volume
 - Select the voice language.: by default for GAMMA (English for ISG and Mercenaries, Russian for everyone else), Russian only, English only.
 - Enable / disable voice-over of kills.
-- Enable / disable weapon jam voiceover (if available, WPO will automatically disable the jam voiceover in it to avoid duplication).
+- Enable / disable weapon jam voiceover (if available, inside WPO will be automatically disabled the jam voiceover to avoid duplication).
 - Enable / disable voice lines when reloading weapons.
 - Enable / disable voice lines when throwing grenades.
 - Enable / disable voice lines for companion commands if there are companions.
