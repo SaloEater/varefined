@@ -1134,6 +1134,7 @@ local progress_health_rightleg_time = nil
 local progress_health_leftleg_time = nil
 
 local scuffed_fix = false
+local xml = nil
 local function HUDUpdate()
     if showtexthud >= 1 then -- text
         local staticname = "body_health_system_text"
@@ -1401,8 +1402,10 @@ local function HUDUpdate()
         end
 
         ::otherhudparts::
-        local xml = CScriptXmlInit()
+        if (xml == nil) then
+            xml = CScriptXmlInit()
         xml:ParseFile("ui_body_health.xml")
+        end
 
         local function ParamBar(barhandler, customstatic, barname, param, param_max, showbg)
 
