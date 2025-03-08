@@ -154,9 +154,10 @@ end
 
 function squad_near() -- CHECKS IF THERE IS A SQUAD IN NEAR DISTANCE ( "NORMAL VOLUME SPEECH HEARING DISTANCE" ) ,MEANS UP TO 24m 
     local i, xv = next(axr_companions.companion_squads, nil) -- GETS INFO ABOUT COMPANIONS
-    if (not (xv) or alife_object(xv:commander_id()).position:distance_to(db.actor:position()) > 24) then -- CHECKS IF THERE IS A SQUAD AND IF ITS CLOSE ENOUGH  
+    local commander = alife_object(xv:commander_id())
+    if (not (xv) or commander and commander.position:distance_to(db.actor:position()) > 24) then -- CHECKS IF THERE IS A SQUAD AND IF ITS CLOSE ENOUGH
         return false -- IF THERE IS NO SQUAD OR SQUAD IS NOT CLOSE ENOUGH GIVE FALSE VALUE
-    elseif alife_object(xv:commander_id()).position:distance_to(db.actor:position()) <= 24 then -- IF THERE IS A SQUAD THEN CHECKS DISTANCE
+    elseif commander.position:distance_to(db.actor:position()) <= 24 then -- IF THERE IS A SQUAD THEN CHECKS DISTANCE
         return true -- IF CONDITIONS ARE MET IT RETURNS TRUE
     else -- IF CONDITIONS ARE NOT MET IT RETURNS FALSE
         return false
