@@ -154,7 +154,7 @@ end
 
 function squad_near() -- CHECKS IF THERE IS A SQUAD IN NEAR DISTANCE ( "NORMAL VOLUME SPEECH HEARING DISTANCE" ) ,MEANS UP TO 24m 
     local i, xv = next(axr_companions.companion_squads, nil) -- GETS INFO ABOUT COMPANIONS
-    local commander = alife_object(xv:commander_id())
+    local commander = xv and alife_object(xv:commander_id())
     if (not (xv) or commander and commander.position:distance_to(db.actor:position()) > 24) then -- CHECKS IF THERE IS A SQUAD AND IF ITS CLOSE ENOUGH
         return false -- IF THERE IS NO SQUAD OR SQUAD IS NOT CLOSE ENOUGH GIVE FALSE VALUE
     elseif commander.position:distance_to(db.actor:position()) <= 24 then -- IF THERE IS A SQUAD THEN CHECKS DISTANCE
@@ -166,7 +166,7 @@ end
 
 function squad_can_hear() -- SAME AS ABOVE FUNCTION BUT FOR HEARING DISTANCE ( "LOUD VOLUME SPEECH HEARING DISTAMCE" ),MEANS MAX. 60m
     local i, yv = next(axr_companions.companion_squads, nil)
-    local commander = alife_object(yv:commander_id())
+    local commander = yv and alife_object(yv:commander_id())
     if (not (yv) or commander.position:distance_to(db.actor:position()) <= 24 or
         commander.position:distance_to(db.actor:position()) > 60) then
         return false
@@ -180,7 +180,7 @@ end
 
 function squad_out() -- SAME AS ABOVE FUNCTIONS BUT FOR OUT OF HEARING DISTANCE (MORE THAN 60m)
     local i, zv = next(axr_companions.companion_squads, nil)
-    local commander = alife_object(zv:commander_id())
+    local commander = zv and alife_object(zv:commander_id())
     if (not (zv) or commander.position:distance_to(db.actor:position()) > 60) then
         return true
     else
