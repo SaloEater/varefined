@@ -21,10 +21,6 @@ end
 
 local idiots_keybinds_playVoiceover = idiots_keybinds.playVoiceover
 function idiots_keybinds.playVoiceover(group, action, GUI)
-    if not GUI.PlayVoiceOver or not axr_companions then
-        return
-    end
-
     local enabled = NPC.getState(GUI.ID, group, action)
 
     if group == "movement" and action == "cover" and not enabled then
