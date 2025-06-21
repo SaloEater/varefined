@@ -132,80 +132,123 @@ by Werwolf969
             muffle = AGDD_voiced_actor.get_muffle_status()
         end
     end
-    
-    function axr_companions.set_companion_hide_in_cover(npc) -- EDITED FUNCTION (MOVE TO POINT COMMAND)
-        npc:give_info_portion("npcx_beh_hide_in_cover")
-        npc:disable_info_portion("npcx_beh_wait")
+
+    function axr_companions.voiceover_companion_hide_in_cover()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check() -- EXTERNAL SOUND CHECK ,IT WILL TURN OFF ANY SOUND CALLED FROM AGDD_voiced_actor.script
             if not (AGDD_voiced_actor.is_actor_in_combat()) or not (AGDD_voiced_actor.outer_combat_checker()) then -- IF ACTOR IS NOT IN COMBAT IT WILL PLAYS ONE OF THE FOLLOWING COMMANDS
                 lang_muffle_init()
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_ComClose", 1.0, 2500, true, false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
+                        "MoveToPoint_ComClose", 1.0, 2500, true, false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_ComNear", 1.0, 2500, false, true, false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
+                        "MoveToPoint_ComNear", 1.0, 2500, false, true, false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_ComMid", 1.0, 2500, false, false, true, false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
+                        "MoveToPoint_ComMid", 1.0, 2500, false, false, true, false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_ComFar", 1.0, 2500, false, false, false, true, false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
+                        "MoveToPoint_ComFar", 1.0, 2500, false, false, false, true, false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_Radio", 1.0, 2500, false, false, false, false, true) -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
+                        "MoveToPoint_Radio", 1.0, 2500, false, false, false, false, true) -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
             else -- IF ACTOR IS IN COMBAT IT WILL PLAYS ONE OF THE FOLLOWING COMMANDS
                 lang_muffle_init()
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_ComClose_AIC", 1.0, 2500, true, false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
+                        "MoveToPoint_ComClose_AIC", 1.0, 2500, true, false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_ComNear_AIC", 1.0, 2500, false, true, false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
+                        "MoveToPoint_ComNear_AIC", 1.0, 2500, false, true, false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_ComMid_AIC", 1.0, 2500, false, false, true, false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
+                        "MoveToPoint_ComMid_AIC", 1.0, 2500, false, false, true, false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_ComFar_AIC", 1.0, 2500, false, false, false, true, false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
+                        "MoveToPoint_ComFar_AIC", 1.0, 2500, false, false, false, true, false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\MoveToPoint\\" .. muffle ..
-                                   "MoveToPoint_ComTooFar_AIC", 1.0, 2500, false, false, false, false, true) -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
+                        "MoveToPoint_ComTooFar_AIC", 1.0, 2500, false, false, false, false, true) -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
             end
         end -- filters disabled companion commands shouts from MCM
     end
-    
-    function axr_companions.set_companion_to_wait_state(npc) -- EDITED FUNCTION (WAIT COMMAND)
-        npc:give_info_portion("npcx_beh_wait")
-        save_var(npc, "fight_from_point", npc:level_vertex_id())
+
+    function axr_companions.set_companion_hide_in_cover(npc) -- EDITED FUNCTION (MOVE TO POINT COMMAND)
+        npc:give_info_portion("npcx_beh_hide_in_cover")
+        npc:disable_info_portion("npcx_beh_wait")
+        axr_companions.voiceover_companion_hide_in_cover()
+    end
+
+    function axr_companions.voiceover_companion_to_wait_state()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check() -- SAME AS ABOVE
             if not (AGDD_voiced_actor.is_actor_in_combat()) or not (AGDD_voiced_actor.outer_combat_checker()) then -- SAME AS ABOVE
                 lang_muffle_init()
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_ComClose", 1.0,
-                    3500, true, false, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        3500, true, false, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_ComNear", 1.0,
-                    3500, false, true, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        3500, false, true, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_ComMid", 1.0, 3500,
-                    false, false, true, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        false, false, true, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_ComFar", 1.0, 3500,
-                    false, false, false, true, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        false, false, false, true, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_Radio", 1.0, 3500,
-                    false, false, false, false, true) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        false, false, false, false, true) -- SAME AS ABOVE BUT FOR WAIT COMMAND
             else -- SAME AS ABOVE
                 lang_muffle_init()
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_ComClose_AIC", 1.0,
-                    3500, true, false, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        3500, true, false, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_ComNear_AIC", 1.0,
-                    3500, false, true, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        3500, false, true, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_ComMid_AIC", 1.0,
-                    3500, false, false, true, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        3500, false, false, true, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_ComFar_AIC", 1.0,
-                    3500, false, false, false, true, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        3500, false, false, false, true, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Wait\\" .. muffle .. "Wait_ComTooFar_AIC",
-                    1.0, 3500, false, false, false, false, true) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+                        1.0, 3500, false, false, false, false, true) -- SAME AS ABOVE BUT FOR WAIT COMMAND
             end
+        end -- filters disabled companion commands shouts from MCM
+    end
+
+    function axr_companions.set_companion_to_wait_state(npc) -- EDITED FUNCTION (WAIT COMMAND)
+        npc:give_info_portion("npcx_beh_wait")
+        save_var(npc, "fight_from_point", npc:level_vertex_id())
+        axr_companions.voiceover_companion_to_wait_state()
+    end
+
+    function axr_companions.voiceover_companion_to_patrol_state()
+        if get_config("enable_companions_commands_shouts") then
+            AGDD_voiced_actor.sound_check()
+            lang_muffle_init()
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Patrol\\" .. muffle .. "StartPatrolling", 1.0,
+                    1700, true, false, false, false, false) -- START PATROLLING COMMAND
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.set_companion_to_patrol_state(npc) -- EDITED FUNCTION (PATROL)
         npc:give_info_portion("npcx_beh_patrol_mode")
+        axr_companions.voiceover_companion_to_patrol_state()
+    end
+
+    function axr_companions.voiceover_companion_to_follow_state()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
-            lang_muffle_init()
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Patrol\\" .. muffle .. "StartPatrolling", 1.0,
-                1700, true, false, false, false, false) -- START PATROLLING COMMAND
+            if not (AGDD_voiced_actor.is_actor_in_combat()) or not (AGDD_voiced_actor.outer_combat_checker()) then
+                lang_muffle_init()
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComClose", 1.0,
+                        3200, true, false, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComNear", 1.0,
+                        3200, false, true, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComMid", 1.0,
+                        3200, false, false, true, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComFar", 1.0,
+                        3200, false, false, false, true, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_Radio", 1.0,
+                        3200, false, false, false, false, true)
+            else
+                lang_muffle_init()
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComClose_AIC",
+                        1.0, 3200, true, false, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComNear_AIC",
+                        1.0, 3200, false, true, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComMid_AIC",
+                        1.0, 3200, false, false, true, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComFar_AIC",
+                        1.0, 3200, false, false, false, true, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComTooFar_AIC",
+                        1.0, 3200, false, false, false, false, true)
+            end
         end -- filters disabled companion commands shouts from MCM
     end
 
@@ -214,32 +257,38 @@ by Werwolf969
         npc:disable_info_portion("npcx_beh_hide_in_cover")
         npc:disable_info_portion("npcx_beh_patrol_mode")
         save_var(npc, "fight_from_point", nil)
+        axr_companions.voiceover_companion_to_follow_state()
+    end
+
+    function axr_companions.voiceover_companion_to_attack_state()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             if not (AGDD_voiced_actor.is_actor_in_combat()) or not (AGDD_voiced_actor.outer_combat_checker()) then
                 lang_muffle_init()
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComClose", 1.0,
-                    3200, true, false, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComNear", 1.0,
-                    3200, false, true, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComMid", 1.0,
-                    3200, false, false, true, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComFar", 1.0,
-                    3200, false, false, false, true, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_Radio", 1.0,
-                    3200, false, false, false, false, true)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
+                        "FireAtWill_ComClose", 1.0, 3000, true, false, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
+                        "FireAtWill_ComNear", 1.0, 3000, false, true, false, false, false)
+                axr_companions.actors_command(
+                        "characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle .. "FireAtWill_ComMid", 1.0,
+                        3000, false, false, true, false, false)
+                axr_companions.actors_command(
+                        "characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle .. "FireAtWill_ComFar", 1.0,
+                        3000, false, false, false, true, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle .. "FireAtWill_Radio",
+                        1.0, 3000, false, false, false, false, true)
             else
                 lang_muffle_init()
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComClose_AIC",
-                    1.0, 3200, true, false, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComNear_AIC",
-                    1.0, 3200, false, true, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComMid_AIC",
-                    1.0, 3200, false, false, true, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComFar_AIC",
-                    1.0, 3200, false, false, false, true, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Follow\\" .. muffle .. "Follow_ComTooFar_AIC",
-                    1.0, 3200, false, false, false, false, true)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
+                        "FireAtWill_ComClose_AIC", 1.0, 3000, true, false, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
+                        "FireAtWill_ComNear_AIC", 1.0, 3000, false, true, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
+                        "FireAtWill_ComMid_AIC", 1.0, 3000, false, false, true, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
+                        "FireAtWill_ComFar_AIC", 1.0, 3000, false, false, false, true, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
+                        "FireAtWill_ComTooFar_AIC", 1.0, 3000, false, false, false, false, true)
             end
         end -- filters disabled companion commands shouts from MCM
     end
@@ -247,34 +296,36 @@ by Werwolf969
     function axr_companions.set_companion_to_attack_state(npc) -- EDITED FUNCTION (FIRE AT WILL COMMAND)
         npc:disable_info_portion("npcx_beh_ignore_combat")
         npc:disable_info_portion("npcx_beh_ignore_actor_enemies")
+        axr_companions.voiceover_companion_to_attack_state()
+    end
+
+    function axr_companions.voiceover_companion_to_ignore_combat_state()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             if not (AGDD_voiced_actor.is_actor_in_combat()) or not (AGDD_voiced_actor.outer_combat_checker()) then
                 lang_muffle_init()
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
-                                   "FireAtWill_ComClose", 1.0, 3000, true, false, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
-                                   "FireAtWill_ComNear", 1.0, 3000, false, true, false, false, false)
-                axr_companions.actors_command(
-                    "characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle .. "FireAtWill_ComMid", 1.0,
-                    3000, false, false, true, false, false)
-                axr_companions.actors_command(
-                    "characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle .. "FireAtWill_ComFar", 1.0,
-                    3000, false, false, false, true, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle .. "FireAtWill_Radio",
-                    1.0, 3000, false, false, false, false, true)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_ComClose", 1.0, 2500, true, false, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_ComNear", 1.0, 2500, false, true, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_ComMid", 1.0, 2500, false, false, true, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_ComFar", 1.0, 2500, false, false, false, true, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_Radio", 1.0, 2500, false, false, false, false, true)
             else
                 lang_muffle_init()
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
-                                   "FireAtWill_ComClose_AIC", 1.0, 3000, true, false, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
-                                   "FireAtWill_ComNear_AIC", 1.0, 3000, false, true, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
-                                   "FireAtWill_ComMid_AIC", 1.0, 3000, false, false, true, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
-                                   "FireAtWill_ComFar_AIC", 1.0, 3000, false, false, false, true, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\FireAtWill\\" .. muffle ..
-                                   "FireAtWill_ComTooFar_AIC", 1.0, 3000, false, false, false, false, true)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_ComClose_AIC", 1.0, 2500, true, false, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_ComNear_AIC", 1.0, 2500, false, true, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_ComMid_AIC", 1.0, 2500, false, false, true, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_ComFar_AIC", 1.0, 2500, false, false, false, true, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
+                        "IgnoreCombat_ComTooFar_AIC", 1.0, 2500, false, false, false, false, true)
             end
         end -- filters disabled companion commands shouts from MCM
     end
@@ -282,229 +333,246 @@ by Werwolf969
     function axr_companions.set_companion_to_ignore_combat_state(npc) -- EDITED FUNCTION (IGNORE COMBAT COMMAND)
         npc:give_info_portion("npcx_beh_ignore_combat")
         npc:give_info_portion("npcx_beh_ignore_actor_enemies")
+        axr_companions.voiceover_companion_to_ignore_combat_state()
+    end
+
+    function axr_companions.voiceover_companion_to_attack_only_actor_combat_enemy_state()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
-            if not (AGDD_voiced_actor.is_actor_in_combat()) or not (AGDD_voiced_actor.outer_combat_checker()) then
-                lang_muffle_init()
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_ComClose", 1.0, 2500, true, false, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_ComNear", 1.0, 2500, false, true, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_ComMid", 1.0, 2500, false, false, true, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_ComFar", 1.0, 2500, false, false, false, true, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_Radio", 1.0, 2500, false, false, false, false, true)
-            else
-                lang_muffle_init()
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_ComClose_AIC", 1.0, 2500, true, false, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_ComNear_AIC", 1.0, 2500, false, true, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_ComMid_AIC", 1.0, 2500, false, false, true, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_ComFar_AIC", 1.0, 2500, false, false, false, true, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombat\\" .. muffle ..
-                                   "IgnoreCombat_ComTooFar_AIC", 1.0, 2500, false, false, false, false, true)
-            end
+            lang_muffle_init()
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombatButHelpMe\\" .. muffle ..
+                    "IgnoreCombatButHelpMe", 1.0, 1500, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.set_companion_to_attack_only_actor_combat_enemy_state(npc) -- EDITED FUNCTION (IGNORE COMBAT BUT HELP ME COMMAND)
         npc:give_info_portion("npcx_beh_ignore_combat")
         npc:disable_info_portion("npcx_beh_ignore_actor_enemies")
+        axr_companions.voiceover_companion_to_attack_only_actor_combat_enemy_state()
+    end
+
+    function axr_companions.voiceover_companion_to_stealth_substate()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             lang_muffle_init()
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\IgnoreCombatButHelpMe\\" .. muffle ..
-                               "IgnoreCombatButHelpMe", 1.0, 1500, true, false, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_ComClose", 1.0,
+                    2300, true, false, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_ComNear", 1.0,
+                    2300, false, true, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_ComMid", 1.0,
+                    2300, false, false, true, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_ComFar", 1.0,
+                    2300, false, false, false, true, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_Radio", 1.0,
+                    2300, false, false, false, false, true)
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.set_companion_to_stealth_substate(npc) -- EDITED FUNCTION (STEALTH COMMAND)
         npc:give_info_portion("npcx_beh_substate_stealth")
+        axr_companions.voiceover_companion_to_stealth_substate()
+    end
+
+    function axr_companions.voiceover_companion_to_default_substate()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             lang_muffle_init()
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_ComClose", 1.0,
-                2300, true, false, false, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_ComNear", 1.0,
-                2300, false, true, false, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_ComMid", 1.0,
-                2300, false, false, true, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_ComFar", 1.0,
-                2300, false, false, false, true, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Stealth\\" .. muffle .. "Stealth_Radio", 1.0,
-                2300, false, false, false, false, true)
+            axr_companions.actors_command(
+                    "characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_ComClose", 1.0,
+                    1700, true, false, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_ComNear",
+                    1.0, 1700, false, true, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_ComMid",
+                    1.0, 1700, false, false, true, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_ComFar",
+                    1.0, 1700, false, false, false, true, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_Radio",
+                    1.0, 1700, false, false, false, false, true)
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.set_companion_to_default_substate(npc) -- EDITED FUNCTION (STOP STEALTH COMMAND)
         npc:disable_info_portion("npcx_beh_substate_stealth")
         npc:disable_info_portion("npcx_beh_substate_relax")
+        axr_companions.voiceover_companion_to_default_substate()
+    end
+
+    function axr_companions.voiceover_companion_to_loot_items_and_corpses()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             lang_muffle_init()
-            axr_companions.actors_command(
-                "characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_ComClose", 1.0,
-                1700, true, false, false, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_ComNear",
-                1.0, 1700, false, true, false, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_ComMid",
-                1.0, 1700, false, false, true, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_ComFar",
-                1.0, 1700, false, false, false, true, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StopStealth\\" .. muffle .. "StopStealth_Radio",
-                1.0, 1700, false, false, false, false, true)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComClose", 1.0, 2200,
+                    true, false, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComNear", 1.0, 2200,
+                    false, true, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComMid", 1.0, 2200,
+                    false, false, true, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComFar", 1.0, 2200,
+                    false, false, false, true, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_Radio", 1.0, 2200,
+                    false, false, false, false, true)
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.set_companion_to_loot_items_and_corpses(npc) -- EDITED FUNCTION (LOOT COMMAND)
         npc:give_info_portion("npcx_beh_gather_items")
         npc:give_info_portion("npcx_beh_loot_corpses")
+        axr_companions.voiceover_companion_to_loot_items_and_corpses()
+    end
+
+    function axr_companions.voiceover_companion_to_loot_items_only()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             lang_muffle_init()
             axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComClose", 1.0, 2200,
-                true, false, false, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComNear", 1.0, 2200,
-                false, true, false, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComMid", 1.0, 2200,
-                false, false, true, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComFar", 1.0, 2200,
-                false, false, false, true, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_Radio", 1.0, 2200,
-                false, false, false, false, true)
+                    true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.set_companion_to_loot_items_only(npc) -- EDITED FUNCTION (LOOT ONLY ITEMS COMMAND)
         npc:give_info_portion("npcx_beh_gather_items")
         npc:disable_info_portion("npcx_beh_loot_corpses")
+        axr_companions.voiceover_companion_to_loot_items_only()
+    end
+
+    function axr_companions.voiceover_companion_to_loot_corpses_only()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             lang_muffle_init()
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComClose", 1.0, 2200,
-                true, false, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComNear", 1.0, 2200,
+                    true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.set_companion_to_loot_corpses_only(npc) -- EDITED FUNCTION (LOOT ONLY BODYS COMMAND)
         npc:disable_info_portion("npcx_beh_gather_items")
         npc:give_info_portion("npcx_beh_loot_corpses")
+        axr_companions.voiceover_companion_to_loot_corpses_only()
+    end
+
+    function axr_companions.voiceover_companion_to_loot_nothing()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             lang_muffle_init()
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Loot\\" .. muffle .. "Loot_ComNear", 1.0, 2200,
-                true, false, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_ComClose", 1.0,
+                    3000, true, false, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_ComNear", 1.0,
+                    3000, false, true, false, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_ComMid", 1.0,
+                    3000, false, false, true, false, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_ComFar", 1.0,
+                    3000, false, false, false, true, false)
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_Radio", 1.0,
+                    3000, false, false, false, false, true)
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.set_companion_to_loot_nothing(npc) -- EDITED FUNCTION (DONT LOOT COMMAND)
         npc:disable_info_portion("npcx_beh_gather_items")
         npc:disable_info_portion("npcx_beh_loot_corpses")
-        if get_config("enable_companions_commands_shouts") then
-            AGDD_voiced_actor.sound_check()
-            lang_muffle_init()
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_ComClose", 1.0,
-                3000, true, false, false, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_ComNear", 1.0,
-                3000, false, true, false, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_ComMid", 1.0,
-                3000, false, false, true, false, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_ComFar", 1.0,
-                3000, false, false, false, true, false)
-            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\DontLoot\\" .. muffle .. "DontLoot_Radio", 1.0,
-                3000, false, false, false, false, true)
-        end -- filters disabled companion commands shouts from MCM
+        axr_companions.voiceover_companion_to_loot_nothing()
     end
 
-    function axr_companions.set_companion_to_stay_close(npc) -- EDITED FUNCTION (STAY CLOSE COMMAND)
-        npc:disable_info_portion("npcx_beh_distance_far")
+    function axr_companions.voiceover_companion_to_stay_close()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             if not (AGDD_voiced_actor.is_actor_in_combat()) or not (AGDD_voiced_actor.outer_combat_checker()) then
                 lang_muffle_init()
                 axr_companions.actors_command(
-                    "characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle .. "StayClose_ComClose", 1.0,
-                    3000, true, false, false, false, false)
+                        "characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle .. "StayClose_ComClose", 1.0,
+                        3000, true, false, false, false, false)
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle .. "StayClose_ComNear",
-                    1.0, 3000, false, true, false, false, false)
+                        1.0, 3000, false, true, false, false, false)
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle .. "StayClose_ComMid",
-                    1.0, 3000, false, false, true, false, false)
+                        1.0, 3000, false, false, true, false, false)
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle .. "StayClose_ComFar",
-                    1.0, 3000, false, false, false, true, false)
+                        1.0, 3000, false, false, false, true, false)
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle .. "StayClose_Radio",
-                    1.0, 3000, false, false, false, false, true)
+                        1.0, 3000, false, false, false, false, true)
             else
                 lang_muffle_init()
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle ..
-                                   "StayClose_ComClose_AIC", 1.0, 3000, true, false, false, false, false)
+                        "StayClose_ComClose_AIC", 1.0, 3000, true, false, false, false, false)
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle ..
-                                   "StayClose_ComNear_AIC", 1.0, 3000, false, true, false, false, false)
+                        "StayClose_ComNear_AIC", 1.0, 3000, false, true, false, false, false)
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle ..
-                                   "StayClose_ComMid_AIC", 1.0, 3000, false, false, true, false, false)
+                        "StayClose_ComMid_AIC", 1.0, 3000, false, false, true, false, false)
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle ..
-                                   "StayClose_ComFar_AIC", 1.0, 3000, false, false, false, true, false)
+                        "StayClose_ComFar_AIC", 1.0, 3000, false, false, false, true, false)
                 axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle ..
-                                   "StayClose_ComTooFar_AIC", 1.0, 3000, false, false, false, false, true)
+                        "StayClose_ComTooFar_AIC", 1.0, 3000, false, false, false, false, true)
+            end
+        end -- filters disabled companion commands shouts from MCM
+    end
+
+    function axr_companions.set_companion_to_stay_close(npc) -- EDITED FUNCTION (STAY CLOSE COMMAND)
+        npc:disable_info_portion("npcx_beh_distance_far")
+        axr_companions.voiceover_companion_to_stay_close()
+    end
+
+    function axr_companions.voiceover_companion_to_stay_far()
+        if get_config("enable_companions_commands_shouts") then
+            AGDD_voiced_actor.sound_check()
+            if not (AGDD_voiced_actor.is_actor_in_combat()) or not (AGDD_voiced_actor.outer_combat_checker()) then
+                lang_muffle_init()
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComClose",
+                        1.0, 3300, true, false, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComNear",
+                        1.0, 3300, false, true, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComMid", 1.0,
+                        3300, false, false, true, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComFar", 1.0,
+                        3300, false, false, false, true, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_Radio", 1.0,
+                        3300, false, false, false, false, true)
+            else
+                lang_muffle_init()
+                axr_companions.actors_command(
+                        "characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComClose_AIC", 1.0,
+                        3300, true, false, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComNear_AIC",
+                        1.0, 3300, false, true, false, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComMid_AIC",
+                        1.0, 3300, false, false, true, false, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComFar_AIC",
+                        1.0, 3300, false, false, false, true, false)
+                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle ..
+                        "StayFar_ComTooFar_AIC", 1.0, 3300, false, false, false, false, true)
             end
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.set_companion_to_stay_far(npc) -- EDITED FUNCTION (STAY FAR COMMAND)
         npc:give_info_portion("npcx_beh_distance_far")
+        axr_companions.voiceover_companion_to_stay_far()
+    end
+
+    function axr_companions.voiceover_companion_to_come_closer()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
-            if not (AGDD_voiced_actor.is_actor_in_combat()) or not (AGDD_voiced_actor.outer_combat_checker()) then
-                lang_muffle_init()
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComClose",
+            lang_muffle_init()
+            axr_companions.actors_command(
+                    "characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle .. "StayClose_ComClose", 1.0,
+                    3000, true, false, false, false, false)
+        end -- filters disabled companion commands shouts from MCM
+    end
+
+    function axr_companions.voiceover_companion_to_move_away()
+        if get_config("enable_companions_commands_shouts") then
+            AGDD_voiced_actor.sound_check()
+            lang_muffle_init()
+            axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComClose",
                     1.0, 3300, true, false, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComNear",
-                    1.0, 3300, false, true, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComMid", 1.0,
-                    3300, false, false, true, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComFar", 1.0,
-                    3300, false, false, false, true, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_Radio", 1.0,
-                    3300, false, false, false, false, true)
-            else
-                lang_muffle_init()
-                axr_companions.actors_command(
-                    "characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComClose_AIC", 1.0,
-                    3300, true, false, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComNear_AIC",
-                    1.0, 3300, false, true, false, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComMid_AIC",
-                    1.0, 3300, false, false, true, false, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComFar_AIC",
-                    1.0, 3300, false, false, false, true, false)
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle ..
-                                   "StayFar_ComTooFar_AIC", 1.0, 3300, false, false, false, false, true)
-            end
         end -- filters disabled companion commands shouts from MCM
     end
 
     function axr_companions.switch_companion_distance(npc) -- EDITED FUNCTION (SWITCHING STAY CLOSE/FAR COMMAND)
         if (npc:has_info("npcx_beh_distance_far")) then
             npc:disable_info_portion("npcx_beh_distance_far")
-            if get_config("enable_companions_commands_shouts") then
-                AGDD_voiced_actor.sound_check()
-                lang_muffle_init()
-                axr_companions.actors_command(
-                    "characters_voice\\commands" .. lang .. "\\StayClose\\" .. muffle .. "StayClose_ComClose", 1.0,
-                    3000, true, false, false, false, false)
-            end -- filters disabled companion commands shouts from MCM
+            axr_companions.voiceover_companion_to_come_closer()
         else
             npc:give_info_portion("npcx_beh_distance_far")
-            if get_config("enable_companions_commands_shouts") then
-                AGDD_voiced_actor.sound_check()
-                lang_muffle_init()
-                axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\StayFar\\" .. muffle .. "StayFar_ComClose",
-                    1.0, 3300, true, false, false, false, false)
-            end -- filters disabled companion commands shouts from MCM
+            axr_companions.voiceover_companion_to_move_away()
         end
     end
 
@@ -570,13 +638,17 @@ by Werwolf969
         end
     end
 
-    function axr_companions.companion_remove_waypoints(npc) -- EDITED FUNCTION (PATROL - FORGET ALL WAYPOINTS COMMAND)
+    function axr_companions.voiceover_companion_remove_waypoints()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             lang_muffle_init()
             axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Patrol\\" .. muffle .. "ForgetAllWaypoints", 1.0,
-                1700, true, false, false, false, false)
+                    1700, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
+    end
+
+    function axr_companions.companion_remove_waypoints(npc) -- EDITED FUNCTION (PATROL - FORGET ALL WAYPOINTS COMMAND)
+        axr_companions.voiceover_companion_remove_waypoints()
         npc:disable_info_portion("npcx_beh_patrol_mode")
         local i = 1
         local p = se_load_var(npc:id(), npc:name(), "pathpoint" .. i) -- load_var(npc,"pathpoint"..tostring(i))
@@ -587,13 +659,17 @@ by Werwolf969
         end
     end
 
-    function axr_companions.companion_add_waypoints(npc, pos) -- EDITED FUNCTION (PATROL - ADD THIS SPOT COMMAND)
+    function axr_companions.voiceover_companion_add_waypoints()
         if get_config("enable_companions_commands_shouts") then
             AGDD_voiced_actor.sound_check()
             lang_muffle_init()
             axr_companions.actors_command("characters_voice\\commands" .. lang .. "\\Patrol\\" .. muffle .. "AddThisSpot", 1.0, 1700,
-                true, false, false, false, false)
+                    true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
+    end
+
+    function axr_companions.companion_add_waypoints(npc, pos) -- EDITED FUNCTION (PATROL - ADD THIS SPOT COMMAND)
+        axr_companions.voiceover_companion_add_waypoints()
         local i = 1
         local p = se_load_var(npc:id(), npc:name(), "pathpoint" .. i) -- load_var(npc,"pathpoint"..tostring(i))
         while p do
