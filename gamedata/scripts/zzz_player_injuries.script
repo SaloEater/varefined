@@ -483,7 +483,7 @@ function trace_this(to_trace1)
     log_file:close(log_file)
 end
 
-local function GetConditionFromFloat(float, bodypart)
+function GetConditionFromFloat(float, bodypart)
     if bodypart then
         if hud_blink_timer[bodypart] then
             if time_global() - hud_blink_timer[bodypart] < hud_blink_timer.blinktime then
@@ -531,7 +531,7 @@ colors.white = "%c[0,255,255,255]"
 -- colors.grey="%c[0,185,185,185]"
 colors.black = "%c[0,0,0,0]"
 
-local function SaveHealthStatus()
+function SaveHealthStatus()
     utils_obj.save_var(db.actor, "health.head", health.head)
     utils_obj.save_var(db.actor, "health.torso", health.torso)
     utils_obj.save_var(db.actor, "health.rightarm", health.rightarm)
@@ -546,7 +546,7 @@ local function SaveHealthStatus()
     utils_obj.save_var(db.actor, "timedhp.rightleg", timedhp.rightleg)
     utils_obj.save_var(db.actor, "timedhp.leftleg", timedhp.leftleg)
 end
-local function LoadHealthStatus()
+function LoadHealthStatus()
     health.head = utils_obj.load_var(db.actor, "health.head") or maxhp.head
     health.torso = utils_obj.load_var(db.actor, "health.torso") or maxhp.torso
     health.rightarm = utils_obj.load_var(db.actor, "health.rightarm") or maxhp.rightarm
@@ -562,7 +562,7 @@ local function LoadHealthStatus()
     timedhp.leftleg = utils_obj.load_var(db.actor, "timedhp.leftleg") or 0
 end
 
-local function PartialDamage()
+function PartialDamage()
     local armsbroken = 0
     local legsbroken = 0
     if health.leftarm == 0 then
@@ -1012,7 +1012,7 @@ function actor_on_hit_callback(bone_id)
     printf("! actor got hit in %s, id %s", text, bone_id)
 end
 
-local function recieved_damage(amount)
+function recieved_damage(amount)
     if grok_progressive_rad_damages.grok_rads == 1 then
         return
     end
@@ -1135,7 +1135,7 @@ local progress_health_leftleg_time = nil
 
 local scuffed_fix = false
 local xml = nil
-local function HUDUpdate()
+function HUDUpdate()
     if showtexthud >= 1 then -- text
         local staticname = "body_health_system_text"
         if showtexthud == 1 then
@@ -1192,7 +1192,7 @@ local function HUDUpdate()
                 str = str .. " \\n"
             end
 
-            local function AddToHUDCircles(array, text, class, array2)
+            function AddToHUDCircles(array, text, class, array2)
                 if class == "main" and showparts then
                     str = str .. colors[GetConditionFromFloat(health[array] / maxhp[array], array)]
                     for i = 1, (preview.health[array] or health[array]) - (preview.bonus[array] or timedhp[array]) do
@@ -1407,7 +1407,7 @@ local function HUDUpdate()
         xml:ParseFile("ui_body_health.xml")
         end
 
-        local function ParamBar(barhandler, customstatic, barname, param, param_max, showbg)
+        function ParamBar(barhandler, customstatic, barname, param, param_max, showbg)
 
             ---- minimal bgs ----
             local staticname
@@ -1520,7 +1520,7 @@ local function HUDUpdate()
         end
         progress_health = ParamBar(progress_health, "bhs_health_bar", "bhs_health", db.actor.health, nil, true)
 
-        local function nil_math(array)
+        function nil_math(array)
             local arg = health[array] - timedhp[array]
             if preview.health[array] or preview.bonus[array] then
                 arg = (preview.health[array] or 0) - (preview.bonus[array] or 0)
@@ -1549,7 +1549,7 @@ function worst_possible_fix()
     return true
 end
 
-local function on_key_press(dik)
+function on_key_press(dik)
     if dik == DIK_keys.DIK_H then
         -- if healthstatus then
         -- healthstatus=false
@@ -1586,11 +1586,11 @@ end
 
 -- ====== xcvb ================================================
 
-local function actor_on_weapon_zoom_in(wpn)
+function actor_on_weapon_zoom_in(wpn)
     shaking_hands()
 end
 
-local function actor_on_weapon_zoom_out(wpn)
+function actor_on_weapon_zoom_out(wpn)
     shaking_hands_remove()
 end
 
@@ -1599,7 +1599,7 @@ local delay_anm_play = 500
 
 cooldown = 2500
 state_cooldown = 0
-local function actor_on_footstep(material, power, hud_view, flags)
+function actor_on_footstep(material, power, hud_view, flags)
 
     if not (NEW_LIMB_PENALTIES_FEATURE) then
         return
@@ -1697,7 +1697,7 @@ end
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
-local function actor_on_sleep(hours)
+function actor_on_sleep(hours)
     for k, v in pairs(timedhp) do
         health[k] = health[k] - timedhp[k]
         if health[k] == "head" or health[k] == "torso" and health[k] <= 0 then
@@ -1781,7 +1781,7 @@ local function actor_on_sleep(hours)
 end
 
 local is_body_parts_damaged = false
-local function check_body_parts()
+function check_body_parts()
     local head_difference = maxhp.head - health.head
     local torso_difference = maxhp.torso - health.torso
     local rightarm_difference = maxhp.rightarm - health.rightarm
@@ -1830,7 +1830,7 @@ function dialogs.is_actor_injured_irradiated(first_speaker, second_speaker)
     return old_is_actor_injured_irradiated(first_speaker, second_speaker)
 end
 
-local function heal_body_parts()
+function heal_body_parts()
     timedhp.head = 0
     health.head = maxhp.head
 
@@ -2001,7 +2001,7 @@ function actor_on_update()
     PartialDamage()
 end
 
-local function actor_on_before_death()
+function actor_on_before_death()
     HUDUpdate()
     health.head = maxhp.head
     health.torso = maxhp.torso
@@ -2036,7 +2036,7 @@ end
 -- end
 
 -- how's it going?
-local function MedicineUsed(name, health, timedhp)
+function MedicineUsed(name, health, timedhp)
     local ret_lastregen, ret_timedhealth = medkits.lastregen, medkits.timedhealth
     if medkits[name] then
         ret_lastregen = time_global()
@@ -2073,7 +2073,7 @@ local function MedicineUsed(name, health, timedhp)
     return ret_lastregen, ret_timedhealth
 end
 
-local function actor_on_item_use(obj, objname)
+function actor_on_item_use(obj, objname)
     if healingitems then
         medkits.lastregen, medkits.timedhealth = MedicineUsed(objname, health, timedhp)
     end
@@ -2081,7 +2081,7 @@ local function actor_on_item_use(obj, objname)
     SaveHealthStatus()
 end
 
-local function InitializePreviewBars()
+function InitializePreviewBars()
     -- db.actor:give_game_news("init", "yes", db.actor:character_icon(), 0, 10000)
     -- xr_sound.set_sound_play(db.actor:id(), "pda_tips")
     preview.health.head = health.head
@@ -2098,7 +2098,7 @@ local function InitializePreviewBars()
     preview.bonus.rightleg = timedhp.rightleg
     preview.bonus.leftleg = timedhp.leftleg
 end
-local function EmptyPreviewBars()
+function EmptyPreviewBars()
     -- db.actor:give_game_news("empty", "yes", db.actor:character_icon(), 0, 10000)
     -- xr_sound.set_sound_play(db.actor:id(), "pda_tips")
     for k, v in pairs(preview.health) do
@@ -2111,7 +2111,7 @@ end
 
 local focused_item
 
-local function copy_table(t)
+function copy_table(t)
     local n = {}
     for k, v in pairs(t) do
         if type(v) == 'table' then
@@ -2123,7 +2123,7 @@ local function copy_table(t)
     return n
 end
 
-local function ActorMenu_on_item_focus_receive(item)
+function ActorMenu_on_item_focus_receive(item)
 
     if item:id() ~= focused_item then
         EmptyPreviewBars()
@@ -2197,7 +2197,7 @@ local function ActorMenu_on_item_focus_receive(item)
     -- -- end 
 end
 
-local function ActorMenu_on_item_focus_lost(item)
+function ActorMenu_on_item_focus_lost(item)
     -- printf("! on item forus lost "..(item and item:section() or "nil"))
     if focused_item == item:id() then
         EmptyPreviewBars()
@@ -2205,7 +2205,7 @@ local function ActorMenu_on_item_focus_lost(item)
     end
 end
 
-local function ActorMenu_on_mode_changed(mode, last_mode)
+function ActorMenu_on_mode_changed(mode, last_mode)
     if last_mode == 1 then -- inv closed
         EmptyPreviewBars()
         focused_item = nil
@@ -2215,7 +2215,7 @@ local function ActorMenu_on_mode_changed(mode, last_mode)
     end
 end
 
--- local function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
+-- function npc_on_hit_callback(npc,amount,local_direction,who,bone_index)
 -- local npc_name=npc:character_name() or "nil"
 -- local npc_icon=npc:character_icon() or "nil"
 -- local amount
