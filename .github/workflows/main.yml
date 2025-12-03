@@ -1,0 +1,55 @@
+name: Create Release with 7z Archive
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag'
+        required: true
+        default: 'auto-release'
+      description:
+        description: 'Release description'
+        required: false
+        default: 'Automatic release - if you reading this that means its better to NOT download this version.'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare build structure
+        run: |
+          mkdir -p build_temp
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitattributes' \
+            --exclude='README.md' \
+            --exclude='version' \
+            ./* build_temp/
+      
+          echo "? files to build:"
+          ls -la build_temp/
+
+      - name: Create 7z archive
+        uses: edgarrc/action-7z@v1
+        with:
+          args: 7z a -t7z -mx=9 varefined-${{ github.event.inputs.version }}.7z ./build_temp/gamedata -r
+
+      - name: Clean up
+        run: rm -rf fomod
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: Release ${{ github.event.inputs.version }}
+          body: |
+            ${{ github.event.inputs.description }}
+          files: varefined-${{ github.event.inputs.version }}.7z
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
