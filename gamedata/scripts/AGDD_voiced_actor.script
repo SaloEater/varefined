@@ -64,21 +64,38 @@ Additional voice lines and conditions with GAMMA weights
 local combat_inertia = 0
 
 lang = "" -- initiates actor language condition
+debug_verbose = nil
+
+function dd(message, ...)
+    if debug_verbose == nil then
+        debug_verbose = get_config("debug_verbose")
+    end
+
+    if debug_verbose then
+        printf(message, ...)
+    end
+end
 
 function get_actor_lang()
+    --dd("get_actor_lang: called, voice_language=%s", tostring(get_config("voice_language")))
     if get_config("voice_language") == 0 then
         local faction = get_actor_true_community()
+        --dd("get_actor_lang: faction=%s", tostring(faction))
         if faction == "isg" or faction == "killer" then
             lang = "_eng"
+            --dd("get_actor_lang: set lang=_eng (isg/killer)")
         else
             lang = ""
+            --dd("get_actor_lang: set lang='' (non-eng faction)")
         end
         return lang
     elseif get_config("voice_language") == 1 then
         lang = ""
+        --dd("get_actor_lang: set lang='' (config=1)")
         return lang
     else
         lang = "_eng"
+        --dd("get_actor_lang: set lang=_eng (config=2)")
         return lang
     end
 end
@@ -86,104 +103,141 @@ end
 muffle = "" -- initiates muffling condition 
 
 function get_muffle_status() -- changes muffle condition of the sound
+    --dd("get_muffle_status: called")
     if not get_config("enable_muffled_shouts") then
         muffle = ""
+        --dd("get_muffle_status: muffled shouts disabled, muffle=''")
         return muffle
     end
     local helmet = (db.actor:item_in_slot(12))
+    --dd("get_muffle_status: helmet=%s", tostring(helmet))
     if helmet then
         muffle = "m_"
+        --dd("get_muffle_status: helmet on, muffle='m_'")
     else
         muffle = ""
+        --dd("get_muffle_status: no helmet, muffle=''")
     end
     return muffle
 end
 
 function check_for_weapon(target) -- this function checks if an npc has a weapon, prevents unarmed stalkers from counting as enemies, can be used externally
-
+    dd("check_for_weapon: called for target=%s", tostring(target))
     if IsStalker(target) then -- checks if target is human
         local target_item = target:active_item() -- gets their active item
+        dd("check_for_weapon: is stalker, active_item=%s", tostring(target_item))
         if target_item and IsWeapon(target_item) then -- checks if the item exists and is a weapon
+            dd("check_for_weapon: has weapon, return true")
             return true
         else
+            dd("check_for_weapon: no weapon, return false")
             return false
         end
     else -- if an npc is not human, it is a mutant, which means it doesn't need a weapon to attack, so we return true here
+        dd("check_for_weapon: is mutant, return true")
         return true
     end
 
 end
 
 function is_actor_in_combat() -- INNER combat checker, returns true if actor is being TARGETED by an npc (both stalkers and mutants count) FROM DISTANCE NOT GREATER THAN 70m , false if not, can be used externally
+    dd("is_actor_in_combat: called")
 
-    --	NOTE: I REMOVED REQUIRMENT FOR WEAPON ,BECAUSE BY MY LOGIC ,ENEMY IS ENEMY ,NO MATTER IF HE HAVE WEAPON IN HANDS OR NOT ,BUT IF YOU WANT TURN ON THIS CONDITION AGAIN 
+    --	NOTE: I REMOVED REQUIRMENT FOR WEAPON ,BECAUSE BY MY LOGIC ,ENEMY IS ENEMY ,NO MATTER IF HE HAVE WEAPON IN HANDS OR NOT ,BUT IF YOU WANT TURN ON THIS CONDITION AGAIN
     --		JUST REPLACE LINE 69 WITH  "if npc and npc:alive() and check_for_weapon(npc) == true and npc:position():distance_to(db.actor:position())<=70"  WITHOUT QUOTES
 
     for id, v in pairs(xr_combat_ignore.fighting_with_actor_npcs) do -- gets internal info
         local npc = db.storage[id] and db.storage[id].object -- gets internal info
+        dd("is_actor_in_combat: checking npc id=%s, npc=%s", tostring(id), tostring(npc))
         if npc and npc:alive() == true and npc:position():distance_to(db.actor:position()) <= 70 then -- checks if there's a TARGETING npc, if it is alive and if it is close enough
+            dd("is_actor_in_combat: npc alive and within 70m, dist=%s", tostring(npc:position():distance_to(db.actor:position())))
             -- DEBUG--			actor_in_combat = "yes, actively targeted" --actor is being targeted right now
             combat_inertia = time_global() + 10000 -- sets the delay of ten seconds to ensure that combat status doesn't drop in case enemies stop targeting the actor for a short time
+            dd("is_actor_in_combat: actively targeted, return true")
             return true -- returns true if all conditions are met
         elseif time_global() < combat_inertia then -- main combat check failed, so now we check if "inertia" is still there
             -- DEBUG--			actor_in_combat = "yes, not actively targeted" --nobody is targeting the actor, but inertia is true
+            dd("is_actor_in_combat: inertia active (time=%s < inertia=%s), return true", tostring(time_global()), tostring(combat_inertia))
             return true
         else -- actor is not in combat and inertia has expired
             -- DEBUG--			actor_in_combat = "no"
+            dd("is_actor_in_combat: not in combat, inertia expired, return false")
             return false
         end
     end
+    dd("is_actor_in_combat: no fighting npcs found, return nil")
 end
 
 function outer_combat_checker() -- OUTER COMBAT CHECKER ,ITS EXACTLY THE SAME AS ABOVE FUNCTION ,BUT FOR DISTANCE FROM 70m TO 140m
+    dd("outer_combat_checker: called")
     for id, v in pairs(xr_combat_ignore.fighting_with_actor_npcs) do
         local npc1 = db.storage[id] and db.storage[id].object
+        dd("outer_combat_checker: checking npc id=%s, npc1=%s", tostring(id), tostring(npc1))
         if is_actor_in_combat() == true then -- ADDED CONDITION TO ENSURE THAT INNER COMBAT PERIMETER WILL HAVE HIGHER PRIORITY AND MOST IMPORTANT TO ENSURE THAT SOUNDS FOR INNER AND OUTER PERIMETER WILL NOT PLAY SIMULTANEOUSLY IF CHARACTER WILL BE IN FIGHT WITH ENEMIES FROM BOTH PERIMETERS
+            dd("outer_combat_checker: inner combat active, return false (inner has priority)")
             return false
         elseif npc1 and npc1:alive() == true and npc1:position():distance_to(db.actor:position()) > 70 and
             npc1:position():distance_to(db.actor:position()) < 140 then
+            dd("outer_combat_checker: npc alive and between 70-140m, dist=%s, return true", tostring(npc1:position():distance_to(db.actor:position())))
             combat_inertia = time_global() + 10000
             return true
         elseif time_global() < combat_inertia then
+            dd("outer_combat_checker: inertia active, return true")
             return true
         else
+            dd("outer_combat_checker: no combat, return false")
             return false
         end
     end
+    dd("outer_combat_checker: no fighting npcs, return nil")
 end
 
-function squad_near() -- CHECKS IF THERE IS A SQUAD IN NEAR DISTANCE ( "NORMAL VOLUME SPEECH HEARING DISTANCE" ) ,MEANS UP TO 24m 
+function squad_near() -- CHECKS IF THERE IS A SQUAD IN NEAR DISTANCE ( "NORMAL VOLUME SPEECH HEARING DISTANCE" ) ,MEANS UP TO 24m
+    dd("squad_near: called")
     local i, xv = next(axr_companions.companion_squads, nil) -- GETS INFO ABOUT COMPANIONS
     local commander = xv and alife_object(xv:commander_id())
+    dd("squad_near: xv=%s, commander=%s", tostring(xv), tostring(commander))
     if (not (xv) or commander and commander.position:distance_to(db.actor:position()) > 24) then -- CHECKS IF THERE IS A SQUAD AND IF ITS CLOSE ENOUGH
+        dd("squad_near: no squad or too far (>24m), return false")
         return false -- IF THERE IS NO SQUAD OR SQUAD IS NOT CLOSE ENOUGH GIVE FALSE VALUE
     elseif commander.position:distance_to(db.actor:position()) <= 24 then -- IF THERE IS A SQUAD THEN CHECKS DISTANCE
+        dd("squad_near: squad within 24m, dist=%s, return true", tostring(commander.position:distance_to(db.actor:position())))
         return true -- IF CONDITIONS ARE MET IT RETURNS TRUE
     else -- IF CONDITIONS ARE NOT MET IT RETURNS FALSE
+        dd("squad_near: conditions not met, return false")
         return false
     end
 end
 
 function squad_can_hear() -- SAME AS ABOVE FUNCTION BUT FOR HEARING DISTANCE ( "LOUD VOLUME SPEECH HEARING DISTAMCE" ),MEANS MAX. 60m
+    dd("squad_can_hear: called")
     local i, yv = next(axr_companions.companion_squads, nil)
     local commander = yv and alife_object(yv:commander_id())
+    dd("squad_can_hear: yv=%s, commander=%s", tostring(yv), tostring(commander))
     if (not (yv) or commander.position:distance_to(db.actor:position()) <= 24 or
         commander.position:distance_to(db.actor:position()) > 60) then
+        dd("squad_can_hear: no squad or outside 24-60m range, return false")
         return false
     elseif commander.position:distance_to(db.actor:position()) > 24 and
         commander.position:distance_to(db.actor:position()) <= 60 then
+        dd("squad_can_hear: squad in 24-60m range, dist=%s, return true", tostring(commander.position:distance_to(db.actor:position())))
         return true
     else
+        dd("squad_can_hear: else branch, return false")
         return false
     end
 end
 
 function squad_out() -- SAME AS ABOVE FUNCTIONS BUT FOR OUT OF HEARING DISTANCE (MORE THAN 60m)
+    dd("squad_out: called")
     local i, zv = next(axr_companions.companion_squads, nil)
     local commander = zv and alife_object(zv:commander_id())
+    dd("squad_out: zv=%s, commander=%s", tostring(zv), tostring(commander))
     if (not (zv) or commander.position:distance_to(db.actor:position()) > 60) then
+        dd("squad_out: no squad or >60m, return true")
         return true
     else
+        dd("squad_out: squad within 60m, return false")
         return false
     end
 end
@@ -195,62 +249,78 @@ local mcm_sound_volume = get_config("shouts_volume") -- gets the volume value fr
 
 function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear,
     requires_squad_out, has_priority, ignore_conditionals, is_state) -- (EDITED FUCTION  - ADDED SOME REQUIREMENTS) player function, plays the sound if all conditions are met. Argument "sound_volume" is overwriten by default from MCM shouts volume slider.
+    dd("actor_speak: called file=%s vol=%s cd=%s chance=%s squad_near=%s squad_hear=%s squad_out=%s priority=%s ignore_cond=%s is_state=%s", tostring(file), tostring(sound_volume), tostring(cooldown), tostring(chance), tostring(requires_squad_near), tostring(requires_squad_can_hear), tostring(requires_squad_out), tostring(has_priority), tostring(ignore_conditionals), tostring(is_state))
 
     if is_state == true then
         has_priority = false
+        dd("actor_speak: is_state=true, forced has_priority=false")
     end -- forces has_priority to be false if this is a state sound
 
     if not db.actor then
+        dd("actor_speak: no db.actor, return")
         return
     end -- this checks if actor exists
     if is_state == true and time_global() < state_cooldown then
+        dd("actor_speak: state cooldown active (time=%s < state_cd=%s), return", tostring(time_global()), tostring(state_cooldown))
         return
     end -- checks if this call is meant to play a state sound
     if is_state == false and has_priority == false and time_global() < speaking_cooldown then
+        dd("actor_speak: speaking cooldown active (time=%s < cd=%s), return", tostring(time_global()), tostring(speaking_cooldown))
         return
     end -- this checks for the cooldown, unless has_priority or is_state is true
     if ignore_conditionals == false and (db.actor:is_talking() or not db.actor:alive()) then
+        dd("actor_speak: actor talking or dead, return")
         return
     end -- checks if the actor is talking or is dead, unless ignore_conditionals is true
     local max_chance = math.random(1, 100) -- sets the max_chance value to compare chance with
+    dd("actor_speak: chance check: chance=%s vs max_chance=%s", tostring(chance), tostring(max_chance))
     if chance < max_chance then
+        dd("actor_speak: failed chance roll, return")
         return
     end -- does the comparasion
     if requires_squad_near == true and squad_near() == false then
+        dd("actor_speak: requires_squad_near but squad not near, return")
         return
     end -- ADDED REQUIREMENT FOR SQUAD IN "NORMAL VOLUME SPEECH HEARING DISTANCE"
     if requires_squad_can_hear == true and squad_can_hear() == false then
+        dd("actor_speak: requires_squad_can_hear but squad cant hear, return")
         return
     end -- ADDED REQUIREMENT FOR SQUAD IN "LOUD VOLUME SPEECH HEARING DISTAMCE"
     if requires_squad_out == true and squad_out() == false then
+        dd("actor_speak: requires_squad_out but squad not out, return")
         return
     end -- ADDED REQUIREMENT FOR SQUAD OUT OF HEARING DISTANCE
 
     if file_to_say then -- makes sure there's a sound to stop
+        dd("actor_speak: stopping previous sound")
         file_to_say:stop() -- stops whatever was called through this function before
     end
 
-    -- DEBUG--	printf("sound volume: " .. sound_volume) --prints out the volume of the sound to the console log, debug purposes
-
+    dd("actor_speak: playing file=%s, volume=%s", tostring(file), tostring(sound_volume))
     file_to_say = sound_object(file) -- sets the file to play
     file_to_say:play(db.actor, 0, sound_object.s2d) -- plays it
     if mcm_sound_volume then
         file_to_say.volume = mcm_sound_volume * sound_volume
+        dd("actor_speak: mcm volume applied, final_vol=%s", tostring(mcm_sound_volume * sound_volume))
     else
         file_to_say.volume = sound_volume -- sets how loud the sound should be
+        dd("actor_speak: raw volume applied, vol=%s", tostring(sound_volume))
     end
-
-    -- DEBUG--	printf("actor sound played: " .. file) --prints out played files to the console log, debug purposes
 
     state_cooldown = time_global() + cooldown -- applies the state cooldown, so that state sounds obey main cooldowns
+    dd("actor_speak: state_cooldown set to %s", tostring(state_cooldown))
     if is_state == false then
         speaking_cooldown = time_global() + cooldown -- applies the main cooldown
+        dd("actor_speak: speaking_cooldown set to %s", tostring(speaking_cooldown))
     end
+    dd("actor_speak: done playing %s", tostring(file))
 
 end
 
 function sound_check() -- SMALL FUNCTION THAT ONLY CHECKS IF SOUND CALLED BY THIS SCRIPT IS PLAYED RIGHT NOW ,THIS FUNCTION IS FOR USE FROM VOICED COMMANDS (axr_companions.script) AND WILL STOP ANY SOUND CALLED BY THIS SCRIPT TO ENSURE THAT SOUNDS CALLED BY BOTH SCRIPTS WILL NOT PLAY SIMULTANEOUSLY AND COMMANDS WILL HAVE HIGHEST PRIORITY
+    dd("sound_check: called, file_to_say=%s", tostring(file_to_say))
     if file_to_say then
+        dd("sound_check: stopping current sound")
         file_to_say:stop()
     end
 end
@@ -267,29 +337,40 @@ local combat_high_threshold = 1200 -- the threshold at which combat status switc
 -- you can also use negative values for intensity and cooldown to reduce them, don't do that with intensity_add_limit though
 
 function add_action_intensity(intensity, intensity_add_limit, cooldown) -- universal function for progressing combat phases, can be used externally
+    dd("add_action_intensity: called intensity=%s limit=%s cooldown=%s, current combat_intensity=%s", tostring(intensity), tostring(intensity_add_limit), tostring(cooldown), tostring(combat_intensity))
 
     if combat_intensity < (combat_high_threshold * intensity_add_limit) then -- checks if we can add intensity according to intensity_add_limit
         combat_intensity = combat_intensity + intensity -- adds it
+        dd("add_action_intensity: added intensity, new combat_intensity=%s", tostring(combat_intensity))
+    else
+        dd("add_action_intensity: at limit, combat_intensity=%s >= threshold=%s", tostring(combat_intensity), tostring(combat_high_threshold * intensity_add_limit))
     end
     combat_intensity_drain_cooldown = combat_intensity_drain_cooldown + cooldown -- adds the cooldown even if we didn't add intensity
+    dd("add_action_intensity: drain_cooldown now=%s", tostring(combat_intensity_drain_cooldown))
 
 end
 
 function monster_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE CALLBACKS) adds combat_intensity when a mutant is killed
-
+    dd("monster_on_death_callback: called, victim=%s, killer=%s", tostring(victim), tostring(killer))
+    printf()
     if not db.actor:alive() then
+        dd("monster_on_death_callback: actor dead, return")
         return
     end -- don't do anything if actor is dead
     if not killer then
+        dd("monster_on_death_callback: no killer, return")
         return
     end -- abort the function if there's no killer
     if killer:id() ~= db.actor:id() then
+        dd("monster_on_death_callback: killer is not actor (killer_id=%s, actor_id=%s), return", tostring(killer:id()), tostring(db.actor:id()))
         return
     end -- make sure that it's the actor who scored the kill
     if db.actor:is_talking() then
+        dd("monster_on_death_callback: actor is talking, return")
         return
     end
     if not get_config("enable_on_kill_shouts") then
+        dd("monster_on_death_callback: kill shouts disabled in MCM, return")
         return
     end -- filters disabled kill shouts from MCM
 
@@ -297,66 +378,84 @@ function monster_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED M
     --	if (not db.actor:see(victim)) then return end   --extra condition, makes sure that actor saw the npc die
 
     if axr_companions.sound_checking() == true then
+        dd("monster_on_death_callback: voiced command playing, return")
         return
     end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
+    dd("monster_on_death_callback: passed all guards, checking combat state. combat_intensity=%s, in_combat=%s, outer_combat=%s", tostring(combat_intensity), tostring(is_actor_in_combat()), tostring(outer_combat_checker()))
     if is_actor_in_combat() == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then -- we're in the maxed out state of combat, play the according sound (something almost insane ideally)
+        dd("monster_on_death_callback: inner combat HIGH intensity kill confirm")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state3_" .. math.random(4),
             1.0, 3500, 70, false, false, false, false, false, false)
     elseif is_actor_in_combat() == true and combat_intensity > combat_medium_threshold and math.random(1, 100) < 40 then -- second state, play the sound (cocky, dominant)
+        dd("monster_on_death_callback: inner combat MEDIUM intensity kill confirm")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state2_" .. math.random(6),
             1.0, 3500, 55, false, false, false, false, false, false)
     elseif is_actor_in_combat() == true and math.random(1, 100) < 40 then -- first state (FOR SQUAD IN HEARING DISTANCE LOUD BUT ONLY informative, WITHOUT SQUAD OR IF SQUAD IS TOO FAR THEN SIMPLY ANGRY INVECTIVES)
+        dd("monster_on_death_callback: inner combat LOW intensity kill confirm")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
             1.0, 2000, 40, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
             1.0, 2000, 40, false, true, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state1_" .. math.random(4),
             1.0, 2000, 40, false, false, true, false, false, false)
-    elseif outer_combat_checker() == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then -- MAXED OUT STATE BUT FOR OUTER COMBAT PERIMETER ,FOR SQUAD IN HEARING DISTANCE IT WILL PLAYS LOUD INFORMATIVE CALLBACKS ,OTHERWISE COMMENTS FOR STATE3 ,MEANS NOT LOUD BUT STILL HUMILATING COMMENTS
+    elseif outer_combat_checker() == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then -- MAXED OUT STATE BUT FOR OUTER COMBAT PERIMETER
+        dd("monster_on_death_callback: outer combat HIGH intensity kill comment")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
             1.0, 2000, 50, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
             1.0, 2000, 50, false, true, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state3_" .. math.random(3),
             1.0, 2000, 50, false, false, true, false, false, false)
-    elseif outer_combat_checker() == true and combat_intensity > combat_medium_threshold and math.random(1, 100) < 40 then -- SECOND STATE FOR OUTER COMBAT PERIMETER ,FOR SQUAD IN NEAR DISTANCE IT WILL PLAYS CALM (THATS WHY ONLY FOR SQUAD IN NEAR DISTANCE) INFORMATIVE CALLBACKS ,OTHERWISE COMMENTS FOR STATE2 ,MEANS LITTLE BIT LOUDER THAN STATE1 (BUT NOT MUCH) AND DIFFERENT (LITTLE BIT ANGRY) COMMENTS
+    elseif outer_combat_checker() == true and combat_intensity > combat_medium_threshold and math.random(1, 100) < 40 then -- SECOND STATE FOR OUTER COMBAT PERIMETER
+        dd("monster_on_death_callback: outer combat MEDIUM intensity kill comment")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_squad_" .. math.random(6),
             1.0, 1500, 40, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state2_" .. math.random(4),
             1.0, 2000, 40, false, true, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state2_" .. math.random(4),
             1.0, 2000, 40, false, false, true, false, false, false)
-    elseif outer_combat_checker() == true and math.random(1, 100) < 40 then -- FIRST STATE FOR OUTER COMBAT PERIMETER ,FOR SQUAD IN NEAR DISTANCE IT WILL PLAYS CALM (THATS WHY ONLY FOR SQUAD IN NEAR DISTANCE) INFORMATIVE CALLBACKS ,OTHERWISE COMMENTS FOR STATE1 ,MEANS SILENT COMMENTS
+    elseif outer_combat_checker() == true and math.random(1, 100) < 40 then -- FIRST STATE FOR OUTER COMBAT PERIMETER
+        dd("monster_on_death_callback: outer combat LOW intensity kill comment")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_squad_" .. math.random(6),
             1.0, 1500, 25, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(5),
             1.0, 2000, 25, false, true, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(5),
             1.0, 2000, 25, false, false, true, false, false, false)
-    elseif not (is_actor_in_combat()) and not (outer_combat_checker()) and math.random(1, 100) < 40 then -- FOR KILLS FARTHER THAN 120m ONLY SILENT COMMENTS ,NO MATTER IF THERE IS SQUAD OR NOT (FOR EXAMPLE FOR SNIPER LONG DISTANCE KILLS)
+    elseif not (is_actor_in_combat()) and not (outer_combat_checker()) and math.random(1, 100) < 40 then -- FOR KILLS FARTHER THAN 120m
+        dd("monster_on_death_callback: long range kill comment")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(5),
             1.0, 2000, 25, false, false, false, false, false, false)
+    else
+        dd("monster_on_death_callback: no combat branch matched or random check failed")
     end
 
+    dd("monster_on_death_callback: adding action intensity 80")
     add_action_intensity(80, 1.0, 1000)
 
 end
 
 function npc_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE CALLBACKS) adds combat_intensity when a human is killed, just go read the previous function for info, it's exactly the same, but for humans
+    dd("npc_on_death_callback: called, victim=%s, killer=%s", tostring(victim), tostring(killer))
 
     if not db.actor:alive() then
+        dd("npc_on_death_callback: actor dead, return")
         return
     end
     if not killer then
+        dd("npc_on_death_callback: no killer, return")
         return
     end
     if killer:id() ~= db.actor:id() then
+        dd("npc_on_death_callback: killer not actor, return")
         return
     end
     if db.actor:is_talking() then
+        dd("npc_on_death_callback: actor talking, return")
         return
     end
     if not get_config("enable_on_kill_shouts") then
+        dd("npc_on_death_callback: kill shouts disabled, return")
         return
     end -- filters disabled kill shouts from MCM
 
@@ -364,15 +463,20 @@ function npc_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE 
     --	if (not db.actor:see(victim)) then return end
 
     if axr_companions.sound_checking() == true then
+        dd("npc_on_death_callback: voiced command playing, return")
         return
     end
+    dd("npc_on_death_callback: passed all guards, combat_intensity=%s", tostring(combat_intensity))
     if is_actor_in_combat() == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then
+        dd("npc_on_death_callback: inner combat HIGH intensity")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state3_" .. math.random(11),
             1.0, 3500, 80, false, false, false, false, false, false)
     elseif is_actor_in_combat() == true and combat_intensity > combat_medium_threshold and math.random(1, 100) < 40 then
+        dd("npc_on_death_callback: inner combat MEDIUM intensity")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state2_" .. math.random(14),
             1.0, 3500, 65, false, false, false, false, false, false)
     elseif is_actor_in_combat() == true then
+        dd("npc_on_death_callback: inner combat LOW intensity")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
             1.0, 2000, 50, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
@@ -380,6 +484,7 @@ function npc_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE 
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state1_" .. math.random(7),
             1.0, 2000, 50, false, false, true, false, false, false)
     elseif outer_combat_checker() == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then
+        dd("npc_on_death_callback: outer combat HIGH intensity")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
             1.0, 2000, 65, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
@@ -387,6 +492,7 @@ function npc_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE 
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state3_" .. math.random(5),
             1.0, 2500, 65, false, false, true, false, false, false)
     elseif outer_combat_checker() == true and combat_intensity > combat_medium_threshold and math.random(1, 100) < 40 then
+        dd("npc_on_death_callback: outer combat MEDIUM intensity")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_squad_" .. math.random(6),
             1.0, 2000, 50, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state2_" .. math.random(8),
@@ -394,6 +500,7 @@ function npc_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE 
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state2_" .. math.random(8),
             1.0, 2300, 50, false, false, true, false, false, false)
     elseif outer_combat_checker() == true then
+        dd("npc_on_death_callback: outer combat LOW intensity")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_squad_" .. math.random(6),
             1.0, 2000, 35, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(10),
@@ -401,44 +508,58 @@ function npc_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE 
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(10),
             1.0, 2500, 35, false, false, true, false, false, false)
     elseif not (is_actor_in_combat()) and not (outer_combat_checker()) and math.random(1, 100) < 40 then
+        dd("npc_on_death_callback: long range kill comment")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(10),
             1.0, 2500, 35, false, false, false, false, false, false)
+    else
+        dd("npc_on_death_callback: no branch matched")
     end
 
+    dd("npc_on_death_callback: adding action intensity 100")
     add_action_intensity(100, 1.0, 1000)
 
 end
 
 function monster_on_hit_callback(npc, damage_amount, local_direction, attacker, bone_index) -- adds intensity when a mutant is hit by the actor
+    dd("monster_on_hit_callback: called, npc=%s, damage=%s, attacker=%s", tostring(npc), tostring(damage_amount), tostring(attacker))
 
     if not db.actor:alive() then
+        dd("monster_on_hit_callback: actor dead, return")
         return
     end -- we don't need this if actor is dead
     if not attacker then
+        dd("monster_on_hit_callback: no attacker, return")
         return
     end -- if there's no attacker, stop the function
     if attacker:id() ~= db.actor:id() then
+        dd("monster_on_hit_callback: attacker not actor, return")
         return
     end -- check if it's the actor who scored the hit
     --	if is_actor_in_combat() == false then return end --only add the values if actor is in combat
 
+    dd("monster_on_hit_callback: adding intensity 25")
     add_action_intensity(25, 1.0, 100)
 
 end
 
 function npc_on_hit_callback(npc, damage_amount, local_direction, attacker, bone_index) -- adds intensity when a human is hit by the actor, same as the previous previous function
+    dd("npc_on_hit_callback: called, npc=%s, damage=%s, attacker=%s", tostring(npc), tostring(damage_amount), tostring(attacker))
 
     if not attacker then
+        dd("npc_on_hit_callback: no attacker, return")
         return
     end
     if not db.actor:alive() then
+        dd("npc_on_hit_callback: actor dead, return")
         return
     end
     if attacker:id() ~= db.actor:id() then
+        dd("npc_on_hit_callback: attacker not actor, return")
         return
     end
     --	if is_actor_in_combat() == false then return end
 
+    dd("npc_on_hit_callback: adding intensity 25")
     add_action_intensity(25, 1.0, 100)
 
 end
@@ -457,6 +578,7 @@ function actor_on_update(binder, delta) -- thinker function, handles conditional
 
     if (trigger == 1 and tg > grok_delay) then
         trigger = 0
+        --dd("actor_on_update: tick fired at tg=%s", tostring(tg))
 
         get_actor_lang()
         get_muffle_status()
@@ -464,16 +586,19 @@ function actor_on_update(binder, delta) -- thinker function, handles conditional
         -- DEBUG--	SetHudMsg("Combat Intensity: " .. combat_intensity .. ", Cooldown: " .. combat_intensity_drain_cooldown .. ", In Combat: " .. actor_in_combat) --draws current combat info
 
         if not db.actor:alive() then
+            dd("actor_on_update: actor dead, return")
             return
         end -- stops the thinker from thinking if actor is dead
 
         if time_global() > combat_check_time then -- checks if actor is in combat every five seconds, is used for consistency with combat detection
+            dd("actor_on_update: periodic combat check")
             is_actor_in_combat()
             combat_check_time = time_global() + 5000 -- adds five seconds of delay
         end
 
         if combat_intensity_drain_cooldown == 0 and combat_intensity > 0 then -- drains combat intensity if there's no cooldown
             combat_intensity = combat_intensity - 1
+            dd("actor_on_update: draining intensity, now=%s", tostring(combat_intensity))
         end
         if combat_intensity_drain_cooldown > 0 then -- constantly drains the cooldown value
             combat_intensity_drain_cooldown = combat_intensity_drain_cooldown - 2
@@ -510,43 +635,56 @@ function actor_on_update(binder, delta) -- thinker function, handles conditional
         -- they are checked one by one and the next state sound will attempt to play only if conditions for the previous one weren't met
 
         if db.actor:is_talking() then
+            dd("actor_on_update: actor talking, return")
             return
         end
         if axr_companions.sound_checking() == true then
+            dd("actor_on_update: voiced command playing, return")
             return
         end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
+        --dd("actor_on_update: state check - health=%s power=%s psy=%s thirst=%s satiety=%s sleep=%s", tostring(db.actor.health), tostring(db.actor.power), tostring(arszi_psy.get_psy_health()), tostring(actor_status_thirst.get_water_deprivation(true)), tostring(db.actor:cast_Actor():conditions():GetSatiety()), tostring(actor_status_sleep.get_sleep_deprivation(true)))
         if db.actor.health < 0.25 and hurt_volume > 0 then -- critically hurt state sound has the highest priority and will always play over any other state sound
+            dd("actor_on_update: state=CRITICALLY_HURT, hurt_volume=%s, hurt_pause=%s", tostring(hurt_volume), tostring(hurt_pause))
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "hurt_bad_" .. math.random(8),
                 hurt_volume * 0.66, hurt_pause, 100, false, false, false, false, false, true) -- plays the critically wounded sound
 
-        elseif arszi_psy.get_psy_health() < 0.4 and psy_volume > 0 then -- new citically psy-hurt sound 
+        elseif arszi_psy.get_psy_health() < 0.4 and psy_volume > 0 then -- new citically psy-hurt sound
+            dd("actor_on_update: state=CRITICAL_PSY, psy_volume=%s, sanity_pause=%s", tostring(psy_volume), tostring(sanity_pause))
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "sanity_" .. math.random(9), psy_volume,
                 sanity_pause, 2000, false, false, false, false, false, true)
 
         elseif arszi_psy.get_psy_health() < 1.0 and psy_volume > 0 then -- new psy-hurt sound (weak psy)
+            dd("actor_on_update: state=PSY_HURT, psy_volume=%s, fear_pause=%s", tostring(psy_volume), tostring(fear_pause))
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "fear_" .. math.random(7), psy_volume,
                 fear_pause, 100, false, false, false, false, false, true) -- plays the psy wounded sound
 
         elseif db.actor.power < 0.10 and sprint_volume > 0 and hurt_volume < sprint_volume and hurt_pause > sprint_pause then -- exhaustion state will only play if it has both longer pause and higher volume than the hurt sound
+            dd("actor_on_update: state=EXHAUSTED, sprint_volume=%s, sprint_pause=%s", tostring(sprint_volume), tostring(sprint_pause))
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "exhausted_" .. math.random(62),
                 sprint_volume, sprint_pause, 100, false, false, false, false, false, true) -- plays the exhausted sound
 
         elseif db.actor.health < 0.55 and hurt_volume > 0 then -- normal hurt state will play if everything else fails to meet the conditions
+            dd("actor_on_update: state=HURT, hurt_volume=%s, hurt_pause=%s", tostring(hurt_volume), tostring(hurt_pause))
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "hurt_" .. math.random(8), hurt_volume,
                 hurt_pause, 100, false, false, false, false, false, true) -- plays the wounded sound
 
         elseif actor_status_thirst.get_water_deprivation(true) > 0.3 and thirst_volume > 0 then
+            dd("actor_on_update: state=THIRSTY, thirst_volume=%s, thirst_pause=%s", tostring(thirst_volume), tostring(thirst_pause))
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "thirst_" .. math.random(7),
                 thirst_volume, thirst_pause, 100, false, false, false, false, false, true)
 
         elseif db.actor:cast_Actor():conditions():GetSatiety() < 0.3 and satiety_volume > 0 then
+            dd("actor_on_update: state=HUNGRY, satiety_volume=%s, satiety_pause=%s", tostring(satiety_volume), tostring(satiety_pause))
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "hunger_" .. math.random(5),
                 satiety_volume, satiety_pause, 100, false, false, false, false, false, true) -- new satiety sound call, adjust filename and corresponding math factor
 
         elseif actor_status_sleep.get_sleep_deprivation(true) > 0 and sleep_volume > 0 then
+            dd("actor_on_update: state=SLEEPY, sleep_volume=%s, sleep_pause=%s", tostring(sleep_volume), tostring(sleep_pause))
             actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "sleepiness_" .. math.random(3),
                 sleep_volume, sleep_pause, 100, false, false, false, false, false, true)
 
+        else
+            --dd("actor_on_update: no state condition met")
         end
     end
 end
@@ -555,37 +693,48 @@ local hit_timer1 = 0 -- this little fella will help us prevent pain sounds from 
 local last_health = 1 -- notes down the last health value between instances of area damage
 
 function actor_on_before_hit(hitinfo, bone_id, flags) -- damage function, plays pain sounds (PLEASE DON'T PUT HIT SOUNDS HERE, CHARACTER PAIN ONLY)
+    dd("actor_on_before_hit: called, hit_type=%s, power=%s, bone=%s", tostring(hitinfo and hitinfo.type), tostring(hitinfo and hitinfo.power), tostring(bone_id))
 
     if not db.actor:alive() then
+        dd("actor_on_before_hit: actor dead, return")
         return
     end -- don't play pain sounds if actor is already dead
 
     if not (hitinfo and hitinfo.type and hitinfo.power) then
+        dd("actor_on_before_hit: missing hit info, return")
         return
     end -- filters out info-less hits
     if (hitinfo.type == hit.radiation or hitinfo.type == hit.telepatic) then
+        dd("actor_on_before_hit: radiation/psi damage, return")
         return
     end -- filters out radiation and psi damage
     if not get_config("enable_pain_shouts") then
+        dd("actor_on_before_hit: pain shouts disabled, return")
         return
     end -- filters disabled pain sounds from MCM
 
     -- all the code related to fixing area damage is pretty much spaghett, I'm honestly way too tired of this shit
 
+    dd("actor_on_before_hit: hit_timer1=%s, time=%s, last_health=%s, actor_health=%s", tostring(hit_timer1), tostring(time_global()), tostring(last_health), tostring(db.actor.health))
     if time_global() > hit_timer1 then -- prevents too many pain sounds from playing in a short succession
         if last_health < db.actor.health then
             last_health = (db.actor.health - 0.0001)
+            dd("actor_on_before_hit: reset last_health to %s", tostring(last_health))
         end -- if player's health value is higher than whatever we last noted down - reset it
         local anims = {"hit_front", "hit_front_left", "hit_front_right"} -- a table of camera animations for hit punch
         if (hitinfo.type == hit.burn or hitinfo.type == hit.light_burn or hitinfo.type == hit.chemical_burn) and
             (last_health - db.actor.health) >= 0.1 then -- this checks for a specific threshold for "area" damage types
+            dd("actor_on_before_hit: area burn damage, health_diff=%s", tostring(last_health - db.actor.health))
             if axr_companions.sound_checking() == true then
+                dd("actor_on_before_hit: voiced command playing, return")
                 return
             end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
             if db.actor.health > 0.5 then -- checks if the actor is over 50% of their full health
+                dd("actor_on_before_hit: burn pain (health>0.5)")
                 actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "pain_" .. math.random(11), 1.0,
                     2000, 100, false, false, false, true, true, false)
             else
+                dd("actor_on_before_hit: burn pain_bad (health<=0.5)")
                 actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "pain_bad_" .. math.random(11), 1.0,
                     2500, 100, false, false, false, true, true, false)
             end
@@ -595,13 +744,17 @@ function actor_on_before_hit(hitinfo, bone_id, flags) -- damage function, plays 
             hit_timer1 = time_global() + 1000 -- sets the delay of one second before the next pain sound can be played if the damage type is usable as an area effect
         elseif (hitinfo.type == hit.shock or hitinfo.type == hit.strike or hitinfo.type == hit.wound or hitinfo.type ==
             hit.fire_wound or hitinfo.type == hit.explosion or hitinfo.type == hit.wound_2) then -- this is for every other "non-area" damage type
+            dd("actor_on_before_hit: direct hit damage type=%s", tostring(hitinfo.type))
             if axr_companions.sound_checking() == true then
+                dd("actor_on_before_hit: voiced command playing, return")
                 return
             end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
             if db.actor.health > 0.5 then
+                dd("actor_on_before_hit: direct pain (health>0.5)")
                 actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "pain_" .. math.random(11), 1.0,
                     2000, 100, false, false, false, true, true, false)
             else
+                dd("actor_on_before_hit: direct pain_bad (health<=0.5)")
                 actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "pain_bad_" .. math.random(11), 1.0,
                     2500, 100, false, false, false, true, true, false)
             end
@@ -613,14 +766,18 @@ function actor_on_before_hit(hitinfo, bone_id, flags) -- damage function, plays 
     --	level.add_pp_effector("amk_shoot.ppe",447554,false) --if you use a generic screen flash effect, put it here
 
     if is_actor_in_combat() and (hitinfo.type == hit.fire_wound or hitinfo.type == hit.wound) then -- if actor is in combat and was hit by a human or by a mutant, add combat intensity
+        dd("actor_on_before_hit: in combat + wound/fire_wound, adding intensity 50")
         add_action_intensity(50, 0.5, 200)
     end
+    dd("actor_on_before_hit: done")
 
 end
 
 function actor_on_before_death(whoID, flags) -- death function, plays death sounds (DEATH SCREAMS AND WHELPS ONLY, NO BODY FALLING SOUNDS OR ANYTHING ELSE)
+    dd("actor_on_before_death: called, whoID=%s", tostring(whoID))
 
     axr_companions.sound_checking_stop() -- STOPS SOUND IF COMMAND FROM axr_companions.script IS CURRENTLY PLAYING
+    dd("actor_on_before_death: playing death sound")
     actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "death_" .. math.random(7), 1.0, 9999, 100,
         false, false, false, true, true, false)
 
@@ -628,24 +785,35 @@ end
 
 local already_commented_this_jam = false -- marker value, tells the code that this jam was already commented on
 
+--AGDD_voiced_actor.actor_on_weapon_jammed
+
 function actor_on_weapon_jammed(wpn) -- (EDITED FUNCTION - ADDED MORE CALLBACKS) plays responses to weapon jams
+    dd("actor_on_weapon_jammed: called, wpn=%s", tostring(wpn))
+    printf("Weapon jammed callback triggered for weapon")
 
     if already_commented_this_jam == true then
-        return
+        dd("actor_on_weapon_jammed: already_commented_this_jam=true (not returning, commented out)")
+        --return
     end -- don't attempt to play the sound if it has been processed already
 
     already_commented_this_jam = true -- marks that we already tried to respond to this jam
+    dd("actor_on_weapon_jammed: set already_commented_this_jam=true")
 
     if db.actor:is_talking() then
+        dd("actor_on_weapon_jammed: actor talking, return")
         return
     end
     if axr_companions.sound_checking() == true then
+        dd("actor_on_weapon_jammed: voiced command playing, return")
         return
     end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
     if not get_config("enable_on_weapon_jam_shouts") then
+        dd("actor_on_weapon_jammed: jam shouts disabled, return")
         return
     end -- filters disabled jam shouts from MCM
-    if is_actor_in_combat() == true then -- PLAYS LOUD RESPONSES TO GUN JAMS IF ACTOR IS IN COMBAT (INNER COMBAT PERIMETER) ,DIFFERENT SHOUTS FOR SQUAD ,DIFFERENT IF HE IS ALONE OR SQUAD IS OUT OF HEARING DISTANCE
+    dd("actor_on_weapon_jammed: passed guards, checking combat state")
+    if is_actor_in_combat() == true then -- PLAYS LOUD RESPONSES TO GUN JAMS IF ACTOR IS IN COMBAT (INNER COMBAT PERIMETER)
+        dd("actor_on_weapon_jammed: inner combat jam response")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_squad_" .. math.random(5), 1.0,
             2500, 100, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_squad_" .. math.random(5), 1.0,
@@ -654,37 +822,50 @@ function actor_on_weapon_jammed(wpn) -- (EDITED FUNCTION - ADDED MORE CALLBACKS)
             2500, 100, false, false, true, false, false, false)
         add_action_intensity(30, 0.5, 125)
     elseif outer_combat_checker() == true and combat_intensity > combat_medium_threshold then -- FOR ACTOR IN COMBAT (OUTER COMBAT PERIMETER) PLAYS LOUD RESPONSES WITH 50% CHANCE IF COMBAT INTENSITY IS AT LEAST ON STATE2
+        dd("actor_on_weapon_jammed: outer combat MEDIUM+ jam response")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_alone_" .. math.random(5), 1.0,
             2500, 50, false, false, false, false, false, false)
     elseif outer_combat_checker() == true then -- FOR ACTOR IN COMBAT (OUTER COMBAT PERIMETER) PLAYS CALM RESPONSES WITH 50% IF COMBAT INTENSITY IS ONLY ON STATE1
+        dd("actor_on_weapon_jammed: outer combat LOW jam response")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_" .. math.random(5), 1.0, 2500, 50,
             false, false, false, false, false, false)
-    elseif not (is_actor_in_combat()) and not (outer_combat_checker()) then -- IF ACTOR IS NOT IN COMBAT AT ALL ,IT WILL PLAYS ONLY CALM RESPONSES TO GUN JAMS AND WITH 50% CHANCE TO PLAY (SAME LIKE FOR COMBAT IN OUTER COMBAT PERIMETER WITH COMBAT INTENSITY ON STATE1)
+    elseif not (is_actor_in_combat()) and not (outer_combat_checker()) then -- IF ACTOR IS NOT IN COMBAT AT ALL
+        dd("actor_on_weapon_jammed: no combat jam response")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_" .. math.random(5), 1.0, 2500, 50,
             false, false, false, false, false, false)
+    else
+        dd("actor_on_weapon_jammed: no branch matched")
     end
 
 end
 
 function actor_on_weapon_reload(wpn, ammo_total) -- calls out reloads
+    dd("actor_on_weapon_reload: called, wpn=%s, ammo_total=%s", tostring(wpn), tostring(ammo_total))
 
     already_commented_this_jam = false -- clear the marker, actor is fixing the jam
+    dd("actor_on_weapon_reload: cleared already_commented_this_jam")
 
     if db.actor:is_talking() then
+        dd("actor_on_weapon_reload: actor talking, return")
         return
     end
     if axr_companions.sound_checking() == true then
+        dd("actor_on_weapon_reload: voiced command playing, return")
         return
     end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
     if not get_config("enable_on_weapon_reload_shouts") then
+        dd("actor_on_weapon_reload: reload shouts disabled, return")
         return
     end -- filters disabled reload shouts from MCM
     if is_actor_in_combat() == true then -- only plays reload shouts if actor is in combat ,has a squad IN HEARING DISTANCE AND IF ENEMIES ARE IN INNER COMBAT PERIMETER
+        dd("actor_on_weapon_reload: in combat, playing reload callout")
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "reloading_" .. math.random(7), 1.0, 2500,
             100, true, false, false, false, false, false)
         actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "reloading_" .. math.random(7), 1.0, 2500,
             100, false, true, false, false, false, false)
         add_action_intensity(40, 0.5, 175)
+    else
+        dd("actor_on_weapon_reload: not in combat, no reload callout")
     end
 
 end
@@ -695,6 +876,7 @@ local actor_weapon_state = 0 -- is set later
 local next_throw_callout = 0 -- is set later
 
 function on_key_release(key) -- (EDITED FUCTION - ADDED MORE CALLBACKS) grenade throw callout function
+    --dd("on_key_release: called, key=%s", tostring(key))
 
     if time_global() < next_throw_callout then
         return
@@ -707,25 +889,32 @@ function on_key_release(key) -- (EDITED FUCTION - ADDED MORE CALLBACKS) grenade 
         end -- prevents the code from running if there's no weapon, it'll cause an engine crash otherwise
         actor_weapon_name = actor_weapon:name() -- gets the weapon name
         actor_weapon_state = actor_weapon:get_state() -- gets what the weapon is doing right now
+        dd("on_key_release: weapon=%s, state=%s", tostring(actor_weapon_name), tostring(actor_weapon_state))
         if (actor_weapon_state == 5 or actor_weapon_state == 6 or actor_weapon_state == 7 or actor_weapon_state == 1) -- the weapon is being: pin-pulled, thrown, "reloaded"
         and (string.find(actor_weapon_name, "grenade_rgd") or string.find(actor_weapon_name, "grenade_f") or
-            string.find(actor_weapon_name, "grenade_gd")) -- the list of valid nades for the callouts (I'd do a table but I don't really know how they work in this engine and I'm not feeling like spending time on that)
+            string.find(actor_weapon_name, "grenade_gd")) -- the list of valid nades for the callouts
         then
+            dd("on_key_release: grenade throw detected! weapon=%s state=%s", tostring(actor_weapon_name), tostring(actor_weapon_state))
             next_throw_callout = time_global() + 5000 -- sets the pause of five seconds before the next callout
             add_action_intensity(75, 0.5, 500)
             if db.actor:is_talking() then
+                dd("on_key_release: actor talking, return")
                 return
             end
             if not (is_actor_in_combat()) and not (outer_combat_checker()) then
+                dd("on_key_release: not in combat, return")
                 return
             end -- IF ACTOR IS NOT IN COMBAT (FOR BOTH PERIMETERS) IT WILL STOP FUNCTION
             if axr_companions.sound_checking() == true then
+                dd("on_key_release: voiced command playing, return")
                 return
             end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
             if not get_config("enable_on_grenade_throw_shouts") then
+                dd("on_key_release: grenade throw shouts disabled, return")
                 return
             end -- filters disabled grenade thrown shouts from MCM
             if is_actor_in_combat() == true then -- ACTOR IN COMBAT IN INNER PERIMETER
+                dd("on_key_release: inner combat grenade callout")
                 actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_squad_" ..
                                 math.random(4), 1.0, 3000, 100, true, false, false, false, false, false) -- IF ACTOR HAVE A SQUAD AND COMPANIONS ARE NOT FARTHER THAN 60m (SO THEY ARE IN DANGER ZONE) ,PLAYS WARNING AND INFORMATIVE GRENADE THROW CALLOUTS ADDRESSED TO COMPANIONS
                 actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_squad_" ..
@@ -733,10 +922,13 @@ function on_key_release(key) -- (EDITED FUCTION - ADDED MORE CALLBACKS) grenade 
                 actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_" .. math.random(4),
                     1.0, 3000, 100, false, false, true, false, false, false) -- IF ACTOR IS NOT IN SQUAD OR COMPANIONS ARE FARTHER THAN 60m (SO THERE IS NO REASON TO WARNING THEM) ,PLAYS ANGRY GRENADE THROW CALLOUTS ADDRESSED TO ENEMIES
             elseif outer_combat_checker() == true then -- ACTOR IN COMBAT IN OUTER PERIMETER
+                dd("on_key_release: outer combat grenade callout")
                 actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_squad_" ..
                                 math.random(4), 1.0, 3000, 100, true, false, false, false, false, false) -- IF ACTOR HAVE A SQUAD AND COMPANIONS ARE NOT FARTHER THAN 60m ,PLAYS WARNING AND INFORMATIVE GRENADE THROW CALLOUTS ADDRESSED TO COMPANIONS
                 actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_squad_" ..
                                 math.random(4), 1.0, 3000, 100, false, true, false, false, false, false)
+            else
+                dd("on_key_release: no combat branch matched for grenade")
             end
         end
         -- DEBUG--		SetHudMsg("Weapon Name: " .. actor_weapon_name .. ", Weapon State: " .. actor_weapon:get_state()) --displays what weapon is the actor using and at what state when LMB or RMB is released
@@ -752,64 +944,60 @@ end
 ----------------------
 
 function hurt_bad_cond() -- CONDITION CHECKER FOR BADLY INJURED STATE ,MEANS PRETTY LOW ON HEALTH
-    if db.actor.health <= 0.25 then
-        return true
-    else
-        return false
-    end
+    local result = db.actor.health <= 0.25
+    dd("hurt_bad_cond: health=%s, result=%s", tostring(db.actor.health), tostring(result))
+    return result
 end
 
 function hurt_cond() -- CONDITION CHECKER FOR INJURED STATE ,MEANS HEALTH IS LESS THAN HALF ,BUT NOT AS LOW AS AT BADLY INJURED STATE
-    if db.actor.health > 0.25 and db.actor.health <= 0.5 then
-        return true
-    else
-        return false
-    end
+    local result = db.actor.health > 0.25 and db.actor.health <= 0.5
+    dd("hurt_cond: health=%s, result=%s", tostring(db.actor.health), tostring(result))
+    return result
 end
 
 function bleed_cond() -- CONDITION CHECKER FOR BLEEDING STATE ,MEANS ACTOR IS BLEEDING BUT HEALTH IS MORE THAN HALF (HURT STATES HAS PRIORITY)
-    if db.actor.bleeding >= 0.1 and db.actor.health > 0.5 then
-        return true
-    else
-        return false
-    end
+    local result = db.actor.bleeding >= 0.1 and db.actor.health > 0.5
+    dd("bleed_cond: bleeding=%s, health=%s, result=%s", tostring(db.actor.bleeding), tostring(db.actor.health), tostring(result))
+    return result
 end
 
 function tired_cond() -- CONDITION CHECKER FOR STAMINA ,TRUE MEANS STAMINA IS LESS THAN HALF BUT SOUND FOR THIS STATE WILL BE PLAYED ONLY IF ACTOR IS NOT COUNTED AS INJURED ,BADLY INJURED OR BLEEDING
-    if db.actor.power < 0.5 and not (bleed_cond()) and not (hurt_bad_cond()) and not (hurt_cond()) then
-        return true
-    else
-        return false
-    end
+    local result = db.actor.power < 0.5 and not (bleed_cond()) and not (hurt_bad_cond()) and not (hurt_cond())
+    dd("tired_cond: power=%s, result=%s", tostring(db.actor.power), tostring(result))
+    return result
 end
 
 function ok_cond() -- OK (RELATIVELY) CONDITION CHECKER ,TRUE MEANS ACTOR IS NOT COUNTED AS INJURED OR BADLY INJURED OR BLEEDING OR TIRED
-    if db.actor.health > 0.5 and db.actor.bleeding < 0.1 and db.actor.power >= 0.5 then
-        return true
-    else
-        return false
-    end
+    local result = db.actor.health > 0.5 and db.actor.bleeding < 0.1 and db.actor.power >= 0.5
+    dd("ok_cond: health=%s, bleeding=%s, power=%s, result=%s", tostring(db.actor.health), tostring(db.actor.bleeding), tostring(db.actor.power), tostring(result))
+    return result
 end
 
 -- INTERACTIVE COMMENTS ON BUTTON
 --------------------------------------
 
 function interactive_comments_on_button(key)
+    --dd("interactive_comments_on_button: called, key=%s, expected=%s", tostring(key), tostring(get_config("comments_shouts_key")))
 
     -------------------------------------------------------------------------------------------
     -- HERE IN BELOW LINE YOU CAN CHANGE INTERACTIVE BUTTON FOR WHATEVER YOU WANT ,DEFAULT IS V
     -------------------------------------------------------------------------------------------
-    if (key == get_config("comments_shouts_key")) then -- RUNS IF CERTAIN KEY IS PRESSED 
+    if (key == get_config("comments_shouts_key")) then -- RUNS IF CERTAIN KEY IS PRESSED
+        dd("interactive_comments_on_button: correct key pressed")
         if db.actor:is_talking() then
+            dd("interactive_comments_on_button: actor talking, return")
             return
         end
         if not db.actor:alive() then
+            dd("interactive_comments_on_button: actor dead, return")
             return
         end -- IF ACTOR IS DEAD ALREADY IT WILL STOP FUNCTION
         if axr_companions.sound_checking() == true then
+            dd("interactive_comments_on_button: voiced command playing, return")
             return
         end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
-        if is_actor_in_combat() == true then -- IF ACTOR IS TARGETED BY ENEMY IN INNER PERIMETER IT WILL PLAYS ,FOR SQUAD IN HEARING DISTANCE INFORMATIVE BUT LOUD AND COCKY RESPONSES ,WITHOUT SQUAD OR WITH SQUAD TOO FAR JUST SIMPLE LOUD INVECTIVES
+        if is_actor_in_combat() == true then -- IF ACTOR IS TARGETED BY ENEMY IN INNER PERIMETER
+            dd("interactive_comments_on_button: inner combat comments")
             actor_speak(
                 "characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Enemy_squad_" .. math.random(5), 1.0,
                 3000, 100, true, false, false, false, false, false)
@@ -819,7 +1007,8 @@ function interactive_comments_on_button(key)
             actor_speak(
                 "characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state1_" .. math.random(7), 1.0,
                 3500, 100, false, false, true, false, false, false)
-        elseif outer_combat_checker() == true then -- IF ACTOR IS TARGETED BY ENEMY FROM OUTER PERIMETER IT WILL PLAYS ,FOR SQUAD IN HEARING DISTANCE LOUD INFORMATIVE BUT NOT COCKY RESPONSES ,WITHOUT SQUAD OR WITH SQUAD TOO FAR JUST SIMPLE INVECTIVES BUT NOT LOUD
+        elseif outer_combat_checker() == true then -- IF ACTOR IS TARGETED BY ENEMY FROM OUTER PERIMETER
+            dd("interactive_comments_on_button: outer combat comments")
             actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "EnemyFar_squad_" ..
                             math.random(5), 1.0, 2000, 100, true, false, false, false, false, false, false, false)
             actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "EnemyFar_squad_" ..
@@ -827,7 +1016,9 @@ function interactive_comments_on_button(key)
             actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Enemy_" .. math.random(4), 1.0,
                 2000, 100, false, false, true, false, false, false)
         elseif not (is_actor_in_combat()) and not (outer_combat_checker()) then -- IF ACTOR IS NOT TARGETED BY ENEMY FROM INNER OR OUTER COMBAT PERIMETER ,CONDITION COMMENTS WILL BE PLAYED
-            if hurt_bad_cond() == true then -- IF ACTOR IS BADLY INJURED IT WILL PLAY DIFFERENT COMMENT FOR SQUAD UP TO NEAR DISTANCE (ADDRESSED TO COMPANIONS) AND DIFFERENT IF HE IS ALONE ,OR SQUAD IS NOT CLOSE ENOUGH
+            dd("interactive_comments_on_button: no combat, checking conditions")
+            if hurt_bad_cond() == true then -- IF ACTOR IS BADLY INJURED
+                dd("interactive_comments_on_button: condition=HURT_BAD")
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "HurtBad_SquadNear_" ..
                                 math.random(3), 1.0, 3500, 100, true, false, false, false, false, false)
                 actor_speak(
@@ -836,34 +1027,40 @@ function interactive_comments_on_button(key)
                 actor_speak(
                     "characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "HurtBad_" .. math.random(4), 1.0,
                     3500, 100, false, false, true, false, false, false)
-            elseif hurt_cond() == true then -- SAME AS BEFORE ,EXCEPT ACTOR IS NOT BADLY INJURED BUT STILL INJURED
+            elseif hurt_cond() == true then -- ACTOR IS INJURED
+                dd("interactive_comments_on_button: condition=HURT")
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Hurt_SquadNear_" ..
                                 math.random(4), 1.0, 3500, 100, true, false, false, false, false, false)
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Hurt_" .. math.random(5),
                     1.0, 3500, 100, false, true, false, false, false, false)
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Hurt_" .. math.random(5),
                     1.0, 3500, 100, false, false, true, false, false, false)
-            elseif bleed_cond() == true then -- SAME AS BEFORE ,EXCEPT ACTOR IS BLEEDING ,BUT NOT INJURED OR BADLY INJURED
+            elseif bleed_cond() == true then -- ACTOR IS BLEEDING
+                dd("interactive_comments_on_button: condition=BLEEDING")
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Bleed_SquadNear_" ..
                                 math.random(3), 1.0, 3000, 100, true, false, false, false, false, false)
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Bleed_" .. math.random(3),
                     1.0, 3500, 100, false, true, false, false, false, false)
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Bleed_" .. math.random(3),
                     1.0, 3500, 100, false, false, true, false, false, false)
-            elseif tired_cond() == true then -- SAME AS BEFORE ,EXCEPT ACTOR IS TIRED ,BUT NOT INJURED OR BADLY INJURED OR BLEEDING
+            elseif tired_cond() == true then -- ACTOR IS TIRED
+                dd("interactive_comments_on_button: condition=TIRED")
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Tired_SquadNear_" ..
                                 math.random(4), 1.0, 3500, 100, true, false, false, false, false, false)
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Tired_" .. math.random(3),
                     1.0, 2500, 100, false, true, false, false, false, false)
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Tired_" .. math.random(3),
                     1.0, 2500, 100, false, false, true, false, false, false)
-            elseif ok_cond() == true then -- IF ACTOR IS NOT INJURED OR BADLY INJURED OR BLEEDING OR TIRED (SIMPLY PUT ,HE IS RELATIVELY OK) ,IT WILL PLAY MUMBLE COMMENT ,DIFFERENT FOR SQUAD UP TO NEAR DISTANCE (ADDRESSED TO COMPANIONS) AND DIFFERENT IF HE IS ALONE ,OR SQUAD IS NOT CLOSE ENOUGH
+            elseif ok_cond() == true then -- ACTOR IS OK
+                dd("interactive_comments_on_button: condition=OK (mumble)")
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Mumble_SquadNear_" ..
                                 math.random(8), 1.0, 3500, 100, true, false, false, false, false, false)
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Mumble_" .. math.random(7),
                     1.0, 3500, 100, false, true, false, false, false, false)
                 actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Mumble_" .. math.random(7),
                     1.0, 3500, 100, false, false, true, false, false, false)
+            else
+                dd("interactive_comments_on_button: no condition matched")
             end
         end
     end
@@ -874,16 +1071,22 @@ end
 --------------------------------------
 
 function random_shouts(key)
+    --dd("random_shouts: called, key=%s, expected=%s", tostring(key), tostring(get_config("random_shouts_key")))
     if (key == get_config("random_shouts_key")) then
+        dd("random_shouts: correct key pressed")
         if not db.actor:alive() then
+            dd("random_shouts: actor dead, return")
             return
         end
         if db.actor:is_talking() then
+            dd("random_shouts: actor talking, return")
             return
         end
         if axr_companions.sound_checking() == true then
+            dd("random_shouts: voiced command playing, return")
             return
         end
+        dd("random_shouts: playing random shout")
         actor_speak("characters_voice\\random_shouts" .. lang .. "\\" .. muffle .. "random_" .. math.random(33), 1.0,
             3500, 100, false, false, false, false, false, false) -- Voiced Actor Refined edit
     end
@@ -894,6 +1097,7 @@ end
 --------------------------------------
 
 function on_game_start() -- lets the engine know we want these function to run when certain things happen
+    dd("on_game_start: registering all AGDD_voiced_actor callbacks")
     RegisterScriptCallback("actor_on_update", actor_on_update) -- runs every tick
     RegisterScriptCallback("actor_on_before_hit", actor_on_before_hit) -- runs right before the actor gets damaged
     RegisterScriptCallback("actor_on_before_death", actor_on_before_death) -- runs right before the actor dies
@@ -906,5 +1110,6 @@ function on_game_start() -- lets the engine know we want these function to run w
     RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback) -- runs when a mutant dies
     RegisterScriptCallback("npc_on_hit_callback", npc_on_hit_callback) -- runs when a human (NOT ACTOR) is hit
     RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback) -- runs when a mutant is hit
+    dd("on_game_start: all AGDD_voiced_actor callbacks registered")
 
 end
