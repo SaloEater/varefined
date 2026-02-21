@@ -59,26 +59,45 @@ muffle = ""
 Werwolf's Edits
 
 Additional voice lines and conditions with GAMMA weights
---]] local get_config = varefined_mcm.get_config
+--]]
+local get_config = varefined_mcm.get_config
+
+--[[
+    Structure of a lines_by_language entry:
+    ["language_key"] ="the prefix for the line in the file name, for example _eng for english"
+]]
+local ini = ini_file_ex("plugins\\varefined.ltx")
+local language_prefixes = {
+    ["rus"] = nil,
+    ["eng"] = nil
+}
+function init_languages()
+    printf("i")
+    local languages = ini:collect_section("language")
+    for lang_key, value in pairs(languages) do
+        language_prefixes[lang_key] = value
+        printf("Language %s has prefix: %s", lang_key, language_prefixes[lang_key])
+    end
+end
 
 local combat_inertia = 0
 
-lang = "" -- initiates actor language condition
+lang = "rus" -- initiates actor language condition
 
 function get_actor_lang()
     if get_config("voice_language") == 0 then
         local faction = get_actor_true_community()
         if faction == "isg" or faction == "killer" then
-            lang = "_eng"
+            lang = "eng"
         else
-            lang = ""
+            lang = "rus"
         end
         return lang
     elseif get_config("voice_language") == 1 then
-        lang = ""
+        lang = "rus"
         return lang
     else
-        lang = "_eng"
+        lang = "eng"
         return lang
     end
 end
@@ -195,6 +214,9 @@ local mcm_sound_volume = get_config("shouts_volume") -- gets the volume value fr
 
 function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear,
     requires_squad_out, has_priority, ignore_conditionals, is_state) -- (EDITED FUCTION  - ADDED SOME REQUIREMENTS) player function, plays the sound if all conditions are met. Argument "sound_volume" is overwriten by default from MCM shouts volume slider.
+    if file == nil then
+        return
+    end
 
     if is_state == true then
         has_priority = false
@@ -275,6 +297,43 @@ function add_action_intensity(intensity, intensity_add_limit, cooldown) -- unive
 
 end
 
+local LANG_SECTION_FORMAT = "lines_%s"
+function get_lines_amount_for_line(line, lang_key)
+    return ini:r_value(string.format(LANG_SECTION_FORMAT, lang_key), line, 2, 0)
+end
+
+-- format is characters_voice\[category][language]\[subcategory]\[muffle][line]_[line_index]
+local VOICE_FORMAT = "characters_voice\\%s%s\\%s\\%s%s_%d"
+local VOICE_CATEGORY_PLAYER = "player"
+local VOICE_CATEGORY_BUTTON_COMMENTS = "buttoncomments"
+local VOICE_CATEGORY_RANDOM_SHOUTS = "random_shouts"
+local VOICE_CATEGORY_COMMANDS = "commands"
+
+function voice_line_and_subcategory_same(category, language_key, muffle_val, line)
+    return random_voice_line(category, line, language_key, muffle_val, line)
+end
+
+function random_voice_line(category, subcategory, language_key, muffle_val, line)
+    local lines = get_lines_amount_for_line(line, language_key)
+    if lines == 0 then
+        return nil
+    end
+        return string.format(VOICE_FORMAT, category, language_prefixes[language_key], subcategory, muffle_val, line, math.random(lines))
+end
+
+function player_with_lang_muffle_random(line)
+    return voice_line_and_subcategory_same(VOICE_CATEGORY_PLAYER, lang, muffle, line)
+end
+function button_comments_with_lang_muffle_random(line)
+    return voice_line_and_subcategory_same(VOICE_CATEGORY_BUTTON_COMMENTS, lang, muffle, line)
+end
+function random_shout_with_lang_muffle_random(line)
+    return voice_line_and_subcategory_same(VOICE_CATEGORY_RANDOM_SHOUTS, lang, muffle, line)
+end
+function commands_with_lang_muffle(subcategory, line)
+    return random_voice_line(VOICE_CATEGORY_COMMANDS, subcategory, lang, muffle, line)
+end
+
 function monster_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE CALLBACKS) adds combat_intensity when a mutant is killed
 
     if not db.actor:alive() then
@@ -300,41 +359,41 @@ function monster_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED M
         return
     end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
     if is_actor_in_combat() == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then -- we're in the maxed out state of combat, play the according sound (something almost insane ideally)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state3_" .. math.random(4),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_state3"),
             1.0, 3500, 70, false, false, false, false, false, false)
     elseif is_actor_in_combat() == true and combat_intensity > combat_medium_threshold and math.random(1, 100) < 40 then -- second state, play the sound (cocky, dominant)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state2_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_state2"),
             1.0, 3500, 55, false, false, false, false, false, false)
     elseif is_actor_in_combat() == true and math.random(1, 100) < 40 then -- first state (FOR SQUAD IN HEARING DISTANCE LOUD BUT ONLY informative, WITHOUT SQUAD OR IF SQUAD IS TOO FAR THEN SIMPLY ANGRY INVECTIVES)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_squad"),
             1.0, 2000, 40, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_squad"),
             1.0, 2000, 40, false, true, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state1_" .. math.random(4),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_state1"),
             1.0, 2000, 40, false, false, true, false, false, false)
     elseif outer_combat_checker() == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then -- MAXED OUT STATE BUT FOR OUTER COMBAT PERIMETER ,FOR SQUAD IN HEARING DISTANCE IT WILL PLAYS LOUD INFORMATIVE CALLBACKS ,OTHERWISE COMMENTS FOR STATE3 ,MEANS NOT LOUD BUT STILL HUMILATING COMMENTS
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_squad"),
             1.0, 2000, 50, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_squad"),
             1.0, 2000, 50, false, true, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state3_" .. math.random(3),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state3"),
             1.0, 2000, 50, false, false, true, false, false, false)
     elseif outer_combat_checker() == true and combat_intensity > combat_medium_threshold and math.random(1, 100) < 40 then -- SECOND STATE FOR OUTER COMBAT PERIMETER ,FOR SQUAD IN NEAR DISTANCE IT WILL PLAYS CALM (THATS WHY ONLY FOR SQUAD IN NEAR DISTANCE) INFORMATIVE CALLBACKS ,OTHERWISE COMMENTS FOR STATE2 ,MEANS LITTLE BIT LOUDER THAN STATE1 (BUT NOT MUCH) AND DIFFERENT (LITTLE BIT ANGRY) COMMENTS
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_comment_squad"),
             1.0, 1500, 40, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state2_" .. math.random(4),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state2"),
             1.0, 2000, 40, false, true, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state2_" .. math.random(4),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state2"),
             1.0, 2000, 40, false, false, true, false, false, false)
     elseif outer_combat_checker() == true and math.random(1, 100) < 40 then -- FIRST STATE FOR OUTER COMBAT PERIMETER ,FOR SQUAD IN NEAR DISTANCE IT WILL PLAYS CALM (THATS WHY ONLY FOR SQUAD IN NEAR DISTANCE) INFORMATIVE CALLBACKS ,OTHERWISE COMMENTS FOR STATE1 ,MEANS SILENT COMMENTS
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_comment_squad"),
             1.0, 1500, 25, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(5),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state1"),
             1.0, 2000, 25, false, true, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(5),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state1"),
             1.0, 2000, 25, false, false, true, false, false, false)
     elseif not (is_actor_in_combat()) and not (outer_combat_checker()) and math.random(1, 100) < 40 then -- FOR KILLS FARTHER THAN 120m ONLY SILENT COMMENTS ,NO MATTER IF THERE IS SQUAD OR NOT (FOR EXAMPLE FOR SNIPER LONG DISTANCE KILLS)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(5),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state1"),
             1.0, 2000, 25, false, false, false, false, false, false)
     end
 
@@ -367,41 +426,41 @@ function npc_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE 
         return
     end
     if is_actor_in_combat() == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state3_" .. math.random(11),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_state3"),
             1.0, 3500, 80, false, false, false, false, false, false)
     elseif is_actor_in_combat() == true and combat_intensity > combat_medium_threshold and math.random(1, 100) < 40 then
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state2_" .. math.random(14),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_state2"),
             1.0, 3500, 65, false, false, false, false, false, false)
     elseif is_actor_in_combat() == true then
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_squad"),
             1.0, 2000, 50, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_squad"),
             1.0, 2000, 50, false, true, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state1_" .. math.random(7),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_state1"),
             1.0, 2000, 50, false, false, true, false, false, false)
     elseif outer_combat_checker() == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_squad"),
             1.0, 2000, 65, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_confirm_squad"),
             1.0, 2000, 65, false, true, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state3_" .. math.random(5),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state3"),
             1.0, 2500, 65, false, false, true, false, false, false)
     elseif outer_combat_checker() == true and combat_intensity > combat_medium_threshold and math.random(1, 100) < 40 then
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_comment_squad"),
             1.0, 2000, 50, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state2_" .. math.random(8),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state2"),
             1.0, 2300, 50, false, true, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state2_" .. math.random(8),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state2"),
             1.0, 2300, 50, false, false, true, false, false, false)
     elseif outer_combat_checker() == true then
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_squad_" .. math.random(6),
+        actor_speak(player_with_lang_muffle_random("kill_comment_squad"),
             1.0, 2000, 35, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(10),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state1"),
             1.0, 2500, 35, false, true, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(10),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state1"),
             1.0, 2500, 35, false, false, true, false, false, false)
     elseif not (is_actor_in_combat()) and not (outer_combat_checker()) and math.random(1, 100) < 40 then
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_comment_state1_" .. math.random(10),
+        actor_speak(player_with_lang_muffle_random("kill_comment_state1"),
             1.0, 2500, 35, false, false, false, false, false, false)
     end
 
@@ -516,35 +575,35 @@ function actor_on_update(binder, delta) -- thinker function, handles conditional
             return
         end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
         if db.actor.health < 0.25 and hurt_volume > 0 then -- critically hurt state sound has the highest priority and will always play over any other state sound
-            actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "hurt_bad_" .. math.random(8),
+            actor_speak(player_with_lang_muffle_random("hurt_bad"),
                 hurt_volume * 0.66, hurt_pause, 100, false, false, false, false, false, true) -- plays the critically wounded sound
 
-        elseif arszi_psy.get_psy_health() < 0.4 and psy_volume > 0 then -- new citically psy-hurt sound 
-            actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "sanity_" .. math.random(9), psy_volume,
+        elseif arszi_psy.get_psy_health() < 0.4 and psy_volume > 0 then -- new citically psy-hurt sound
+            actor_speak(player_with_lang_muffle_random("sanity"), psy_volume,
                 sanity_pause, 2000, false, false, false, false, false, true)
 
         elseif arszi_psy.get_psy_health() < 1.0 and psy_volume > 0 then -- new psy-hurt sound (weak psy)
-            actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "fear_" .. math.random(7), psy_volume,
+            actor_speak(player_with_lang_muffle_random("fear"), psy_volume,
                 fear_pause, 100, false, false, false, false, false, true) -- plays the psy wounded sound
 
         elseif db.actor.power < 0.10 and sprint_volume > 0 and hurt_volume < sprint_volume and hurt_pause > sprint_pause then -- exhaustion state will only play if it has both longer pause and higher volume than the hurt sound
-            actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "exhausted_" .. math.random(62),
+            actor_speak(player_with_lang_muffle_random("exhausted"),
                 sprint_volume, sprint_pause, 100, false, false, false, false, false, true) -- plays the exhausted sound
 
         elseif db.actor.health < 0.55 and hurt_volume > 0 then -- normal hurt state will play if everything else fails to meet the conditions
-            actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "hurt_" .. math.random(8), hurt_volume,
+            actor_speak(player_with_lang_muffle_random("hurt"), hurt_volume,
                 hurt_pause, 100, false, false, false, false, false, true) -- plays the wounded sound
 
         elseif actor_status_thirst.get_water_deprivation(true) > 0.3 and thirst_volume > 0 then
-            actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "thirst_" .. math.random(7),
+            actor_speak(player_with_lang_muffle_random("thirst"),
                 thirst_volume, thirst_pause, 100, false, false, false, false, false, true)
 
         elseif db.actor:cast_Actor():conditions():GetSatiety() < 0.3 and satiety_volume > 0 then
-            actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "hunger_" .. math.random(5),
+            actor_speak(player_with_lang_muffle_random("hunger"),
                 satiety_volume, satiety_pause, 100, false, false, false, false, false, true) -- new satiety sound call, adjust filename and corresponding math factor
 
         elseif actor_status_sleep.get_sleep_deprivation(true) > 0 and sleep_volume > 0 then
-            actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "sleepiness_" .. math.random(3),
+            actor_speak(player_with_lang_muffle_random("sleepiness"),
                 sleep_volume, sleep_pause, 100, false, false, false, false, false, true)
 
         end
@@ -583,10 +642,10 @@ function actor_on_before_hit(hitinfo, bone_id, flags) -- damage function, plays 
                 return
             end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
             if db.actor.health > 0.5 then -- checks if the actor is over 50% of their full health
-                actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "pain_" .. math.random(11), 1.0,
+                actor_speak(player_with_lang_muffle_random("pain"), 1.0,
                     2000, 100, false, false, false, true, true, false)
             else
-                actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "pain_bad_" .. math.random(11), 1.0,
+                actor_speak(player_with_lang_muffle_random("pain_bad"), 1.0,
                     2500, 100, false, false, false, true, true, false)
             end
             level.add_cam_effector("camera_effects\\" .. anims[math.random(#anims)] .. ".anm",
@@ -599,10 +658,10 @@ function actor_on_before_hit(hitinfo, bone_id, flags) -- damage function, plays 
                 return
             end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
             if db.actor.health > 0.5 then
-                actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "pain_" .. math.random(11), 1.0,
+                actor_speak(player_with_lang_muffle_random("pain"), 1.0,
                     2000, 100, false, false, false, true, true, false)
             else
-                actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "pain_bad_" .. math.random(11), 1.0,
+                actor_speak(player_with_lang_muffle_random("pain_bad"), 1.0,
                     2500, 100, false, false, false, true, true, false)
             end
             --			level.add_cam_effector( "camera_effects\\" .. anims[math.random(#anims)] .. ".anm", math.random(447555, 447999), false, "" ) --if you use a generic camera punch effect, put it here
@@ -621,7 +680,7 @@ end
 function actor_on_before_death(whoID, flags) -- death function, plays death sounds (DEATH SCREAMS AND WHELPS ONLY, NO BODY FALLING SOUNDS OR ANYTHING ELSE)
 
     axr_companions.sound_checking_stop() -- STOPS SOUND IF COMMAND FROM axr_companions.script IS CURRENTLY PLAYING
-    actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "death_" .. math.random(7), 1.0, 9999, 100,
+    actor_speak(player_with_lang_muffle_random("death"), 1.0, 9999, 100,
         false, false, false, true, true, false)
 
 end
@@ -646,21 +705,21 @@ function actor_on_weapon_jammed(wpn) -- (EDITED FUNCTION - ADDED MORE CALLBACKS)
         return
     end -- filters disabled jam shouts from MCM
     if is_actor_in_combat() == true then -- PLAYS LOUD RESPONSES TO GUN JAMS IF ACTOR IS IN COMBAT (INNER COMBAT PERIMETER) ,DIFFERENT SHOUTS FOR SQUAD ,DIFFERENT IF HE IS ALONE OR SQUAD IS OUT OF HEARING DISTANCE
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_squad_" .. math.random(5), 1.0,
+        actor_speak(player_with_lang_muffle_random("gun_jam_squad"), 1.0,
             2500, 100, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_squad_" .. math.random(5), 1.0,
+        actor_speak(player_with_lang_muffle_random("gun_jam_squad"), 1.0,
             2500, 100, false, true, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_alone_" .. math.random(5), 1.0,
+        actor_speak(player_with_lang_muffle_random("gun_jam_alone"), 1.0,
             2500, 100, false, false, true, false, false, false)
         add_action_intensity(30, 0.5, 125)
     elseif outer_combat_checker() == true and combat_intensity > combat_medium_threshold then -- FOR ACTOR IN COMBAT (OUTER COMBAT PERIMETER) PLAYS LOUD RESPONSES WITH 50% CHANCE IF COMBAT INTENSITY IS AT LEAST ON STATE2
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_alone_" .. math.random(5), 1.0,
+        actor_speak(player_with_lang_muffle_random("gun_jam_alone"), 1.0,
             2500, 50, false, false, false, false, false, false)
     elseif outer_combat_checker() == true then -- FOR ACTOR IN COMBAT (OUTER COMBAT PERIMETER) PLAYS CALM RESPONSES WITH 50% IF COMBAT INTENSITY IS ONLY ON STATE1
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_" .. math.random(5), 1.0, 2500, 50,
+        actor_speak(player_with_lang_muffle_random("gun_jam"), 1.0, 2500, 50,
             false, false, false, false, false, false)
     elseif not (is_actor_in_combat()) and not (outer_combat_checker()) then -- IF ACTOR IS NOT IN COMBAT AT ALL ,IT WILL PLAYS ONLY CALM RESPONSES TO GUN JAMS AND WITH 50% CHANCE TO PLAY (SAME LIKE FOR COMBAT IN OUTER COMBAT PERIMETER WITH COMBAT INTENSITY ON STATE1)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "gun_jam_" .. math.random(5), 1.0, 2500, 50,
+        actor_speak(player_with_lang_muffle_random("gun_jam"), 1.0, 2500, 50,
             false, false, false, false, false, false)
     end
 
@@ -680,9 +739,9 @@ function actor_on_weapon_reload(wpn, ammo_total) -- calls out reloads
         return
     end -- filters disabled reload shouts from MCM
     if is_actor_in_combat() == true then -- only plays reload shouts if actor is in combat ,has a squad IN HEARING DISTANCE AND IF ENEMIES ARE IN INNER COMBAT PERIMETER
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "reloading_" .. math.random(7), 1.0, 2500,
+        actor_speak(player_with_lang_muffle_random("reloading"), 1.0, 2500,
             100, true, false, false, false, false, false)
-        actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "reloading_" .. math.random(7), 1.0, 2500,
+        actor_speak(player_with_lang_muffle_random("reloading"), 1.0, 2500,
             100, false, true, false, false, false, false)
         add_action_intensity(40, 0.5, 175)
     end
@@ -726,17 +785,17 @@ function on_key_release(key) -- (EDITED FUCTION - ADDED MORE CALLBACKS) grenade 
                 return
             end -- filters disabled grenade thrown shouts from MCM
             if is_actor_in_combat() == true then -- ACTOR IN COMBAT IN INNER PERIMETER
-                actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_squad_" ..
-                                math.random(4), 1.0, 3000, 100, true, false, false, false, false, false) -- IF ACTOR HAVE A SQUAD AND COMPANIONS ARE NOT FARTHER THAN 60m (SO THEY ARE IN DANGER ZONE) ,PLAYS WARNING AND INFORMATIVE GRENADE THROW CALLOUTS ADDRESSED TO COMPANIONS
-                actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_squad_" ..
-                                math.random(4), 1.0, 3000, 100, false, true, false, false, false, false)
-                actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_" .. math.random(4),
+                actor_speak(player_with_lang_muffle_random("grenade_throw_squad"),
+                    1.0, 3000, 100, true, false, false, false, false, false) -- IF ACTOR HAVE A SQUAD AND COMPANIONS ARE NOT FARTHER THAN 60m (SO THEY ARE IN DANGER ZONE) ,PLAYS WARNING AND INFORMATIVE GRENADE THROW CALLOUTS ADDRESSED TO COMPANIONS
+                actor_speak(player_with_lang_muffle_random("grenade_throw_squad"),
+                    1.0, 3000, 100, false, true, false, false, false, false)
+                actor_speak(player_with_lang_muffle_random("grenade_throw"),
                     1.0, 3000, 100, false, false, true, false, false, false) -- IF ACTOR IS NOT IN SQUAD OR COMPANIONS ARE FARTHER THAN 60m (SO THERE IS NO REASON TO WARNING THEM) ,PLAYS ANGRY GRENADE THROW CALLOUTS ADDRESSED TO ENEMIES
             elseif outer_combat_checker() == true then -- ACTOR IN COMBAT IN OUTER PERIMETER
-                actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_squad_" ..
-                                math.random(4), 1.0, 3000, 100, true, false, false, false, false, false) -- IF ACTOR HAVE A SQUAD AND COMPANIONS ARE NOT FARTHER THAN 60m ,PLAYS WARNING AND INFORMATIVE GRENADE THROW CALLOUTS ADDRESSED TO COMPANIONS
-                actor_speak("characters_voice\\player" .. lang .. "\\" .. muffle .. "grenade_throw_squad_" ..
-                                math.random(4), 1.0, 3000, 100, false, true, false, false, false, false)
+                actor_speak(player_with_lang_muffle_random("grenade_throw_squad"),
+                    1.0, 3000, 100, true, false, false, false, false, false) -- IF ACTOR HAVE A SQUAD AND COMPANIONS ARE NOT FARTHER THAN 60m ,PLAYS WARNING AND INFORMATIVE GRENADE THROW CALLOUTS ADDRESSED TO COMPANIONS
+                actor_speak(player_with_lang_muffle_random("grenade_throw_squad"),
+                    1.0, 3000, 100, false, true, false, false, false, false)
             end
         end
         -- DEBUG--		SetHudMsg("Weapon Name: " .. actor_weapon_name .. ", Weapon State: " .. actor_weapon:get_state()) --displays what weapon is the actor using and at what state when LMB or RMB is released
@@ -810,59 +869,54 @@ function interactive_comments_on_button(key)
             return
         end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
         if is_actor_in_combat() == true then -- IF ACTOR IS TARGETED BY ENEMY IN INNER PERIMETER IT WILL PLAYS ,FOR SQUAD IN HEARING DISTANCE INFORMATIVE BUT LOUD AND COCKY RESPONSES ,WITHOUT SQUAD OR WITH SQUAD TOO FAR JUST SIMPLE LOUD INVECTIVES
-            actor_speak(
-                "characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Enemy_squad_" .. math.random(5), 1.0,
+            actor_speak(button_comments_with_lang_muffle_random("Enemy_squad"), 1.0,
                 3000, 100, true, false, false, false, false, false)
-            actor_speak(
-                "characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Enemy_squad_" .. math.random(5), 1.0,
+            actor_speak(button_comments_with_lang_muffle_random("Enemy_squad"), 1.0,
                 3000, 100, false, true, false, false, false, false)
-            actor_speak(
-                "characters_voice\\player" .. lang .. "\\" .. muffle .. "kill_confirm_state1_" .. math.random(7), 1.0,
+            actor_speak(player_with_lang_muffle_random("kill_confirm_state1"), 1.0,
                 3500, 100, false, false, true, false, false, false)
         elseif outer_combat_checker() == true then -- IF ACTOR IS TARGETED BY ENEMY FROM OUTER PERIMETER IT WILL PLAYS ,FOR SQUAD IN HEARING DISTANCE LOUD INFORMATIVE BUT NOT COCKY RESPONSES ,WITHOUT SQUAD OR WITH SQUAD TOO FAR JUST SIMPLE INVECTIVES BUT NOT LOUD
-            actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "EnemyFar_squad_" ..
-                            math.random(5), 1.0, 2000, 100, true, false, false, false, false, false, false, false)
-            actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "EnemyFar_squad_" ..
-                            math.random(5), 1.0, 2000, 100, false, true, false, false, false, false, false, false)
-            actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Enemy_" .. math.random(4), 1.0,
+            actor_speak(button_comments_with_lang_muffle_random("EnemyFar_squad"),
+                1.0, 2000, 100, true, false, false, false, false, false)
+            actor_speak(button_comments_with_lang_muffle_random("EnemyFar_squad"),
+                1.0, 2000, 100, false, true, false, false, false, false)
+            actor_speak(button_comments_with_lang_muffle_random("Enemy"), 1.0,
                 2000, 100, false, false, true, false, false, false)
         elseif not (is_actor_in_combat()) and not (outer_combat_checker()) then -- IF ACTOR IS NOT TARGETED BY ENEMY FROM INNER OR OUTER COMBAT PERIMETER ,CONDITION COMMENTS WILL BE PLAYED
             if hurt_bad_cond() == true then -- IF ACTOR IS BADLY INJURED IT WILL PLAY DIFFERENT COMMENT FOR SQUAD UP TO NEAR DISTANCE (ADDRESSED TO COMPANIONS) AND DIFFERENT IF HE IS ALONE ,OR SQUAD IS NOT CLOSE ENOUGH
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "HurtBad_SquadNear_" ..
-                                math.random(3), 1.0, 3500, 100, true, false, false, false, false, false)
-                actor_speak(
-                    "characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "HurtBad_" .. math.random(4), 1.0,
+                actor_speak(button_comments_with_lang_muffle_random("HurtBad_SquadNear"),
+                    1.0, 3500, 100, true, false, false, false, false, false)
+                actor_speak(button_comments_with_lang_muffle_random("HurtBad"), 1.0,
                     3500, 100, false, true, false, false, false, false)
-                actor_speak(
-                    "characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "HurtBad_" .. math.random(4), 1.0,
+                actor_speak(button_comments_with_lang_muffle_random("HurtBad"), 1.0,
                     3500, 100, false, false, true, false, false, false)
             elseif hurt_cond() == true then -- SAME AS BEFORE ,EXCEPT ACTOR IS NOT BADLY INJURED BUT STILL INJURED
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Hurt_SquadNear_" ..
-                                math.random(4), 1.0, 3500, 100, true, false, false, false, false, false)
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Hurt_" .. math.random(5),
+                actor_speak(button_comments_with_lang_muffle_random("Hurt_SquadNear"),
+                    1.0, 3500, 100, true, false, false, false, false, false)
+                actor_speak(button_comments_with_lang_muffle_random("Hurt"),
                     1.0, 3500, 100, false, true, false, false, false, false)
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Hurt_" .. math.random(5),
+                actor_speak(button_comments_with_lang_muffle_random("Hurt"),
                     1.0, 3500, 100, false, false, true, false, false, false)
             elseif bleed_cond() == true then -- SAME AS BEFORE ,EXCEPT ACTOR IS BLEEDING ,BUT NOT INJURED OR BADLY INJURED
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Bleed_SquadNear_" ..
-                                math.random(3), 1.0, 3000, 100, true, false, false, false, false, false)
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Bleed_" .. math.random(3),
+                actor_speak(button_comments_with_lang_muffle_random("Bleed_SquadNear"),
+                    1.0, 3000, 100, true, false, false, false, false, false)
+                actor_speak(button_comments_with_lang_muffle_random("Bleed"),
                     1.0, 3500, 100, false, true, false, false, false, false)
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Bleed_" .. math.random(3),
+                actor_speak(button_comments_with_lang_muffle_random("Bleed"),
                     1.0, 3500, 100, false, false, true, false, false, false)
             elseif tired_cond() == true then -- SAME AS BEFORE ,EXCEPT ACTOR IS TIRED ,BUT NOT INJURED OR BADLY INJURED OR BLEEDING
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Tired_SquadNear_" ..
-                                math.random(4), 1.0, 3500, 100, true, false, false, false, false, false)
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Tired_" .. math.random(3),
+                actor_speak(button_comments_with_lang_muffle_random("Tired_SquadNear"),
+                    1.0, 3500, 100, true, false, false, false, false, false)
+                actor_speak(button_comments_with_lang_muffle_random("Tired"),
                     1.0, 2500, 100, false, true, false, false, false, false)
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Tired_" .. math.random(3),
+                actor_speak(button_comments_with_lang_muffle_random("Tired"),
                     1.0, 2500, 100, false, false, true, false, false, false)
             elseif ok_cond() == true then -- IF ACTOR IS NOT INJURED OR BADLY INJURED OR BLEEDING OR TIRED (SIMPLY PUT ,HE IS RELATIVELY OK) ,IT WILL PLAY MUMBLE COMMENT ,DIFFERENT FOR SQUAD UP TO NEAR DISTANCE (ADDRESSED TO COMPANIONS) AND DIFFERENT IF HE IS ALONE ,OR SQUAD IS NOT CLOSE ENOUGH
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Mumble_SquadNear_" ..
-                                math.random(8), 1.0, 3500, 100, true, false, false, false, false, false)
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Mumble_" .. math.random(7),
+                actor_speak(button_comments_with_lang_muffle_random("Mumble_SquadNear"),
+                    1.0, 3500, 100, true, false, false, false, false, false)
+                actor_speak(button_comments_with_lang_muffle_random("Mumble"),
                     1.0, 3500, 100, false, true, false, false, false, false)
-                actor_speak("characters_voice\\buttoncomments" .. lang .. "\\" .. muffle .. "Mumble_" .. math.random(7),
+                actor_speak(button_comments_with_lang_muffle_random("Mumble"),
                     1.0, 3500, 100, false, false, true, false, false, false)
             end
         end
@@ -884,7 +938,7 @@ function random_shouts(key)
         if axr_companions.sound_checking() == true then
             return
         end
-        actor_speak("characters_voice\\random_shouts" .. lang .. "\\" .. muffle .. "random_" .. math.random(33), 1.0,
+        actor_speak(random_shout_with_lang_muffle_random("random"), 1.0,
             3500, 100, false, false, false, false, false, false) -- Voiced Actor Refined edit
     end
 end
@@ -906,5 +960,5 @@ function on_game_start() -- lets the engine know we want these function to run w
     RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback) -- runs when a mutant dies
     RegisterScriptCallback("npc_on_hit_callback", npc_on_hit_callback) -- runs when a human (NOT ACTOR) is hit
     RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback) -- runs when a mutant is hit
-
+    init_languages()
 end
