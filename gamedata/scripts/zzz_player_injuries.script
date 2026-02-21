@@ -29,10 +29,10 @@ function load_state(m_data)
     head_tbl = m_data.head_tbl or {}
 end
 
-local aim_anm = {"earthquake_1", "earthquake_2"}
-local rightleg_anm = {"med1", "med4"}
-local leftleg_anm = {"med2", "med3"}
-local bothlegs_anm = {"strong1", "strong2", "strong4"}
+local aim_anm = { "earthquake_1", "earthquake_2" }
+local rightleg_anm = { "med1", "med4" }
+local leftleg_anm = { "med2", "med3" }
+local bothlegs_anm = { "strong1", "strong2", "strong4" }
 
 function on_option_change()
     if r(head_tbl.volume) ~= r(ui_options.get("sound/general/master_volume")) then
@@ -644,7 +644,7 @@ function PartialDamage()
 
             msg = msg .. "Both legs are damaged, you cannot walk."
             if not (movementspeed < 60 and movementspeed > 50) and not (movementspeed < 22 and movementspeed > 20) and
-                not (movementspeed < 3 and movementspeed >= 0) then
+                    not (movementspeed < 3 and movementspeed >= 0) then
                 db.actor.power = 0.0
                 actor_menu.set_msg(1, msg, 10)
                 -- trace_this("Actor power"..msg.."\n")
@@ -722,7 +722,7 @@ function shaking_hands()
         end
         -- play anm
         level.add_cam_effector("camera_effects\\" .. aim_anm[math.random(#aim_anm)] .. ".anm", 9921, true, "", 0, true,
-            cam_power)
+                cam_power)
     else
         cam_power = 0.19 * weight / max_arms_sum
         cam_power = (body_state == "crouch") and (0.18 * weight / max_arms_sum) or cam_power
@@ -734,7 +734,7 @@ function shaking_hands()
             cam_power = cam_power_scope
         end
         level.add_cam_effector("camera_effects\\" .. aim_anm[math.random(#aim_anm)] .. ".anm", 9921, true, "", 0, true,
-            cam_power)
+                cam_power)
     end
     --	news_manager.send_tip(db.actor, r(cam_power), 0, nil, 1500)
 
@@ -780,9 +780,9 @@ function legs_limp()
     local left_l = health.rightleg * effects_mult
     local legs_sum = left_l + right_l
     local max_right_l = maxhp.leftleg * effects_mult *
-                            (zzz_player_injuries_mcm.get_config("leg_penalty_minimum_hp") * 0.2)
+            (zzz_player_injuries_mcm.get_config("leg_penalty_minimum_hp") * 0.2)
     local max_left_l = maxhp.rightleg * effects_mult *
-                           (zzz_player_injuries_mcm.get_config("leg_penalty_minimum_hp") * 0.2)
+            (zzz_player_injuries_mcm.get_config("leg_penalty_minimum_hp") * 0.2)
     local max_legs_sum = max_left_l + max_right_l
 
     if (right_l == left_l) and (legs_sum < max_legs_sum) then
@@ -955,7 +955,8 @@ hitboxes[8] = "rightleg"
 function actor_on_hit_callback(bone_id)
     -- printf("! actor got hit in %s", bone_id)
 
-    if bone_id == 65535 then -- toxic anomalies and radiation. It was hitting head or torso be redirected to arms or torso instead
+    if bone_id == 65535 then
+        -- toxic anomalies and radiation. It was hitting head or torso be redirected to arms or torso instead
         rand = math.random(1, 5)
         if rand == 1 or rand == 2 or rand == 3 then
             bone_id = 12
@@ -966,7 +967,8 @@ function actor_on_hit_callback(bone_id)
         end
     end
 
-    if bone_id == 0 then -- attributes fall damage to left or right leg
+    if bone_id == 0 then
+        -- attributes fall damage to left or right leg
         rand = math.random(1, 2)
         if rand == 1 then
             bone_id = 3
@@ -996,7 +998,8 @@ function actor_on_hit_callback(bone_id)
     if hitboxes[bone_id] then
         last_damaged_hitbox = hitboxes[bone_id]
         text = hitboxes[bone_id]
-    else -- if an unknown bone is hit, arms or torso are hit
+    else
+        -- if an unknown bone is hit, arms or torso are hit
         bone_id = math.random(1, 3)
         if bone_id == 1 then
             bone_id = 35
@@ -1136,7 +1139,8 @@ local progress_health_leftleg_time = nil
 local scuffed_fix = false
 local xml = nil
 function HUDUpdate()
-    if showtexthud >= 1 then -- text
+    if showtexthud >= 1 then
+        -- text
         local staticname = "body_health_system_text"
         if showtexthud == 1 then
             staticname = "body_health_system_text"
@@ -1147,7 +1151,8 @@ function HUDUpdate()
         local hud_d = hud:GetCustomStatic(staticname)
         local wnd
 
-        if not healthstatus or show_hud_type ~= 2 then -- not show
+        if not healthstatus or show_hud_type ~= 2 then
+            -- not show
             if (hud_d ~= nil) then
                 hud:RemoveCustomStatic(staticname)
                 hud_d = nil
@@ -1298,7 +1303,7 @@ function HUDUpdate()
                         end
                         str = str .. colors[GetConditionFromFloat(health[array2] / maxhp[array2], array2)]
                         for i = 1, (preview.health[array2] or health[array2]) -
-                            (preview.bonus[array2] or timedhp[array2]) do
+                                (preview.bonus[array2] or timedhp[array2]) do
                             str = str .. ""
                         end
                     else
@@ -1307,7 +1312,7 @@ function HUDUpdate()
                             str = str .. ""
                         end
                         for i = 1, (preview.health[array2] or health[array2]) -
-                            (preview.bonus[array2] or timedhp[array2]) do
+                                (preview.bonus[array2] or timedhp[array2]) do
                             str = str .. colors[GetConditionFromFloat(health[array2] / maxhp[array2], array2)]
                             str = str .. ""
                         end
@@ -1364,7 +1369,8 @@ function HUDUpdate()
                 return
             end
         end
-    else -- pics
+    else
+        -- pics
         local staticname = "body_health_system"
         if display.types[display_ratio] then
             if display_ratio ~= 169 then
@@ -1375,7 +1381,8 @@ function HUDUpdate()
         local hud_d = hud:GetCustomStatic(staticname)
         local wnd
 
-        if not healthstatus or show_hud_type ~= 2 then -- not show
+        if not healthstatus or show_hud_type ~= 2 then
+            -- not show
             if (hud_d ~= nil) then
                 hud:RemoveCustomStatic(staticname)
                 hud_d = nil
@@ -1401,10 +1408,10 @@ function HUDUpdate()
             end
         end
 
-        ::otherhudparts::
+        :: otherhudparts ::
         if (xml == nil) then
             xml = CScriptXmlInit()
-        xml:ParseFile("ui_body_health.xml")
+            xml:ParseFile("ui_body_health.xml")
         end
 
         function ParamBar(barhandler, customstatic, barname, param, param_max, showbg)
@@ -1425,7 +1432,8 @@ function HUDUpdate()
             local hud_d = hud:GetCustomStatic(staticname)
             local wnd
 
-            if not healthstatus or show_hud_type ~= 1 or (not showbg) then -- not show
+            if not healthstatus or show_hud_type ~= 1 or (not showbg) then
+                -- not show
                 if (hud_d ~= nil) then
                     hud:RemoveCustomStatic(staticname)
                     hud_d = nil
@@ -1451,7 +1459,7 @@ function HUDUpdate()
 
             end
             -------------------
-            ::progressbars::
+            :: progressbars ::
 
             if display.types[display_ratio] then
                 if display_ratio ~= 169 then
@@ -1473,7 +1481,8 @@ function HUDUpdate()
                     CreateTimeEvent("bvcx", "bvcx", disable_hud_fps_fix_tmr, worst_possible_fix)
                 end
             else
-                if not param_max then -- default 0 to 100
+                if not param_max then
+                    -- default 0 to 100
                     param = param * 100
                     if not param then
                         param = 0
@@ -1487,7 +1496,8 @@ function HUDUpdate()
                     barhandler:SetProgressPos(param)
                 end
             end
-            if show_hud_type < 1 or (time_global() - show_hud_change_time < 50) then -- not show
+            if show_hud_type < 1 or (time_global() - show_hud_change_time < 50) then
+                -- not show
                 if (cs_name ~= nil) then
                     hud:RemoveCustomStatic(customstatic)
                     cs_name = nil
@@ -1501,17 +1511,17 @@ function HUDUpdate()
 
         --- green bkg lines equials health -----
         progress_health_head_time = ParamBar(progress_health_head_time, "bhs_health_head_bar_green",
-            "bhs_health_bodypart_green", preview.health.head or health.head, maxhp.head, false)
+                "bhs_health_bodypart_green", preview.health.head or health.head, maxhp.head, false)
         progress_health_torso_time = ParamBar(progress_health_torso_time, "bhs_health_torso_bar_green",
-            "bhs_health_bodypart_green", preview.health.torso or health.torso, maxhp.torso, false)
+                "bhs_health_bodypart_green", preview.health.torso or health.torso, maxhp.torso, false)
         progress_health_rightarm_time = ParamBar(progress_health_rightarm_time, "bhs_health_rightarm_bar_green",
-            "bhs_health_bodypart_green", preview.health.rightarm or health.rightarm, maxhp.rightarm, false)
+                "bhs_health_bodypart_green", preview.health.rightarm or health.rightarm, maxhp.rightarm, false)
         progress_health_leftarm_time = ParamBar(progress_health_leftarm_time, "bhs_health_leftarm_bar_green",
-            "bhs_health_bodypart_green", preview.health.leftarm or health.leftarm, maxhp.leftarm, false)
+                "bhs_health_bodypart_green", preview.health.leftarm or health.leftarm, maxhp.leftarm, false)
         progress_health_rightleg_time = ParamBar(progress_health_rightleg_time, "bhs_health_rightleg_bar_green",
-            "bhs_health_bodypart_green", preview.health.rightleg or health.rightleg, maxhp.rightleg, false)
+                "bhs_health_bodypart_green", preview.health.rightleg or health.rightleg, maxhp.rightleg, false)
         progress_health_leftleg_time = ParamBar(progress_health_leftleg_time, "bhs_health_leftleg_bar_green",
-            "bhs_health_bodypart_green", preview.health.leftleg or health.leftleg, maxhp.leftleg, false)
+                "bhs_health_bodypart_green", preview.health.leftleg or health.leftleg, maxhp.leftleg, false)
         -----------------------------
 
         --- blue bkg health equals heals-timedhp -----
@@ -1529,17 +1539,17 @@ function HUDUpdate()
         end
 
         progress_health_head = ParamBar(progress_health_head, "bhs_health_head_bar", "bhs_health_bodypart",
-            nil_math("head"), maxhp.head, true)
+                nil_math("head"), maxhp.head, true)
         progress_health_torso = ParamBar(progress_health_torso, "bhs_health_torso_bar", "bhs_health_bodypart",
-            nil_math("torso"), maxhp.torso, true)
+                nil_math("torso"), maxhp.torso, true)
         progress_health_rightarm = ParamBar(progress_health_rightarm, "bhs_health_rightarm_bar", "bhs_health_bodypart",
-            nil_math("rightarm"), maxhp.rightarm, true)
+                nil_math("rightarm"), maxhp.rightarm, true)
         progress_health_leftarm = ParamBar(progress_health_leftarm, "bhs_health_leftarm_bar", "bhs_health_bodypart",
-            nil_math("leftarm"), maxhp.leftarm, true)
+                nil_math("leftarm"), maxhp.leftarm, true)
         progress_health_rightleg = ParamBar(progress_health_rightleg, "bhs_health_rightleg_bar", "bhs_health_bodypart",
-            nil_math("rightleg"), maxhp.rightleg, true)
+                nil_math("rightleg"), maxhp.rightleg, true)
         progress_health_leftleg = ParamBar(progress_health_leftleg, "bhs_health_leftleg_bar", "bhs_health_bodypart",
-            nil_math("leftleg"), maxhp.leftleg, true)
+                nil_math("leftleg"), maxhp.leftleg, true)
         -------------------------------------
     end
 end
@@ -1624,23 +1634,23 @@ function actor_on_footstep(material, power, hud_view, flags)
         if leftleg_flag then
             if not mst then
                 level.add_cam_effector("camera_effects\\switch\\" .. leftleg_anm[math.random(#leftleg_anm)] .. ".anm",
-                    99251, false, "", 0, false, ((left_limp - 1) *
-                        (zzz_player_injuries_mcm.get_config("leg_animation_power"))))
+                        99251, false, "", 0, false, ((left_limp - 1) *
+                                (zzz_player_injuries_mcm.get_config("leg_animation_power"))))
                 tg_anm = tg + delay_anm_play
             end
             --	actor_menu.set_msg(1, strformat("Left leg HP: %s | Left leg Power: %s", left_l, left_limp))
         elseif rightleg_flag then
             if not mst then
                 level.add_cam_effector("camera_effects\\switch\\" .. rightleg_anm[math.random(#rightleg_anm)] .. ".anm",
-                    99261, false, "", 0, false, ((right_limp - 1) *
-                        (zzz_player_injuries_mcm.get_config("leg_animation_power"))))
+                        99261, false, "", 0, false, ((right_limp - 1) *
+                                (zzz_player_injuries_mcm.get_config("leg_animation_power"))))
                 tg_anm = tg + delay_anm_play
             end
             --	actor_menu.set_msg(1, strformat("Right leg HP: %s | Right leg Power: %s", right_l, right_limp))
         elseif bothlegs_flag then
             level.add_cam_effector("camera_effects\\switch\\" .. bothlegs_anm[math.random(#bothlegs_anm)] .. ".anm",
-                99271, false, "", 0, false,
-                ((both_limp - 1) * (zzz_player_injuries_mcm.get_config("leg_animation_power"))))
+                    99271, false, "", 0, false,
+                    ((both_limp - 1) * (zzz_player_injuries_mcm.get_config("leg_animation_power"))))
             if not mst then
                 tg_anm = tg + delay_anm_play
             else
@@ -1656,7 +1666,8 @@ function actor_on_footstep(material, power, hud_view, flags)
     local cr = IsMoveState('mcCrouch')
     local low_cr = cr and IsMoveState('mcAccel')
 
-    if mst then -- comment this and uncomment next one for super memes !!
+    if mst then
+        -- comment this and uncomment next one for super memes !!
         --	if (not (cr or low_cr) ) and (left_l < 1 or right_l < 1) then
         if left_l <= (zzz_player_injuries_mcm.get_config("leg_limping_damage_minimum_hp")) then
             l_leg_power = 0.0290
@@ -1792,7 +1803,7 @@ function check_body_parts()
     is_body_parts_damaged = false
 
     if (head_difference > 0 or torso_difference > 0 or rightarm_difference > 0 or leftarm_difference > 0 or
-        rightleg_difference > 0 or leftleg_difference > 0) then
+            rightleg_difference > 0 or leftleg_difference > 0) then
         is_body_parts_damaged = true
     end
 end
@@ -1982,7 +1993,7 @@ function actor_on_update()
 
     local speedvector = db.actor:get_movement_speed()
     local movementspeed = (speedvector.x * speedvector.x) + (speedvector.y * speedvector.y) +
-                              (speedvector.z * speedvector.z)
+            (speedvector.z * speedvector.z)
 
     -- xcvb ---
     limp_speed_slow()
@@ -2206,10 +2217,12 @@ function ActorMenu_on_item_focus_lost(item)
 end
 
 function ActorMenu_on_mode_changed(mode, last_mode)
-    if last_mode == 1 then -- inv closed
+    if last_mode == 1 then
+        -- inv closed
         EmptyPreviewBars()
         focused_item = nil
-    elseif last_mode == 4 then -- looting closed
+    elseif last_mode == 4 then
+        -- looting closed
         EmptyPreviewBars()
         focused_item = nil
     end
