@@ -932,7 +932,7 @@ function interactive_comments_on_button(key)
     end
 end
 
-local speaking_to_unique_npc = false
+local talking_to_unique_npc_story_id = false
 function GUI_on_show(name, path)
     if name ~= "Dialog" then
         return
@@ -943,16 +943,29 @@ function GUI_on_show(name, path)
         return
     end
 
-    speak_unique_npc(get_object_story_id(npc:id()) or nil)
-end
-
-function speak_unique_npc(speaker_npc_story_id)
-    if speaker_npc_story_id == nil then
+    talking_to_unique_npc_story_id = get_object_story_id(npc:id()) or nil
+    if not talking_to_unique_npc_story_id then
+        start_dialog_with_regular_npc()
         return
     end
 
-    local unique_category = "start_unique"
-    local unique_npc_category = unique_category .. "_" .. speaker_npc_story_id
+    start_dialog_with_unique_npc(talking_to_unique_npc_story_id)
+end
+
+function start_dialog_with_unique_npc(story_id)
+    dialog_with_unique_npc(story_id, "start_unique")
+end
+
+function end_dialog_with_unique_npc(story_id)
+    dialog_with_unique_npc(story_id, "end_unique")
+end
+
+function dialog_with_unique_npc(story_id, unique_category)
+    if story_id == nil then
+        return
+    end
+
+    local unique_npc_category = unique_category .. "_" .. story_id
     local unique_dialogs = get_lines_amount_for_line_for_current_lang(unique_category)
     local unique_npc_dialogs = get_lines_amount_for_line_for_current_lang(unique_npc_category)
     local total = unique_dialogs + unique_npc_dialogs
@@ -962,6 +975,28 @@ function speak_unique_npc(speaker_npc_story_id)
     else
         actor_speak(dialogs_with_lang_muffle(unique_npc_category), 1.0, 3500, 100, false, false, false, false, true, false)
     end
+end
+
+function GUI_on_hide(name, path)
+    if name ~= "Dialog" then
+        return
+    end
+
+    if not talking_to_unique_npc_story_id then
+        end_dialog_with_regular_npc()
+        return
+    end
+
+    end_dialog_with_unique_npc(talking_to_unique_npc_story_id)
+    talking_to_unique_npc_story_id = nil
+end
+
+function start_dialog_with_regular_npc()
+    actor_speak(dialogs_with_lang_muffle("start_regular"), 1.0, 3500, 100, false, false, false, false, true, false)
+end
+
+function end_dialog_with_regular_npc()
+    actor_speak(dialogs_with_lang_muffle("end_regular"), 1.0, 3500, 100, false, false, false, false, true, false)
 end
 
 --------------------------------------
