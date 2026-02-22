@@ -214,6 +214,7 @@ local mcm_sound_volume = get_config("shouts_volume") -- gets the volume value fr
 
 function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear,
     requires_squad_out, has_priority, ignore_conditionals, is_state) -- (EDITED FUCTION  - ADDED SOME REQUIREMENTS) player function, plays the sound if all conditions are met. Argument "sound_volume" is overwriten by default from MCM shouts volume slider.
+    printf("file to say: %s", file)
     if file == nil then
         return
     end
@@ -308,9 +309,14 @@ local VOICE_CATEGORY_PLAYER = "player"
 local VOICE_CATEGORY_BUTTON_COMMENTS = "buttoncomments"
 local VOICE_CATEGORY_RANDOM_SHOUTS = "random_shouts"
 local VOICE_CATEGORY_COMMANDS = "commands"
+local VOICE_CATEGORY_DIALOGS = "dialogs"
 
-function voice_line_and_subcategory_same(category, language_key, muffle_val, line)
+function random_voice_line_and_subcategory_same(category, language_key, muffle_val, line)
     return random_voice_line(category, line, language_key, muffle_val, line)
+end
+
+function get_lines_amount_for_line_for_current_lang(line)
+    return get_lines_amount_for_line(line, get_actor_lang())
 end
 
 function random_voice_line(category, subcategory, language_key, muffle_val, line)
@@ -322,16 +328,19 @@ function random_voice_line(category, subcategory, language_key, muffle_val, line
 end
 
 function player_with_lang_muffle_random(line)
-    return voice_line_and_subcategory_same(VOICE_CATEGORY_PLAYER, lang, muffle, line)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_PLAYER, lang, muffle, line)
 end
 function button_comments_with_lang_muffle_random(line)
-    return voice_line_and_subcategory_same(VOICE_CATEGORY_BUTTON_COMMENTS, lang, muffle, line)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_BUTTON_COMMENTS, lang, muffle, line)
 end
 function random_shout_with_lang_muffle_random(line)
-    return voice_line_and_subcategory_same(VOICE_CATEGORY_RANDOM_SHOUTS, lang, muffle, line)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_RANDOM_SHOUTS, lang, muffle, line)
 end
 function commands_with_lang_muffle(subcategory, line)
     return random_voice_line(VOICE_CATEGORY_COMMANDS, subcategory, lang, muffle, line)
+end
+function dialogs_with_lang_muffle(line)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_DIALOGS, lang, muffle, line)
 end
 
 function monster_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE CALLBACKS) adds combat_intensity when a mutant is killed
@@ -923,6 +932,38 @@ function interactive_comments_on_button(key)
     end
 end
 
+local speaking_to_unique_npc = false
+function GUI_on_show(name, path)
+    if name ~= "Dialog" then
+        return
+    end
+
+    local npc = get_speaker(true, true)
+    if not npc then
+        return
+    end
+
+    speak_unique_npc(get_object_story_id(npc:id()) or nil)
+end
+
+function speak_unique_npc(speaker_npc_story_id)
+    if speaker_npc_story_id == nil then
+        return
+    end
+
+    local unique_category = "start_unique"
+    local unique_npc_category = unique_category .. "_" .. speaker_npc_story_id
+    local unique_dialogs = get_lines_amount_for_line_for_current_lang(unique_category)
+    local unique_npc_dialogs = get_lines_amount_for_line_for_current_lang(unique_npc_category)
+    local total = unique_dialogs + unique_npc_dialogs
+    local random = math.random(1, total)
+    if random <= unique_dialogs then
+        actor_speak(dialogs_with_lang_muffle(unique_category), 1.0, 3500, 100, false, false, false, false, true, false)
+    else
+        actor_speak(dialogs_with_lang_muffle(unique_npc_category), 1.0, 3500, 100, false, false, false, false, true, false)
+    end
+end
+
 --------------------------------------
 -- INTERACTIVE COMMENTS PART ENDS HERE
 --------------------------------------
@@ -960,5 +1001,7 @@ function on_game_start() -- lets the engine know we want these function to run w
     RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback) -- runs when a mutant dies
     RegisterScriptCallback("npc_on_hit_callback", npc_on_hit_callback) -- runs when a human (NOT ACTOR) is hit
     RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback) -- runs when a mutant is hit
+    RegisterScriptCallback("GUI_on_show", GUI_on_show) -- runs when a mutant is hit
+    RegisterScriptCallback("GUI_on_hide", GUI_on_hide) -- runs when a mutant is hit
     init_languages()
 end
