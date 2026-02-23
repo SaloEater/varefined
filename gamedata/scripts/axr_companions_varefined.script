@@ -600,6 +600,33 @@ function axr_companions.companion_add_waypoints(npc, pos)
     se_save_var(npc:id(), npc:name(), "pathpoint" .. i, s) -- save_var(npc,"pathpoint"..tostring(i),s)
 end
 
+local old_dialogs_axr_companion_become_actor_companion = dialogs_axr_companion.become_actor_companion
+function dialogs_axr_companion.become_actor_companion(actor, npc)
+    old_dialogs_axr_companion_become_actor_companion(actor, npc)
+    actor_speak_npc_joined()
+end
+
+local old_axr_companions_add_to_actor_squad = axr_companions.add_to_actor_squad
+function axr_companions.add_to_actor_squad(npc)
+    printf("Adding %s to actor squad", npc:id())
+    old_axr_companions_add_to_actor_squad(npc)
+    actor_speak_npc_joined()
+end
+
+function actor_speak_npc_joined()
+    AGDD_voiced_actor.actor_speak(AGDD_voiced_actor.squad_with_lang_muffle("npc_joined"), 1.0, 3500, 100, false, false, false, false, true, false)
+end
+
+local old_axr_companions_remove_from_actor_squad = axr_companions.remove_from_actor_squad
+function axr_companions.remove_from_actor_squad(npc)
+    old_axr_companions_remove_from_actor_squad(npc)
+    actor_speak_npc_left()
+end
+
+function actor_speak_npc_left()
+    AGDD_voiced_actor.actor_speak(AGDD_voiced_actor.squad_with_lang_muffle("npc_left"), 1.0, 3500, 100, false, false, false, false, true, false)
+end
+
 printf(
         "[VARefined] axr_companions.script monkeypatched by zzz_monkey_axr_companions_varefined.script [Voiced Actor Refined mod]")
 

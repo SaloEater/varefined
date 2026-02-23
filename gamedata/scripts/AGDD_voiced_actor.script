@@ -67,7 +67,7 @@ local get_config = varefined_mcm.get_config
     ["language_key"] ="the prefix for the line in the file name, for example _eng for english"
 ]]
 local ini = ini_file_ex("plugins\\varefined.ltx")
-local language_prefixes = {
+language_prefixes = {
     ["rus"] = nil,
     ["eng"] = nil
 }
@@ -310,13 +310,14 @@ local VOICE_CATEGORY_BUTTON_COMMENTS = "buttoncomments"
 local VOICE_CATEGORY_RANDOM_SHOUTS = "random_shouts"
 local VOICE_CATEGORY_COMMANDS = "commands"
 local VOICE_CATEGORY_DIALOGS = "dialogs"
+local VOICE_CATEGORY_SQUAD = "squad"
 
 function random_voice_line_and_subcategory_same(category, language_key, muffle_val, line)
     return random_voice_line(category, line, language_key, muffle_val, line)
 end
 
 function get_lines_amount_for_line_for_current_lang(line)
-    return get_lines_amount_for_line(line, get_actor_lang())
+    return get_lines_amount_for_line(line, lang)
 end
 
 function random_voice_line(category, subcategory, language_key, muffle_val, line)
@@ -324,7 +325,12 @@ function random_voice_line(category, subcategory, language_key, muffle_val, line
     if lines == 0 then
         return nil
     end
-        return string.format(VOICE_FORMAT, category, language_prefixes[language_key], subcategory, muffle_val, line, math.random(lines))
+
+    if language_prefixes == nil or next(language_prefixes) == nil then
+        init_languages()
+    end
+
+    return string.format(VOICE_FORMAT, category, language_prefixes[language_key], subcategory, muffle_val, line, math.random(lines))
 end
 
 function player_with_lang_muffle_random(line)
@@ -341,6 +347,9 @@ function commands_with_lang_muffle(subcategory, line)
 end
 function dialogs_with_lang_muffle(line)
     return random_voice_line_and_subcategory_same(VOICE_CATEGORY_DIALOGS, lang, muffle, line)
+end
+function squad_with_lang_muffle(line)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_SQUAD, lang, muffle, line)
 end
 
 function monster_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE CALLBACKS) adds combat_intensity when a mutant is killed
@@ -415,13 +424,18 @@ function npc_on_death_callback(victim, killer) -- (EDITED FUNCTION - ADDED MORE 
     if not db.actor:alive() then
         return
     end
+    if db.actor:is_talking() then
+        return
+    end
+
+    if dialogs_axr_companion.is_actor_companion(db.actor, victim) then
+        actor_speak(squad_with_lang_muffle("npc_died"), 1.0, 3500, 100, false, false, false, false, true, false)
+    end
+
     if not killer then
         return
     end
     if killer:id() ~= db.actor:id() then
-        return
-    end
-    if db.actor:is_talking() then
         return
     end
     if not get_config("enable_on_kill_shouts") then
@@ -502,6 +516,11 @@ function npc_on_hit_callback(npc, damage_amount, local_direction, attacker, bone
     if not db.actor:alive() then
         return
     end
+
+    if dialogs_axr_companion.is_actor_companion(db.actor, npc) then
+        actor_speak(squad_with_lang_muffle("npc_hit"), 1.0, 3500, 100, false, false, false, false, true, false)
+    end
+
     if attacker:id() ~= db.actor:id() then
         return
     end
@@ -513,18 +532,13 @@ end
 
 local combat_check_time = 0 -- is set later
 
-trigger = 0
 delay = 500
+grok_delay = 0
 function actor_on_update(binder, delta) -- thinker function, handles conditional sounds
     tg = time_global()
 
-    if trigger == 0 then
+    if (tg > grok_delay) then
         grok_delay = tg + delay
-        trigger = 1
-    end
-
-    if (trigger == 1 and tg > grok_delay) then
-        trigger = 0
 
         get_actor_lang()
         get_muffle_status()
@@ -600,8 +614,8 @@ function actor_on_update(binder, delta) -- thinker function, handles conditional
                 sprint_volume, sprint_pause, 100, false, false, false, false, false, true) -- plays the exhausted sound
 
         elseif db.actor.health < 0.55 and hurt_volume > 0 then -- normal hurt state will play if everything else fails to meet the conditions
-            actor_speak(player_with_lang_muffle_random("hurt"), hurt_volume,
-                hurt_pause, 100, false, false, false, false, false, true) -- plays the wounded sound
+            --actor_speak(player_with_lang_muffle_random("hurt"), hurt_volume,
+            --    hurt_pause, 100, false, false, false, false, false, true) -- plays the wounded sound
 
         elseif actor_status_thirst.get_water_deprivation(true) > 0.3 and thirst_volume > 0 then
             actor_speak(player_with_lang_muffle_random("thirst"),
@@ -628,62 +642,85 @@ function actor_on_before_hit(hitinfo, bone_id, flags) -- damage function, plays 
         return
     end -- don't play pain sounds if actor is already dead
 
-    if not (hitinfo and hitinfo.type and hitinfo.power) then
+    local hit_type = hitinfo and hitinfo.type
+    if not (hitinfo and hit_type and hitinfo.power) then
         return
     end -- filters out info-less hits
-    if (hitinfo.type == hit.radiation or hitinfo.type == hit.telepatic) then
+    if (hit_type == hit.radiation or hit_type == hit.telepatic) then
         return
     end -- filters out radiation and psi damage
-    if not get_config("enable_pain_shouts") then
-        return
-    end -- filters disabled pain sounds from MCM
 
     -- all the code related to fixing area damage is pretty much spaghett, I'm honestly way too tired of this shit
 
-    if time_global() > hit_timer1 then -- prevents too many pain sounds from playing in a short succession
-        if last_health < db.actor.health then
-            last_health = (db.actor.health - 0.0001)
-        end -- if player's health value is higher than whatever we last noted down - reset it
-        local anims = {"hit_front", "hit_front_left", "hit_front_right"} -- a table of camera animations for hit punch
-        if (hitinfo.type == hit.burn or hitinfo.type == hit.light_burn or hitinfo.type == hit.chemical_burn) and
-            (last_health - db.actor.health) >= 0.1 then -- this checks for a specific threshold for "area" damage types
-            if axr_companions.sound_checking() == true then
-                return
-            end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
-            if db.actor.health > 0.5 then -- checks if the actor is over 50% of their full health
-                actor_speak(player_with_lang_muffle_random("pain"), 1.0,
-                    2000, 100, false, false, false, true, true, false)
-            else
-                actor_speak(player_with_lang_muffle_random("pain_bad"), 1.0,
-                    2500, 100, false, false, false, true, true, false)
+    tg = time_global()
+    if tg > hit_timer1 then -- prevents too many pain sounds from playing in a short succession
+        local cooldown = nil
+
+        if get_config("enable_pain_shouts") then
+            if last_health < db.actor.health then
+                last_health = (db.actor.health - 0.0001)
+            end -- if player's health value is higher than whatever we last noted down - reset it
+            local anims = {"hit_front", "hit_front_left", "hit_front_right"} -- a table of camera animations for hit punch
+            if (hit_type == hit.burn or hit_type == hit.light_burn or hit_type == hit.chemical_burn) and
+                    (last_health - db.actor.health) >= 0.1 then -- this checks for a specific threshold for "area" damage types
+                if axr_companions.sound_checking() == true then
+                    return
+                end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
+                if db.actor.health > 0.5 then -- checks if the actor is over 50% of their full health
+                    cooldown = 2000
+                    actor_speak(player_with_lang_muffle_random("pain"), 1.0,
+                            cooldown, 100, false, false, false, true, true, false)
+                else
+                    cooldown = 2500
+                    actor_speak(player_with_lang_muffle_random("pain_bad"), 1.0,
+                            cooldown, 100, false, false, false, true, true, false)
+                end
+                level.add_cam_effector("camera_effects\\" .. anims[math.random(#anims)] .. ".anm",
+                        math.random(447555, 447999), false, "") -- if you use a generic camera punch effect, put it here
+                last_health = db.actor.health -- saves player's health value for later use
+                hit_timer1 = tg + 1000 -- sets the delay of one second before the next pain sound can be played if the damage type is usable as an area effect
+            elseif (hit_type == hit.shock or hit_type == hit.strike or hit_type == hit.wound or hit_type ==
+                    hit.fire_wound or hit_type == hit.explosion or hit_type == hit.wound_2) then -- this is for every other "non-area" damage type
+                if axr_companions.sound_checking() == true then
+                    return
+                end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
+                if db.actor.health > 0.5 then
+                    cooldown = 2000
+                    actor_speak(player_with_lang_muffle_random("pain"), 1.0,
+                            cooldown, 100, false, false, false, true, true, false)
+                else
+                    cooldown = 2500
+                    actor_speak(player_with_lang_muffle_random("pain_bad"), 1.0,
+                            cooldown, 100, false, false, false, true, true, false)
+                end
+                --			level.add_cam_effector( "camera_effects\\" .. anims[math.random(#anims)] .. ".anm", math.random(447555, 447999), false, "" ) --if you use a generic camera punch effect, put it here
+                hit_timer1 = tg + 125 -- sets the delay of 1/8th of a second before the next pain sound can be played if the damage type is only used in hits
             end
-            level.add_cam_effector("camera_effects\\" .. anims[math.random(#anims)] .. ".anm",
-                math.random(447555, 447999), false, "") -- if you use a generic camera punch effect, put it here
-            last_health = db.actor.health -- saves player's health value for later use
-            hit_timer1 = time_global() + 1000 -- sets the delay of one second before the next pain sound can be played if the damage type is usable as an area effect
-        elseif (hitinfo.type == hit.shock or hitinfo.type == hit.strike or hitinfo.type == hit.wound or hitinfo.type ==
-            hit.fire_wound or hitinfo.type == hit.explosion or hitinfo.type == hit.wound_2) then -- this is for every other "non-area" damage type
-            if axr_companions.sound_checking() == true then
-                return
-            end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
-            if db.actor.health > 0.5 then
-                actor_speak(player_with_lang_muffle_random("pain"), 1.0,
-                    2000, 100, false, false, false, true, true, false)
-            else
-                actor_speak(player_with_lang_muffle_random("pain_bad"), 1.0,
-                    2500, 100, false, false, false, true, true, false)
-            end
-            --			level.add_cam_effector( "camera_effects\\" .. anims[math.random(#anims)] .. ".anm", math.random(447555, 447999), false, "" ) --if you use a generic camera punch effect, put it here
-            hit_timer1 = time_global() + 125 -- sets the delay of 1/8th of a second before the next pain sound can be played if the damage type is only used in hits
+        else -- filters disabled pain sounds from MCM
+            hit_timer1 = tg + 3500 -- sets the delay to be equal to delay from actor_speak_about_hit
+        end
+
+        if cooldown ~= nil then
+            printf("hit by %s, cooldown: %s, timer %s", hit_type, cooldown, hit_timer1)
+            CreateTimeEvent("varefined", "before_hit_comment", (cooldown + 150) / 1000 , function(hit_type)
+                actor_speak_about_hit(hit_type)
+                return true
+            end, hit_type)
         end
     end
 
     --	level.add_pp_effector("amk_shoot.ppe",447554,false) --if you use a generic screen flash effect, put it here
 
-    if is_actor_in_combat() and (hitinfo.type == hit.fire_wound or hitinfo.type == hit.wound) then -- if actor is in combat and was hit by a human or by a mutant, add combat intensity
+    if is_actor_in_combat() and (hit_type == hit.fire_wound or hit_type == hit.wound) then -- if actor is in combat and was hit by a human or by a mutant, add combat intensity
         add_action_intensity(50, 0.5, 200)
     end
 
+end
+
+function actor_speak_about_hit(hit_type)
+    local hit_type_string = gameplay_silent_kills.dtype[hit_type]
+    actor_speak(player_with_lang_muffle_random(string.format("hit_by_%s", hit_type_string)), 1.0,
+            3500, 100, false, false, false, true, true, false)
 end
 
 function actor_on_before_death(whoID, flags) -- death function, plays death sounds (DEATH SCREAMS AND WHELPS ONLY, NO BODY FALLING SOUNDS OR ANYTHING ELSE)

@@ -19,10 +19,10 @@ function on_key_press(key)
 		chance = math.random(0,100)
 		if chance > 50 then
 			axr_companions.sound_checking_stop()
-			AGDD_voiced_actor.actor_speak(AGDD_voiced_actor.player_with_lang_muffle("command_start"),1.0,1000,100, true, false, false, false, false, false)
+			AGDD_voiced_actor.actor_speak(AGDD_voiced_actor.player_with_lang_muffle_random("command_start"),1.0,1000,100, true, false, false, false, false, false)
 --			show_all_ui(false)
 			if AGDD_voiced_actor.is_actor_in_combat() ~= true then
-				AGDD_voiced_actor.actor_speak(AGDD_voiced_actor.player_with_lang_muffle("command_stop"),1.0,1000,100, true, false, false, false, false, false)
+				AGDD_voiced_actor.actor_speak(AGDD_voiced_actor.player_with_lang_muffle_random("command_stop"),1.0,1000,100, true, false, false, false, false, false)
 			end
 --				addonMenu:CloseTheMenu()
 --			end
