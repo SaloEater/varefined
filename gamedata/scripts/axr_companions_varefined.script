@@ -614,7 +614,7 @@ function axr_companions.add_to_actor_squad(npc)
 end
 
 function actor_speak_npc_joined()
-    AGDD_voiced_actor.actor_speak(AGDD_voiced_actor.squad_with_lang_muffle("npc_joined"), 1.0, 3500, 100, false, false, false, false, true, false)
+    AGDD_voiced_actor.actor_speak_default(AGDD_voiced_actor.squad_with_lang_muffle("squadmate_joined"), 1.0, 3500, 100)
 end
 
 local old_axr_companions_remove_from_actor_squad = axr_companions.remove_from_actor_squad
@@ -624,7 +624,7 @@ function axr_companions.remove_from_actor_squad(npc)
 end
 
 function actor_speak_npc_left()
-    AGDD_voiced_actor.actor_speak(AGDD_voiced_actor.squad_with_lang_muffle("npc_left"), 1.0, 3500, 100, false, false, false, false, true, false)
+    AGDD_voiced_actor.actor_speak_default(AGDD_voiced_actor.squad_with_lang_muffle("squadmate_left"), 1.0, 3500, 100)
 end
 
 printf(
