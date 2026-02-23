@@ -63,16 +63,16 @@ def _helmet_scipy(data, samplerate: int, resonance_hz: int):
 
     data = data.astype(np.float64)
 
-    # 1. High-pass: remove low-end bass (sealed helmet blocks it)
-    hp = signal.butter(2, 350, btype='high', fs=samplerate, output='sos')
+    #1. High-pass: remove low-end bass (sealed helmet blocks it)
+    hp = signal.butter(2, 500, btype='high', fs=samplerate, output='sos')
     data = _apply_sos(hp, data)
 
     # 2. Low-pass: soften high frequencies while keeping voice presence
-    lp = signal.butter(3, 2200, btype='low', fs=samplerate, output='sos')
+    lp = signal.butter(3, 1300, btype='low', fs=samplerate, output='sos')
     data = _apply_sos(lp, data)
 
     # 3. Resonance peak: helmet interior acts as a resonant cavity
-    b, a = signal.iirpeak(resonance_hz, Q=3.5, fs=samplerate)
+    b, a = signal.iirpeak(resonance_hz, Q=0.5, fs=samplerate)
     data = _apply_ba(b, a, data)
 
     # 4. Early reflections: sound bouncing off the visor / helmet walls
