@@ -61,6 +61,7 @@ All voice lines takes into account Actor conditions:
 - actor is healthy/injured/badly injured,
 - thirst/sleepiness/psy health/stamina level of actor.
 
+Implemented reactions:
 <voice lines start here>
 
 | Parent folder | Folder | Description |
@@ -109,12 +110,12 @@ All voice lines takes into account Actor conditions:
 | player | gun_jam | When gun jams and enemy is far or there is no enemy |
 | player | gun_jam_alone | When enemy close and gun jams and squadmates are far<br>When combat intensity is medium and enemy is far and gun jams |
 | player | gun_jam_squad | When enemy close and gun jams and squadmates near or can hear you |
-| player | hit_by_burn | Player voice (Russian) — reaction to burn damage |
-| player | hit_by_chemical_burn | Player voice (Russian) — reaction to chemical burn damage |
-| player | hit_by_explosion | Player voice (Russian) — reaction to explosion damage |
-| player | hit_by_fire_wound | Player voice (Russian) — reaction to fire wound |
-| player | hit_by_light_burn | Player voice (Russian) — reaction to light burn |
-| player | hit_by_shock | After some time after character was hit by damage with burn type |
+| player | hit_by_burn | After some time after character was hit by damage with burn type |
+| player | hit_by_chemical_burn | After some time after character was hit by damage with chemical burn type |
+| player | hit_by_explosion | After some time after character was hit by damage with explosion type |
+| player | hit_by_fire_wound | After some time after character was hit by damage with fire wound type |
+| player | hit_by_light_burn | After some time after character was hit by damage with light burn type |
+| player | hit_by_shock | After some time after character was hit by damage with shock type |
 | player | hit_by_strike | After some time after character was hit by damage with strike type |
 | player | hit_by_wound | After some time after character was hit by damage with wound type |
 | player | hunger | Player voice (Russian) — hunger |
