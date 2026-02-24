@@ -66,7 +66,7 @@ Implemented reactions:
 
 | Parent folder | Folder | Description |
 |---|---|---|
-|  | buttoncomments |  |
+|  | buttoncomments | Character comments about his wellbeing |
 | buttoncomments | Bleed | Comment when character is bleeding out and squadmates can hear you or far from you |
 | buttoncomments | Bleed_SquadNear | Comment when character is bleeding out and squadmates near you |
 | buttoncomments | Enemy | Comment when there is an aggroed enemy far from you and squadmates far from you |
@@ -80,7 +80,7 @@ Implemented reactions:
 | buttoncomments | Mumble_SquadNear | Comment when character is not hurt enough and squadmates near you |
 | buttoncomments | Tired | Comment when character has low stamina and squadmates can hear you or far from you |
 | buttoncomments | Tired_SquadNear | Comment when character has low stamina and squadmates near you |
-|  | commands | Command voice (Russian) |
+|  | commands | Commands to companions |
 | commands | DontLoot | When companions are ordered to don't loot |
 | commands | FireAtWill | When companions are ordered to fire	at will |
 | commands | Follow | When companions are ordered to follow |
@@ -101,7 +101,7 @@ Implemented reactions:
 | dialogs | start_regular | When player starts the dialog with non-unique NPC |
 | dialogs | start_unique | When player starts the dialog with NPC that has story_id |
 | dialogs | start_unique_bar_visitors_stalker_mechanic | When player starts the dialog with NPC that has story_id "bar_visitors_stalker_mechanic" |
-|  | player | Player voice (Russian) |
+|  | player | Character reactions |
 | player | death | When character dies |
 | player | exhausted | When character is exhausted |
 | player | fear | When character has low psy health |
@@ -151,9 +151,9 @@ Implemented reactions:
 | player | sanity | When character has very low psy health |
 | player | sleepiness | When character	is sleepy |
 | player | thirst | When character is thirsty |
-|  | random_shouts | Random shout (Russian) |
+|  | random_shouts | Random shouts |
 | random_shouts | random | Just random shouts |
-|  | squad | Squad voice (Russian) |
+|  | squad | Reactions to squad changes |
 | squad | squadmate_died | When squadmate dies |
 | squad | squadmate_hit | When squadmate receives damage |
 | squad | squadmate_joined | When new squadmate joins |
