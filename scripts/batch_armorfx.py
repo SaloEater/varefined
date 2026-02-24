@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+All credits go to @Varian for providing shell scripts
 
 batch_armorfx.py
 
@@ -10,12 +11,14 @@ For every non-m_ .ogg file found under --root:
   2. <out-dir>/.../m_<file>.ogg — armor/helmet effect (sox_ng) then loudness-normalised
 
 Requires: sox_ng (or sox as fallback), ffmpeg
+https://www.ffmpeg.org/download.html#build-windows
+https://codeberg.org/sox_ng/sox_ng/releases
 
 Usage:
   python batch_armorfx.py apply --root gamedata/sounds --out-dir _out
   python batch_armorfx.py apply --root . --preset heavy --wet 0.55 --dry-run
   python batch_armorfx.py presets
-  python batch_armorfx.py apply --root test --sox C:\\Users\\danil\\Downloads\\sox-ng\\sox_ng.exe --ffmpeg C:\\Users\\danil\\Downloads\\ffmpeg\\bin\\ffmpeg.exe --preset halo --wet 0.65 --comb-hz 250 --comb-decay 0.30
+  python batch_armorfx.py apply apply --root gamedata/sounds/characters_voice --in-place --helmet-only --sox .\\sox-ng\\sox_ng.exe --ffmpeg .\\ffmpeg\\bin\\ffmpeg.exe --preset halo --wet 0.65 --comb-hz 115 --comb-decay 0.75
 """
 
 import argparse
