@@ -46,7 +46,7 @@ Dhatri and Grok's Edits
 
 Now actor will have voice lines related to thirstiness and hunger (associated with HUD icons appearing).
 
-An option, defined just below, will play muffled sounds. If such sounds are not available, replace 
+An option, defined just below, will play muffled sounds. If such sounds are not available, replace
 
 muffle = "m_"
 
@@ -102,7 +102,7 @@ function get_actor_lang()
     end
 end
 
-muffle = "" -- initiates muffling condition 
+muffle = "" -- initiates muffling condition
 
 function get_muffle_status()
     -- changes muffle condition of the sound
@@ -141,7 +141,7 @@ end
 function is_actor_in_combat()
     -- INNER combat checker, returns true if actor is being TARGETED by an npc (both stalkers and mutants count) FROM DISTANCE NOT GREATER THAN 70m , false if not, can be used externally
 
-    --	NOTE: I REMOVED REQUIRMENT FOR WEAPON ,BECAUSE BY MY LOGIC ,ENEMY IS ENEMY ,NO MATTER IF HE HAVE WEAPON IN HANDS OR NOT ,BUT IF YOU WANT TURN ON THIS CONDITION AGAIN 
+    --	NOTE: I REMOVED REQUIRMENT FOR WEAPON ,BECAUSE BY MY LOGIC ,ENEMY IS ENEMY ,NO MATTER IF HE HAVE WEAPON IN HANDS OR NOT ,BUT IF YOU WANT TURN ON THIS CONDITION AGAIN
     --		JUST REPLACE LINE 69 WITH  "if npc and npc:alive() and check_for_weapon(npc) == true and npc:position():distance_to(db.actor:position())<=70"  WITHOUT QUOTES
 
     for id, v in pairs(xr_combat_ignore.fighting_with_actor_npcs) do
@@ -374,6 +374,8 @@ end
 function random_voice_line(category, subcategory, language_key, muffle_val, line)
     local lines = get_lines_amount_for_line(line, language_key)
     if lines == 0 then
+        printf("no lines found for line %s, language %s, category %s, subcategory %s, muffle %s", line, language_key, category,
+                subcategory, muffle_val)
         return nil
     end
 
@@ -626,8 +628,8 @@ function actor_on_update(binder, delta)
         local sprint_volume = (1 - db.actor.power - (db.actor.power * 0.5)) -- sets the volume of the next exhaustion sound, gets louder the less stamina the actor has
         local sprint_pause = 12000 * db.actor.power -- sets the pause before the next exhaustion sound, it gets shorter the less stamina the actor has
         local psy_volume = (1 - arszi_psy.get_psy_health() - (arszi_psy.get_psy_health() * 0.5)) -- sets the volume of the next psy sound, gets louder the less psy-health the actor has
-        local sanity_pause = (7000 * arszi_psy.get_psy_health()) -- sets the pause before the next psy sound, it gets shorter the less psy-health the actor has	
-        local fear_pause = (20000 * arszi_psy.get_psy_health()) -- sets the pause before the next psy sound, it gets shorter the less psy-health the actor has	
+        local sanity_pause = (7000 * arszi_psy.get_psy_health()) -- sets the pause before the next psy sound, it gets shorter the less psy-health the actor has
+        local fear_pause = (20000 * arszi_psy.get_psy_health()) -- sets the pause before the next psy sound, it gets shorter the less psy-health the actor has
         local thirst_volume = (actor_status_thirst.get_water_deprivation(true) * 0.2)
         local thirst_pause = 65000 / (actor_status_thirst.get_water_deprivation(true) * 0.5)
         local satiety_volume = (1 - db.actor:cast_Actor():conditions():GetSatiety() -
@@ -639,7 +641,7 @@ function actor_on_update(binder, delta)
         sprint_pause = clamp(sprint_pause, 12000, 12500) -- limits the sprint_pause value so the pause between sounds isn't too short or too long
         sanity_pause = clamp(sanity_pause, 7000, 8000)
         fear_pause = clamp(fear_pause, 20000, 25000) -- limits the psy_pause value so the pause between sounds isn't too short or too long
-        thirst_pause = clamp(thirst_pause, 65000, 95000) -- new thirst clamp 
+        thirst_pause = clamp(thirst_pause, 65000, 95000) -- new thirst clamp
         satiety_pause = clamp(satiety_pause, 96000, 108000) -- new satiety clamp, set to long rn, more testing and soundcarpet needed
         sleep_pause = clamp(sleep_pause, 120000, 160000)
 
@@ -1110,6 +1112,7 @@ function choose_random_category(...)
     for i, count in ipairs(lines) do
         cumulative = cumulative + count
         if random <= cumulative then
+            printf("Chose category %s with %s lines (random number was %s)", categories[i], count, random)
             return categories[i]
         end
     end
