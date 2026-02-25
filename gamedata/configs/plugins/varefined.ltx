@@ -1,12 +1,11 @@
-; define prefixes for language files, so further we can specify amount of lines for each language
+; define prefixes for language files
 [language]
 rus = ;has no prefix because it's default language
 eng = _eng
 
-; section name is just lines_ with language prefix
-; each line is a key and value pair of how many lines there are present in filesystem for each key. Make sure
-; make sure you also have the same amount of lines of muffled sounds, such files just have prefix `m_`
-; since they all are listed here but actually located in different folders, make sure you named them completely uniquely
+; section name is just lines_ with language key
+; each line is a key and value pair of how many lines there are present in filesystem for each key.
+; Make sure you also have the same amount of muffled lines, you can use script to auto-generate them
 [lines_rus]
 AddThisSpot = 1
 Bleed = 3
