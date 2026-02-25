@@ -61,7 +61,7 @@ All voice lines takes into account Actor conditions:
 - actor is healthy/injured/badly injured,
 - thirst/sleepiness/psy health/stamina level of actor.
 
-Implemented reactions:
+## **Implemented reactions:**
 <voice lines start here>
 
 | Parent folder | Folder | Description |
