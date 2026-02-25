@@ -30,6 +30,7 @@ jobs:
             --exclude='.gitattributes' \
             --exclude='README.md' \
             --exclude='version' \
+            --exclude='scripts' \
             ./* build_temp/
       
           echo "? files to build:"
