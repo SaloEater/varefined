@@ -360,6 +360,8 @@ function add_action_intensity(intensity, intensity_add_limit, cooldown)
 end
 
 local LANG_SECTION_FORMAT = "lines_%s"
+--- Takes a line name and a language key
+--- Returns the amount of lines there are for this line and language in the ini file
 function get_lines_amount_for_line(line, lang_key)
     return ini:r_value(string.format(LANG_SECTION_FORMAT, lang_key), line, 2, 0)
 end
@@ -373,14 +375,19 @@ local VOICE_CATEGORY_COMMANDS = "commands"
 local VOICE_CATEGORY_DIALOGS = "dialogs"
 local VOICE_CATEGORY_SQUAD = "squad"
 
+--- A helper function to random_voice_line when category and subcategory are the same, which is the most common case, for example player\death contains only death_ files
+--- Returns a random voice line
 function random_voice_line_and_subcategory_same(category, language_key, muffle_val, line)
     return random_voice_line(category, line, language_key, muffle_val, line)
 end
 
+--- Returns the amount of lines there are for this line and current language in the ini file
 function get_lines_amount_for_line_for_current_lang(line)
     return get_lines_amount_for_line(line, lang)
 end
 
+--- Takes all required parameters to match the path template
+--- Returns a path of a random voice line
 function random_voice_line(category, subcategory, language_key, muffle_val, line)
     local lines = get_lines_amount_for_line(line, language_key)
     if lines == 0 then
@@ -394,23 +401,59 @@ function random_voice_line(category, subcategory, language_key, muffle_val, line
     return string.format(VOICE_FORMAT, category, language_prefixes[language_key], subcategory, muffle_val, line, math.random(lines))
 end
 
-function player_with_lang_muffle_random(category)
-    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_PLAYER, lang, muffle, category)
+--- Returns a voice line from `player` category
+function player_with_lang_muffle_random(subcategory)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_PLAYER, lang, muffle, subcategory)
 end
-function button_comments_with_lang_muffle_random(category)
-    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_BUTTON_COMMENTS, lang, muffle, category)
+
+--- Returns a voice line from `button_comments` category
+function button_comments_with_lang_muffle_random(subcategory)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_BUTTON_COMMENTS, lang, muffle, subcategory)
 end
-function random_shout_with_lang_muffle_random(category)
-    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_RANDOM_SHOUTS, lang, muffle, category)
+
+--- Returns a voice line from `random_shouts` category
+function random_shout_with_lang_muffle_random(subcategory)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_RANDOM_SHOUTS, lang, muffle, subcategory)
 end
-function commands_with_lang_muffle(category, line)
-    return random_voice_line(VOICE_CATEGORY_COMMANDS, category, lang, muffle, line)
+
+--- Returns a voice line from `commands` category
+function commands_with_lang_muffle(subcategory, line)
+    return random_voice_line(VOICE_CATEGORY_COMMANDS, subcategory, lang, muffle, line)
 end
-function dialogs_with_lang_muffle(category)
-    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_DIALOGS, lang, muffle, category)
+
+--- Returns a voice line from `dialogs` category
+function dialogs_with_lang_muffle(subcategory)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_DIALOGS, lang, muffle, subcategory)
 end
-function squad_with_lang_muffle(category)
-    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_SQUAD, lang, muffle, category)
+
+--- Returns a voice line from `squad` category
+function squad_with_lang_muffle(subcategory)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_SQUAD, lang, muffle, subcategory)
+end
+
+--- Takes a list of categories and chooses one based on how many lines there are in each of them for the current language.
+--- Return the random category based on weighted random choice, categories with more lines have higher chances to be chosen.
+function choose_random_category(...)
+    local categories = { ... }
+    local total_lines = 0
+    local lines = {}
+    for _, category in ipairs(categories) do
+        local count = get_lines_amount_for_line_for_current_lang(category)
+        lines[#lines + 1] = count
+        total_lines = total_lines + count
+    end
+
+    local random = math.random(1, total_lines)
+    local cumulative = 0
+    for i, count in ipairs(lines) do
+        cumulative = cumulative + count
+        if random <= cumulative then
+            printf("Chose category %s with %s lines (random number was %s)", categories[i], count, random)
+            return categories[i]
+        end
+    end
+
+    return "none"
 end
 
 function monster_on_death_callback(victim, killer)
@@ -1103,29 +1146,6 @@ function dialog_with_unique_npc(story_id, unique_category)
     local unique_npc_category = unique_category .. "_" .. story_id
 
     actor_speak_default_ignore_conditionals(dialogs_with_lang_muffle(choose_random_category(unique_category, unique_npc_category)), 1.0, 3500, 100)
-end
-
-function choose_random_category(...)
-    local categories = { ... }
-    local total_lines = 0
-    local lines = {}
-    for _, category in ipairs(categories) do
-        local count = get_lines_amount_for_line_for_current_lang(category)
-        lines[#lines + 1] = count
-        total_lines = total_lines + count
-    end
-
-    local random = math.random(1, total_lines)
-    local cumulative = 0
-    for i, count in ipairs(lines) do
-        cumulative = cumulative + count
-        if random <= cumulative then
-            printf("Chose category %s with %s lines (random number was %s)", categories[i], count, random)
-            return categories[i]
-        end
-    end
-
-    return "none"
 end
 
 function GUI_on_hide(name, path)
