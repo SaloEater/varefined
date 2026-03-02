@@ -56,6 +56,28 @@ muffle = ""
 
 ------------------------------------------------------------------------------------
 
+-- === Shuffle Bag System ===
+local shuffle_bag = {}
+
+function get_shuffle(category, max_val)
+    if max_val <= 1 then return 1 end
+
+    local bag = shuffle_bag[category]
+
+    -- Initialize or Reset if first time, empty, or file count changed
+    if not bag or #bag == 0 or bag._max ~= max_val then
+        bag = {}
+        for i = 1, max_val do
+            bag[i] = i
+        end
+        bag._max = max_val
+        shuffle_bag[category] = bag
+    end
+
+    local pick = math.random(#bag)
+    return table.remove(bag, pick)
+end
+
 Werwolf's Edits
 
 Additional voice lines and conditions with GAMMA weights
@@ -398,7 +420,8 @@ function random_voice_line(category, subcategory, language_key, muffle_val, line
 
     reinit_languages()
 
-    return string.format(VOICE_FORMAT, category, language_prefixes[language_key], subcategory, muffle_val, line, math.random(lines))
+    local idx = get_shuffle(subcategory, lines)
+    return string.format(VOICE_FORMAT, category, language_prefixes[language_key], subcategory, muffle_val, line, idx)
 end
 
 --- Returns a voice line from `player` category
