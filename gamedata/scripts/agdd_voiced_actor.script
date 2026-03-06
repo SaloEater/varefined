@@ -80,19 +80,9 @@ function init_languages()
     end
 end
 
-function reinit_languages()
-    if language_prefixes == nil or next(language_prefixes) == nil then
-        init_languages()
-    end
-end
-
 local combat_inertia = 0
 
 lang = "rus" -- initiates actor language condition
-function get_lang()
-    reinit_languages()
-    return language_prefixes[lang]
-end
 
 function get_actor_lang()
     if get_config("voice_language") == 0 then
@@ -395,8 +385,6 @@ function random_voice_line(category, subcategory, language_key, muffle_val, line
                 subcategory, muffle_val)
         return nil
     end
-
-    reinit_languages()
 
     return string.format(VOICE_FORMAT, category, language_prefixes[language_key], subcategory, muffle_val, line, math.random(lines))
 end

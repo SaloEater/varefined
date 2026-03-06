@@ -5,7 +5,7 @@ if not grok_doom_weapons_inspect then
 end
 
 function grok_doom_weapons_inspect.play_anim_sound_file()
-    return string.format("grok\\%sactor_%d%s", AGDD_voiced_actor.muffle, math.random(1, 11), AGDD_voiced_actor.get_lang()) -- Voiced Actor Refined edit
+    return string.format("grok\\%sactor_%d%s", agdd_voiced_actor.muffle, math.random(1, 11), agdd_voiced_actor.lang) -- Voiced Actor Refined edit
 end
 
 printf(
