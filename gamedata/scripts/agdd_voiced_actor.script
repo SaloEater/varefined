@@ -92,13 +92,13 @@ function get_actor_lang()
         else
             lang = "rus"
         end
-        return lang
+        return get_current_language_prefix()
     elseif get_config("voice_language") == 1 then
         lang = "rus"
-        return lang
+        return get_current_language_prefix()
     else
         lang = "eng"
-        return lang
+        return get_current_language_prefix()
     end
 end
 
@@ -376,6 +376,14 @@ function get_lines_amount_for_line_for_current_lang(line)
     return get_lines_amount_for_line(line, lang)
 end
 
+function get_current_language_prefix()
+    return language_prefix(lang)
+end
+
+function language_prefix(language_key)
+    return language_prefixes[language_key]
+end
+
 --- Takes all required parameters to match the path template
 --- Returns a path of a random voice line
 function random_voice_line(category, subcategory, language_key, muffle_val, line)
@@ -386,7 +394,7 @@ function random_voice_line(category, subcategory, language_key, muffle_val, line
         return nil
     end
 
-    return string.format(VOICE_FORMAT, category, language_prefixes[language_key], subcategory, muffle_val, line, math.random(lines))
+    return string.format(VOICE_FORMAT, category, language_prefix(language_key), subcategory, muffle_val, line, math.random(lines))
 end
 
 --- Returns a voice line from `player` category
