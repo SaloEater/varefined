@@ -79,14 +79,11 @@ function axr_companions.squad_too_far()
     end
 end
 
-local command_cooldown = 0
-local file_to_play = nil
 local get_config = varefined_mcm.get_config
-local mcm_sound_volume = get_config("shouts_volume") -- gets the volume value from MCM
 
 function axr_companions.actors_command(file, sound_volume, cooldown, requires_squad_close, requires_squad_near, requires_squad_mid,
                                        requires_squad_far, requires_squad_too_far)
-    -- THIS WILL PICK CERTAIN SOUND ,DEPENDS ON SQUAD DISTANCE AND PLAYS IT. Argument "sound_volume" is overwriten by default from MCM shouts volume slider.
+    -- THIS WILL PICK CERTAIN SOUND ,DEPENDS ON SQUAD DISTANCE AND PLAYS IT. Routed through agdd_voiced_actor.actor_speak with priority.
     if not db.actor then
         return
     end
@@ -106,40 +103,11 @@ function axr_companions.actors_command(file, sound_volume, cooldown, requires_sq
         return
     end
 
-    if file_to_play then
-        file_to_play:stop()
-    end
-
-    file_to_play = sound_object(file)
-    file_to_play:play(db.actor, 0, sound_object.s2d)
-    if mcm_sound_volume then
-        file_to_play.volume = mcm_sound_volume * sound_volume
-    else
-        file_to_play.volume = sound_volume -- sets how loud the sound should be
-    end
-
-    command_cooldown = time_global() + cooldown
-end
-
-function axr_companions.sound_checking()
-    -- SMALL FUNCTION THAT CHECKS IF COOLDOWN OF SOUNDS CALLED BY THIS SCRIPT EXPIRED OR NOT YET ,THIS FUNCTION IS FOR USE FROM agdd_voiced_actor.script TO OBEY COMMANDS COOLDOWNS SO IT WILL GUARANTEE THAT COMMANDS WILL HAVE HIGHEST PRIORITY AND WILL BE NOT INTERRUPTED BY OTHER SOUNDS
-    if time_global() < command_cooldown then
-        return true
-    else
-        return false
-    end
-end
-
-function axr_companions.sound_checking_stop()
-    -- SMALL FUNCTION THAT STOPS ANY SOUND CALLED BY THIS SCRIPT ,THIS FUNCTION IS FOR USE FROM agdd_voiced_actor.script AND ui_addon_companion_quick_menu.script (IF COMPANION MENU OPENS OR IF ACTOR DIE AND COMMAND IS PLAYED IN THAT MOMENT ,IT WILL STOP COMMAND SOUND RIGHT THERE)
-    if file_to_play then
-        file_to_play:stop()
-    end
+    agdd_voiced_actor.actor_speak(file, sound_volume, cooldown, 100, false, false, false, true, false, false)
 end
 
 function axr_companions.voiceover_companion_hide_in_cover()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check() -- EXTERNAL SOUND CHECK ,IT WILL TURN OFF ANY SOUND CALLED FROM agdd_voiced_actor.script
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
             -- IF ACTOR IS NOT IN COMBAT IT WILL PLAYS ONE OF THE FOLLOWING COMMANDS
 
@@ -169,7 +137,6 @@ end
 
 function axr_companions.voiceover_companion_to_wait_state()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check() -- SAME AS ABOVE
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
             -- SAME AS ABOVE
 
@@ -199,8 +166,6 @@ end
 
 function axr_companions.voiceover_companion_to_patrol_state()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("Patrol", "StartPatrolling"), 1.0, 1700, true, false, false, false, false) -- START PATROLLING COMMAND
     end -- filters disabled companion commands shouts from MCM
 end
@@ -213,7 +178,6 @@ end
 
 function axr_companions.voiceover_companion_to_follow_state()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
             axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComClose"), 1.0, 3200, true,  false, false, false, false)
@@ -243,7 +207,6 @@ end
 
 function axr_companions.voiceover_companion_to_attack_state()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
             axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComClose"), 1.0, 3000, true,  false, false, false, false)
@@ -271,7 +234,6 @@ end
 
 function axr_companions.voiceover_companion_to_ignore_combat_state()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
             axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComClose"), 1.0, 2500, true,  false, false, false, false)
@@ -299,8 +261,6 @@ end
 
 function axr_companions.voiceover_companion_to_attack_only_actor_combat_enemy_state()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombatButHelpMe", "IgnoreCombatButHelpMe"), 1.0, 1500, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
@@ -314,8 +274,6 @@ end
 
 function axr_companions.voiceover_companion_to_stealth_substate()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("Stealth", "Stealth_ComClose"), 1.0, 2300, true,  false, false, false, false)
         axr_companions.actors_command(commands_with_lang_muffle("Stealth", "Stealth_ComNear"),  1.0, 2300, false, true,  false, false, false)
         axr_companions.actors_command(commands_with_lang_muffle("Stealth", "Stealth_ComMid"),   1.0, 2300, false, false, true,  false, false)
@@ -332,8 +290,6 @@ end
 
 function axr_companions.voiceover_companion_to_default_substate()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("StopStealth", "StopStealth_ComClose"), 1.0, 1700, true,  false, false, false, false)
         axr_companions.actors_command(commands_with_lang_muffle("StopStealth", "StopStealth_ComNear"),  1.0, 1700, false, true,  false, false, false)
         axr_companions.actors_command(commands_with_lang_muffle("StopStealth", "StopStealth_ComMid"),   1.0, 1700, false, false, true,  false, false)
@@ -351,8 +307,6 @@ end
 
 function axr_companions.voiceover_companion_to_loot_items_and_corpses()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComClose"), 1.0, 2200, true,  false, false, false, false)
         axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComNear"),  1.0, 2200, false, true,  false, false, false)
         axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComMid"),   1.0, 2200, false, false, true,  false, false)
@@ -370,8 +324,6 @@ end
 
 function axr_companions.voiceover_companion_to_loot_items_only()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComClose"), 1.0, 2200, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
@@ -385,8 +337,6 @@ end
 
 function axr_companions.voiceover_companion_to_loot_corpses_only()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComNear"), 1.0, 2200, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
@@ -400,8 +350,6 @@ end
 
 function axr_companions.voiceover_companion_to_loot_nothing()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComClose"), 1.0, 3000, true,  false, false, false, false)
         axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComNear"),  1.0, 3000, false, true,  false, false, false)
         axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComMid"),   1.0, 3000, false, false, true,  false, false)
@@ -419,7 +367,6 @@ end
 
 function axr_companions.voiceover_companion_to_stay_close()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
             axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComClose"), 1.0, 3000, true,  false, false, false, false)
@@ -446,7 +393,6 @@ end
 
 function axr_companions.voiceover_companion_to_stay_far()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
             axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComClose"), 1.0, 3300, true,  false, false, false, false)
@@ -473,16 +419,12 @@ end
 
 function axr_companions.voiceover_companion_to_come_closer()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComClose"), 1.0, 3000, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
 
 function axr_companions.voiceover_companion_to_move_away()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComClose"), 1.0, 3300, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
@@ -503,15 +445,11 @@ function axr_companions.switch_companion_patrol_mode(npc)
     if (npc:has_info("npcx_beh_patrol_mode")) then
         npc:disable_info_portion("npcx_beh_patrol_mode")
         if get_config("enable_companions_commands_shouts") then
-            agdd_voiced_actor.sound_check()
-
             axr_companions.actors_command(commands_with_lang_muffle("Patrol", "StopPatrolling"), 1.0, 1700, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     else
         npc:give_info_portion("npcx_beh_patrol_mode")
         if get_config("enable_companions_commands_shouts") then
-            agdd_voiced_actor.sound_check()
-
             axr_companions.actors_command(commands_with_lang_muffle("Patrol", "StartPatrolling"), 1.0, 1700, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     end
@@ -523,16 +461,12 @@ function axr_companions.switch_companion_gather_items(npc)
         actor_menu.set_msg(1, game.translate_string("st_disable_looting"), 8)
         npc:disable_info_portion("npcx_beh_gather_items")
         if get_config("enable_companions_commands_shouts") then
-            agdd_voiced_actor.sound_check()
-
             axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComClose"), 1.0, 3000, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     else
         actor_menu.set_msg(1, game.translate_string("st_enable_looting"), 8)
         npc:give_info_portion("npcx_beh_gather_items")
         if get_config("enable_companions_commands_shouts") then
-            agdd_voiced_actor.sound_check()
-
             axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComClose"), 1.0, 2200, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     end
@@ -543,15 +477,11 @@ function axr_companions.switch_companion_loot_corpses(npc)
     if (npc:has_info("npcx_beh_loot_corpses")) then
         npc:disable_info_portion("npcx_beh_loot_corpses")
         if get_config("enable_companions_commands_shouts") then
-            agdd_voiced_actor.sound_check()
-
             axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComClose"), 1.0, 3000, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     else
         npc:give_info_portion("npcx_beh_loot_corpses")
         if get_config("enable_companions_commands_shouts") then
-            agdd_voiced_actor.sound_check()
-
             axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComNear"), 1.0, 2200, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     end
@@ -559,8 +489,6 @@ end
 
 function axr_companions.voiceover_companion_remove_waypoints()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("Patrol", "ForgetAllWaypoints"), 1.0, 1700, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
@@ -580,8 +508,6 @@ end
 
 function axr_companions.voiceover_companion_add_waypoints()
     if get_config("enable_companions_commands_shouts") then
-        agdd_voiced_actor.sound_check()
-
         axr_companions.actors_command(commands_with_lang_muffle("Patrol", "AddThisSpot"), 1.0, 1700, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
@@ -614,7 +540,7 @@ function axr_companions.add_to_actor_squad(npc)
 end
 
 function actor_speak_npc_joined()
-    agdd_voiced_actor.actor_speak_default(agdd_voiced_actor.squad_with_lang_muffle("squadmate_joined"), 1.0, 3500, 100)
+    agdd_voiced_actor.actor_speak_with_priority_ignore_conditionals(agdd_voiced_actor.squad_with_lang_muffle("squadmate_joined"), 1.0, 3500, 100)
 end
 
 local old_axr_companions_remove_from_actor_squad = axr_companions.remove_from_actor_squad
@@ -624,7 +550,7 @@ function axr_companions.remove_from_actor_squad(npc)
 end
 
 function actor_speak_npc_left()
-    agdd_voiced_actor.actor_speak_default(agdd_voiced_actor.squad_with_lang_muffle("squadmate_left"), 1.0, 3500, 100)
+    agdd_voiced_actor.actor_speak_with_priority_ignore_conditionals(agdd_voiced_actor.squad_with_lang_muffle("squadmate_left"), 1.0, 3500, 100)
 end
 
 printf(

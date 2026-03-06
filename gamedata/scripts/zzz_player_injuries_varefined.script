@@ -80,8 +80,7 @@ function zzz_player_injuries.actor_on_footstep(material, power, hud_view, flags)
                 file = "actor\\pain_" .. math.random(8) -- Voiced Actor Refined edits end
             end
 
-            file_to_say = sound_object(file)
-            file_to_say:play(db.actor, 0, sound_object.s2d)
+            agdd_voiced_actor.actor_speak(file, 1.0, cooldown, 100, false, false, false, true, true, false)
 
             level.add_pp_effector("blur_bhs.ppe", math.random(655808, 655820), false)
 

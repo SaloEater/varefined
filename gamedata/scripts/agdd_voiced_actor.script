@@ -320,13 +320,6 @@ function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, 
 
 end
 
-function sound_check()
-    -- SMALL FUNCTION THAT ONLY CHECKS IF SOUND CALLED BY THIS SCRIPT IS PLAYED RIGHT NOW ,THIS FUNCTION IS FOR USE FROM VOICED COMMANDS (axr_companions.script) AND WILL STOP ANY SOUND CALLED BY THIS SCRIPT TO ENSURE THAT SOUNDS CALLED BY BOTH SCRIPTS WILL NOT PLAY SIMULTANEOUSLY AND COMMANDS WILL HAVE HIGHEST PRIORITY
-    if file_to_say then
-        file_to_say:stop()
-    end
-end
-
 local combat_intensity = 0 -- main value that drives the combat status system
 local combat_intensity_drain_cooldown = 0 -- auxilary value, prevents combat progression from draining constantly, instead it only drains after nothing combat-related happens for some time
 local combat_medium_threshold = 600 -- the threshold at which combat status switches to it's second phase
@@ -474,9 +467,6 @@ function monster_on_death_callback(victim, killer)
     --	if is_actor_in_combat() == false then return end   --auxialry rule, checks if actor is in combat before doing anything (remove the "--" at the start of the line to enable it)
     --	if (not db.actor:see(victim)) then return end   --extra condition, makes sure that actor saw the npc die
 
-    if axr_companions.sound_checking() == true then
-        return
-    end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
     local actor_in_combat = is_actor_in_combat()
     local outer_combat = outer_combat_checker()
     if actor_in_combat == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then
@@ -545,9 +535,6 @@ function npc_on_death_callback(victim, killer)
     --	if is_actor_in_combat() == false then return end
     --	if (not db.actor:see(victim)) then return end
 
-    if axr_companions.sound_checking() == true then
-        return
-    end
     local actor_in_combat = is_actor_in_combat()
     local outer_combat = outer_combat_checker()
     if actor_in_combat == true and combat_intensity > combat_high_threshold and math.random(1, 100) < 40 then
@@ -698,9 +685,6 @@ function actor_on_update(binder, delta)
         if db.actor:is_talking() then
             return
         end
-        if axr_companions.sound_checking() == true then
-            return
-        end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
         if db.actor.health < 0.25 and hurt_volume > 0 then
             -- critically hurt state sound has the highest priority and will always play over any other state sound
             actor_speak_default_state(player_with_lang_muffle_random("hurt_bad"),
@@ -775,9 +759,6 @@ function actor_on_before_hit(hitinfo, bone_id, flags)
             if (hit_type == hit.burn or hit_type == hit.light_burn or hit_type == hit.chemical_burn) and
                     (last_health - db.actor.health) >= 0.1 then
                 -- this checks for a specific threshold for "area" damage types
-                if axr_companions.sound_checking() == true then
-                    return
-                end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
                 if db.actor.health > 0.5 then
                     -- checks if the actor is over 50% of their full health
                     cooldown = 2000
@@ -795,9 +776,6 @@ function actor_on_before_hit(hitinfo, bone_id, flags)
             elseif (hit_type == hit.shock or hit_type == hit.strike or hit_type == hit.wound or hit_type ==
                     hit.fire_wound or hit_type == hit.explosion or hit_type == hit.wound_2) then
                 -- this is for every other "non-area" damage type
-                if axr_companions.sound_checking() == true then
-                    return
-                end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
                 if db.actor.health > 0.5 then
                     cooldown = 2000
                     actor_speak_with_priority_ignore_conditionals(player_with_lang_muffle_random("pain"), 1.0,
@@ -842,7 +820,6 @@ end
 function actor_on_before_death(whoID, flags)
     -- death function, plays death sounds (DEATH SCREAMS AND WHELPS ONLY, NO BODY FALLING SOUNDS OR ANYTHING ELSE)
 
-    axr_companions.sound_checking_stop() -- STOPS SOUND IF COMMAND FROM axr_companions.script IS CURRENTLY PLAYING
     actor_speak_with_priority_ignore_conditionals(player_with_lang_muffle_random("death"), 1.0, 9999, 100)
 
 end
@@ -861,9 +838,6 @@ function actor_on_weapon_jammed(wpn)
     if db.actor:is_talking() then
         return
     end
-    if axr_companions.sound_checking() == true then
-        return
-    end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
     if not get_config("enable_on_weapon_jam_shouts") then
         return
     end -- filters disabled jam shouts from MCM
@@ -898,9 +872,6 @@ function actor_on_weapon_reload(wpn, ammo_total)
     if db.actor:is_talking() then
         return
     end
-    if axr_companions.sound_checking() == true then
-        return
-    end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
     if not get_config("enable_on_weapon_reload_shouts") then
         return
     end -- filters disabled reload shouts from MCM
@@ -945,9 +916,6 @@ function on_key_release(key)
             if not (is_actor_in_combat()) and not (outer_combat_checker()) then
                 return
             end -- IF ACTOR IS NOT IN COMBAT (FOR BOTH PERIMETERS) IT WILL STOP FUNCTION
-            if axr_companions.sound_checking() == true then
-                return
-            end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
             if not get_config("enable_on_grenade_throw_shouts") then
                 return
             end -- filters disabled grenade thrown shouts from MCM
@@ -1040,9 +1008,6 @@ function interactive_comments_on_button(key)
         if not db.actor:alive() then
             return
         end -- IF ACTOR IS DEAD ALREADY IT WILL STOP FUNCTION
-        if axr_companions.sound_checking() == true then
-            return
-        end -- CHECKS IF VOICED COMMAND IS CURRENTLY PLAYED AND IF YES ,IT WILL STOP FUNCTION SO IT WILL NOT INTERRUPT ANY COMMAND
         if is_actor_in_combat() == true then
             -- IF ACTOR IS TARGETED BY ENEMY IN INNER PERIMETER IT WILL PLAYS ,FOR SQUAD IN HEARING DISTANCE INFORMATIVE BUT LOUD AND COCKY RESPONSES ,WITHOUT SQUAD OR WITH SQUAD TOO FAR JUST SIMPLE LOUD INVECTIVES
             actor_speak_squad_near(button_comments_with_lang_muffle_random("Enemy_squad"), 1.0,
@@ -1176,9 +1141,6 @@ function random_shouts(key)
             return
         end
         if db.actor:is_talking() then
-            return
-        end
-        if axr_companions.sound_checking() == true then
             return
         end
         actor_speak_default(random_shout_with_lang_muffle_random("random"), 1.0,

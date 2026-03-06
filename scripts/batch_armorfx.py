@@ -18,7 +18,7 @@ Usage:
   python batch_armorfx.py apply --root gamedata/sounds --out-dir _out
   python batch_armorfx.py apply --root . --preset heavy --wet 0.55 --dry-run
   python batch_armorfx.py presets
-  python batch_armorfx.py apply apply --root gamedata/sounds/characters_voice --in-place --helmet-only --sox .\\sox-ng\\sox_ng.exe --ffmpeg .\\ffmpeg\\bin\\ffmpeg.exe --preset halo --wet 0.65 --comb-hz 115 --comb-decay 0.75
+  python scripts/batch_armorfx.py apply --root gamedata/sounds/characters_voice --in-place --helmet-only --sox .\\sox-ng\\sox_ng.exe --ffmpeg .\\ffmpeg\\bin\\ffmpeg.exe --preset halo --wet 0.65 --comb-hz 115 --comb-decay 0.75
 """
 
 import argparse
