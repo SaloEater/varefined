@@ -226,6 +226,12 @@ function squad_out()
 end
 
 local speaking_cooldown = 0 -- is set later
+local random_long_shout_cooldown = 0
+
+local function get_long_shout_cooldown_ms()
+    return ini:r_value("config", "random_long_shout_cooldown_ms", 2, 30000)
+end
+
 local state_cooldown = 0 -- is set later
 local file_to_say = nil -- is set later
 local mcm_sound_volume = get_config("shouts_volume") -- gets the volume value from MCM
@@ -1143,14 +1149,34 @@ function random_shouts(key)
         if db.actor:is_talking() then
             return
         end
-        actor_speak_default(random_shout_with_lang_muffle_random("random"), 1.0,
-                3500, 100) -- Voiced Actor Refined edit
+        local chosen
+        local long_cooldown_ms = get_long_shout_cooldown_ms()
+        printf("%s", random_long_shout_cooldown - time_global())
+        if time_global() >= random_long_shout_cooldown then
+            chosen = choose_random_category("random", "random_long")
+        else
+            chosen = "random"
+        end
+        actor_speak_default(random_shout_with_lang_muffle_random(chosen), 1.0, 3500, 100)
+        if chosen == "random_long" then
+            random_long_shout_cooldown = time_global() + long_cooldown_ms
+        end
     end
 end
 
 --------------------------------------
 -- RANDOM SHOUTS PART ENDS HERE
 --------------------------------------
+
+function save_state(mdata)
+    local remaining = random_long_shout_cooldown - time_global()
+    mdata.varefined_random_long_cd = remaining > 0 and remaining or 0
+end
+
+function load_state(mdata)
+    local remaining = mdata.varefined_random_long_cd or 0
+    random_long_shout_cooldown = time_global() + remaining
+end
 
 function on_game_start()
     -- lets the engine know we want these function to run when certain things happen
@@ -1168,5 +1194,7 @@ function on_game_start()
     RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback) -- runs when a mutant is hit
     RegisterScriptCallback("GUI_on_show", GUI_on_show) -- runs when a mutant is hit
     RegisterScriptCallback("GUI_on_hide", GUI_on_hide) -- runs when a mutant is hit
+    RegisterScriptCallback("save_state", save_state)
+    RegisterScriptCallback("load_state", load_state)
     init_languages()
 end

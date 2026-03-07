@@ -89,9 +89,11 @@ All voice lines takes into account Actor conditions:
 | commands | Loot | When companions are ordered to loot |
 | commands | MoveToPoint | When companions are ordered to move to a point |
 | commands | Patrol | When companions are ordered to patrol |
+| commands | Start | When companions window is opened |
 | commands | StayClose | When companions are ordered to stay close |
 | commands | StayFar | When companions are ordered to stay far |
 | commands | Stealth | When companions are ordered to stealth |
+| commands | Stop | When companions window is opened and no combat |
 | commands | StopStealth | When companions are ordered to stop stealth |
 | commands | Wait | When companions are ordered to wait |
 |  | dialogs | Story IDs can be fetched from files like this https://github.com/Tosox/STALKER-Anomaly-gamedata/blob/v1.5.2/gamedata/configs/creatures/spawn_sections_bar.ltx |
@@ -153,6 +155,7 @@ All voice lines takes into account Actor conditions:
 | player | thirst | When character is thirsty |
 |  | random_shouts | Random shouts |
 | random_shouts | random | Just random shouts |
+| random_shouts | random_long | Random shouts with especially long duration, have personal cooldown to make these rare |
 |  | squad | Reactions to squad changes |
 | squad | squadmate_died | When squadmate dies |
 | squad | squadmate_hit | When squadmate receives damage |
