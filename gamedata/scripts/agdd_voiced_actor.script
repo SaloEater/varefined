@@ -1168,6 +1168,95 @@ end
 -- RANDOM SHOUTS PART ENDS HERE
 --------------------------------------
 
+--------------------------------------
+-- ITEM USE REACTIONS
+--------------------------------------
+
+--Tab types taken from Bart's New Sorting Tabs
+local TAB_TYPE = {
+    --[2] = "weapons",
+    --[3] = "armor",
+    --[4] = "ammo",
+    --[5] = "artefact",
+    [6] = "tools",
+    [7] = "food",
+    [8] = "meds",
+    --[9] = "misc",
+}
+
+local kind_to_type = {}
+
+local function build_item_type_cache()
+    for tab_id = 6, 8 do
+        local kinds = parse_list(ini_sys, "button_sort_tab_" .. tab_id, "kinds", true)
+        if kinds then
+            for kind in pairs(kinds) do
+                kind_to_type[kind] = TAB_TYPE[tab_id]
+            end
+        end
+    end
+end
+
+local function get_item_type(sec)
+    local kind = ini_sys:r_string_ex(sec, "kind") or ""
+    local tab_type = kind_to_type[kind]
+    if not tab_type then
+        return nil
+    end
+
+    if tab_type == "food" then
+        local thirst = ini_sys:r_float_ex(sec, "boost_thirst")
+        return (thirst and thirst > 0) and "drink" or "food"
+    end
+
+    return tab_type
+end
+
+function actor_on_item_before_use(obj)
+    local sec       = obj:section()
+    local item_type = get_item_type(sec)
+    if not item_type then
+        return
+    end
+
+    local common_candidates = {
+        "on_item_before_use",
+        "on_item_before_use_type_" .. item_type,
+        "on_item_before_use_" .. sec,
+    }
+    local last_candidates = {
+        "on_item_before_use_last",
+        "on_item_before_use_type_" .. item_type .. "_last",
+        "on_item_before_use_" .. sec .. "_last",
+    }
+
+    local chosen
+    local max_uses = obj:get_max_uses()
+    if not max_uses or max_uses <= 1 then
+        -- single-use item: always the last use, pick from common + last pool together
+        chosen = choose_random_category(unpack(common_candidates), unpack(last_candidates))
+    else
+        -- multi-use item: try last candidates on final use, fall back to common if none exist
+        local is_last = obj:get_remaining_uses() == 0
+        if is_last then
+            chosen = choose_random_category(unpack(last_candidates))
+        end
+        if not chosen or chosen == "none" then
+            chosen = choose_random_category(unpack(common_candidates))
+        end
+    end
+
+    if not chosen or chosen == "none" then
+        return
+    end
+
+    actor_speak_default(player_with_lang_muffle_random(chosen), 1.0, 3500, 100)
+end
+
+--------------------------------------
+-- ITEM USE REACTIONS PART ENDS HERE
+--------------------------------------
+
 function save_state(mdata)
     local remaining = random_long_shout_cooldown - time_global()
     mdata.varefined_random_long_cd = remaining > 0 and remaining or 0
@@ -1194,7 +1283,9 @@ function on_game_start()
     RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback) -- runs when a mutant is hit
     RegisterScriptCallback("GUI_on_show", GUI_on_show) -- runs when a mutant is hit
     RegisterScriptCallback("GUI_on_hide", GUI_on_hide) -- runs when a mutant is hit
+    RegisterScriptCallback("actor_on_item_before_use", actor_on_item_before_use) -- runs when actor uses an item
     RegisterScriptCallback("save_state", save_state)
     RegisterScriptCallback("load_state", load_state)
+    build_item_type_cache()
     init_languages()
 end
