@@ -294,7 +294,11 @@ function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, 
                      requires_squad_out, has_priority, ignore_conditionals, is_state)
     local actor_talks = actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear, requires_squad_out,
             has_priority, ignore_conditionals, is_state)
-    if actor_talks or last_shuffle_pick == -1 or last_shuffle_category == "" or not shuffle_bag[last_shuffle_category] then return end
+    if actor_talks or last_shuffle_pick == -1 or last_shuffle_category == "" or not shuffle_bag[last_shuffle_category] then
+        printf("failed to say that")
+        return
+    end
+    printf("said that successfully")
 
     shuffle_bag[last_shuffle_category][#shuffle_bag[last_shuffle_category] + 1] = last_shuffle_pick
     last_shuffle_category = ""
@@ -473,11 +477,14 @@ function choose_random_category(...)
     local categories = { ... }
     local total_lines = 0
     local lines = {}
+    local choices = ""
     for _, category in ipairs(categories) do
         local count = get_lines_amount_for_line_for_current_lang(category)
         lines[#lines + 1] = count
         total_lines = total_lines + count
+        choices = choices .. category .. ", "
     end
+    printf("choose random from %s", choices)
 
     local random = math.random(1, total_lines)
     local cumulative = 0
@@ -912,7 +919,7 @@ function actor_on_weapon_jammed(wpn)
 end
 
 function actor_on_weapon_reload(wpn, ammo_total)
-    -- calls out reloads
+    -- calls out reloads, with ammo-awareness: pairs reloading lines with low/out-of-ammo lines
 
     already_commented_this_jam = false -- clear the marker, actor is fixing the jam
 
@@ -924,8 +931,23 @@ function actor_on_weapon_reload(wpn, ammo_total)
     end -- filters disabled reload shouts from MCM
     if is_actor_in_combat() == true then
         -- only plays reload shouts if actor is in combat ,has a squad IN HEARING DISTANCE AND IF ENEMIES ARE IN INNER COMBAT PERIMETER
-        actor_speak_squad_near(player_with_lang_muffle_random("reloading"), 1.0, 2500, 100)
-        actor_speak_squad_can_hear(player_with_lang_muffle_random("reloading"), 1.0, 2500, 100)
+        local line_category
+        local mag_size = math.floor(ini_sys:r_float_ex(wpn:section(), "ammo_mag_size") or 30)
+        ammo_total = ammo_total - mag_size
+        if ammo_total <= 0 then
+            -- last magazine just loaded, no reserve ammo left
+            line_category = choose_random_category("reloading", "reloading_ammo_out")
+        else
+            local ammo_low_mags = ini:r_value("config", "reloading_ammo_low_mags", 2, 3)
+            if ammo_total <= ammo_low_mags * mag_size then
+                -- reserve ammo at or below the configured threshold
+                line_category = choose_random_category("reloading", "reloading_ammo_low")
+            else
+                line_category = "reloading"
+            end
+        end
+        actor_speak_squad_near(player_with_lang_muffle_random(line_category), 1.0, 2500, 100)
+        actor_speak_squad_can_hear(player_with_lang_muffle_random(line_category), 1.0, 2500, 100)
         add_action_intensity(40, 0.5, 175)
     end
 

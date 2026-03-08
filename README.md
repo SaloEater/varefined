@@ -82,7 +82,8 @@ All voice lines takes into account Actor conditions:
 | buttoncomments | comment_tired_squadnear | Comment when character has low stamina and squadmates near you |
 |  | commands | Commands to companions |
 | commands | add_this_spot |  |
-| commands | command_start |  |
+| commands | command_start | When player opens menu with companions during combat |
+| commands | command_stop | When player opens menu with companions and no combat is happening |
 | commands | dont_loot_com_close | When companions are ordered to don't loot |
 | commands | dont_loot_com_far | When companions are ordered to don't loot |
 | commands | dont_loot_com_mid | When companions are ordered to don't loot |
@@ -241,6 +242,8 @@ All voice lines takes into account Actor conditions:
 | player | pain | When character receives a hit |
 | player | pain_bad | When character receives a hit and health	is low |
 | player | reloading | When character is reloading and enemy close |
+| player | reloading_ammo_low | When character is reloading last magazine |
+| player | reloading_ammo_out | When character is reloading and runs out of ammo (configured in configs) |
 | player | sanity | When character has very low psy health |
 | player | sleepiness | When character	is sleepy |
 | player | thirst | When character is thirsty |
