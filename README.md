@@ -67,35 +67,117 @@ All voice lines takes into account Actor conditions:
 | Parent folder | Folder | Description |
 |---|---|---|
 |  | buttoncomments | Character comments about his wellbeing |
-| buttoncomments | Bleed | Comment when character is bleeding out and squadmates can hear you or far from you |
-| buttoncomments | Bleed_SquadNear | Comment when character is bleeding out and squadmates near you |
-| buttoncomments | Enemy | Comment when there is an aggroed enemy far from you and squadmates far from you |
-| buttoncomments | Enemy_squad | Comment when there is an aggroed enemy close and squadmates near you or can	hear you |
-| buttoncomments | EnemyFar_squad | Comment when there is an aggroed enemy far from you and squadmates near you or can	hear you |
-| buttoncomments | Hurt | Comment when character has low health and squadmates can hear you or far from you |
-| buttoncomments | Hurt_SquadNear | Comment when character has low health and squadmates near you |
-| buttoncomments | HurtBad | Comment when character has very low health and squadmates can hear you or far from you |
-| buttoncomments | HurtBad_SquadNear | Comment when character has very low health and squadmates near you |
-| buttoncomments | Mumble | Comment when character is not hurt enough and squadmates can hear	you or far from you |
-| buttoncomments | Mumble_SquadNear | Comment when character is not hurt enough and squadmates near you |
-| buttoncomments | Tired | Comment when character has low stamina and squadmates can hear you or far from you |
-| buttoncomments | Tired_SquadNear | Comment when character has low stamina and squadmates near you |
+| buttoncomments | comment_bleed | Comment when character is bleeding out and squadmates can hear you or far from you |
+| buttoncomments | comment_bleed_squadnear | Comment when character is bleeding out and squadmates near you |
+| buttoncomments | comment_enemy | Comment when there is an aggroed enemy far from you and squadmates far from you |
+| buttoncomments | comment_enemy_far_squad | Comment when there is an aggroed enemy far from you and squadmates near you or can	hear you |
+| buttoncomments | comment_enemy_squad | Comment when there is an aggroed enemy close and squadmates near you or can	hear you |
+| buttoncomments | comment_hurt | Comment when character has low health and squadmates can hear you or far from you |
+| buttoncomments | comment_hurt_bad | Comment when character has very low health and squadmates can hear you or far from you |
+| buttoncomments | comment_hurt_bad_squadnear | Comment when character has very low health and squadmates near you |
+| buttoncomments | comment_hurt_squadnear | Comment when character has low health and squadmates near you |
+| buttoncomments | comment_mumble | Comment when character is not hurt enough and squadmates can hear	you or far from you |
+| buttoncomments | comment_mumble_squadnear | Comment when character is not hurt enough and squadmates near you |
+| buttoncomments | comment_tired | Comment when character has low stamina and squadmates can hear you or far from you |
+| buttoncomments | comment_tired_squadnear | Comment when character has low stamina and squadmates near you |
 |  | commands | Commands to companions |
-| commands | DontLoot | When companions are ordered to don't loot |
-| commands | FireAtWill | When companions are ordered to fire	at will |
-| commands | Follow | When companions are ordered to follow |
-| commands | IgnoreCombat | When companions are ordered to ignore combat |
-| commands | IgnoreCombatButHelpMe | When companions are ordered to ignore	combat but help the player |
-| commands | Loot | When companions are ordered to loot |
-| commands | MoveToPoint | When companions are ordered to move to a point |
-| commands | Patrol | When companions are ordered to patrol |
-| commands | Start | When companions window is opened |
-| commands | StayClose | When companions are ordered to stay close |
-| commands | StayFar | When companions are ordered to stay far |
-| commands | Stealth | When companions are ordered to stealth |
-| commands | Stop | When companions window is opened and no combat |
-| commands | StopStealth | When companions are ordered to stop stealth |
-| commands | Wait | When companions are ordered to wait |
+| commands | add_this_spot |  |
+| commands | command_start |  |
+| commands | dont_loot_com_close | When companions are ordered to don't loot |
+| commands | dont_loot_com_far | When companions are ordered to don't loot |
+| commands | dont_loot_com_mid | When companions are ordered to don't loot |
+| commands | dont_loot_com_near | When companions are ordered to don't loot |
+| commands | dont_loot_radio | .descriptionWhen companions are ordered to don't loot |
+| commands | fire_at_will_com_close |  |
+| commands | fire_at_will_com_close_aic |  |
+| commands | fire_at_will_com_far |  |
+| commands | fire_at_will_com_far_aic |  |
+| commands | fire_at_will_com_mid |  |
+| commands | fire_at_will_com_mid_aic |  |
+| commands | fire_at_will_com_near |  |
+| commands | fire_at_will_com_near_aic |  |
+| commands | fire_at_will_com_too_far_aic |  |
+| commands | fire_at_will_radio |  |
+| commands | follow_com_close |  |
+| commands | follow_com_close_aic |  |
+| commands | follow_com_far |  |
+| commands | follow_com_far_aic |  |
+| commands | follow_com_mid |  |
+| commands | follow_com_mid_aic |  |
+| commands | follow_com_near |  |
+| commands | follow_com_near_aic |  |
+| commands | follow_com_too_far_aic |  |
+| commands | follow_radio |  |
+| commands | forget_all_waypoints |  |
+| commands | ignore_combat | When companions are ordered to ignore combat |
+| commands | ignore_combat_but_help_me | When companions are ordered to ignore	combat but help the player |
+| commands | ignore_combat_com_close |  |
+| commands | ignore_combat_com_close_aic |  |
+| commands | ignore_combat_com_far |  |
+| commands | ignore_combat_com_far_aic |  |
+| commands | ignore_combat_com_mid |  |
+| commands | ignore_combat_com_mid_aic |  |
+| commands | ignore_combat_com_near |  |
+| commands | ignore_combat_com_near_aic |  |
+| commands | ignore_combat_com_too_far_aic |  |
+| commands | ignore_combat_radio |  |
+| commands | loot_com_close |  |
+| commands | loot_com_far |  |
+| commands | loot_com_mid |  |
+| commands | loot_com_near |  |
+| commands | loot_radio |  |
+| commands | move_to_point_com_close |  |
+| commands | move_to_point_com_close_aic |  |
+| commands | move_to_point_com_far |  |
+| commands | move_to_point_com_far_aic |  |
+| commands | move_to_point_com_mid |  |
+| commands | move_to_point_com_mid_aic |  |
+| commands | move_to_point_com_near |  |
+| commands | move_to_point_com_near_aic |  |
+| commands | move_to_point_com_too_far_aic |  |
+| commands | move_to_point_radio |  |
+| commands | start_patrolling |  |
+| commands | stay_close_com_close |  |
+| commands | stay_close_com_close_aic |  |
+| commands | stay_close_com_far |  |
+| commands | stay_close_com_far_aic |  |
+| commands | stay_close_com_mid |  |
+| commands | stay_close_com_mid_aic |  |
+| commands | stay_close_com_near |  |
+| commands | stay_close_com_near_aic |  |
+| commands | stay_close_com_too_far_aic |  |
+| commands | stay_close_radio |  |
+| commands | stay_far_com_close |  |
+| commands | stay_far_com_close_aic |  |
+| commands | stay_far_com_far |  |
+| commands | stay_far_com_far_aic |  |
+| commands | stay_far_com_mid |  |
+| commands | stay_far_com_mid_aic |  |
+| commands | stay_far_com_near |  |
+| commands | stay_far_com_near_aic |  |
+| commands | stay_far_com_too_far_aic |  |
+| commands | stay_far_radio |  |
+| commands | stealth_com_close |  |
+| commands | stealth_com_far |  |
+| commands | stealth_com_mid |  |
+| commands | stealth_com_near |  |
+| commands | stealth_radio |  |
+| commands | stop_patrolling |  |
+| commands | stop_stealth_com_close |  |
+| commands | stop_stealth_com_far |  |
+| commands | stop_stealth_com_mid |  |
+| commands | stop_stealth_com_near |  |
+| commands | stop_stealth_radio |  |
+| commands | wait_com_close |  |
+| commands | wait_com_close_aic |  |
+| commands | wait_com_far |  |
+| commands | wait_com_far_aic |  |
+| commands | wait_com_mid |  |
+| commands | wait_com_mid_aic |  |
+| commands | wait_com_near |  |
+| commands | wait_com_near_aic | When companions are ordered to wait |
+| commands | wait_com_too_far_aic | When companions are ordered to wait |
+| commands | wait_radio | When companions are ordered to wait |
 |  | dialogs | Story IDs can be fetched from files like this https://github.com/Tosox/STALKER-Anomaly-gamedata/blob/v1.5.2/gamedata/configs/creatures/spawn_sections_bar.ltx |
 | dialogs | end_regular | When player closes the dialog with non-unique NPC |
 | dialogs | end_unique | When player closes the dialog with NPC that has story_id |
@@ -147,6 +229,12 @@ All voice lines takes into account Actor conditions:
 | player | kill_confirm_stalker_state1 | While combat intensity is low and when character kills an npc close and squadmates are far from you |
 | player | kill_confirm_stalker_state2 | While combat intensity is medium and when character kills an npc close |
 | player | kill_confirm_stalker_state3 | While combat intensity is high and when character kills an npc close |
+| player | on_item_before_use | When character uses an item |
+| player | on_item_before_use_bandage | When character uses a bandage |
+| player | on_item_before_use_bandage_last | When character uses the last bandage |
+| player | on_item_before_use_last | When character uses the last of an item |
+| player | on_item_before_use_type_food | When character eats food |
+| player | on_item_before_use_type_food_last | When character eats the last food |
 | player | pain | When character receives a hit |
 | player | pain_bad | When character receives a hit and health	is low |
 | player | reloading | When character is reloading and enemy close |

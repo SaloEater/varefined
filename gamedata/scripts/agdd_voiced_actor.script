@@ -412,8 +412,8 @@ function random_shout_with_lang_muffle_random(subcategory)
 end
 
 --- Returns a voice line from `commands` category
-function commands_with_lang_muffle(subcategory, line)
-    return random_voice_line(VOICE_CATEGORY_COMMANDS, subcategory, lang, muffle, line)
+function commands_with_lang_muffle_random(subcategory)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_COMMANDS, lang, muffle, subcategory)
 end
 
 --- Returns a voice line from `dialogs` category

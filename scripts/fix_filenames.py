@@ -20,7 +20,7 @@ import argparse
 from pathlib import Path
 
 INDEXED_OGG  = re.compile(r'^(m_)?(.+?)(_(\d+))?\.ogg$', re.IGNORECASE)
-EXCLUDED_TOP = {'commands', 'commands_eng'}
+EXCLUDED_TOP = {}
 
 
 def extract_index(filename: str) -> int:
@@ -52,11 +52,11 @@ def process_folder(folder: Path, dry_run: bool) -> int:
     renames: list[tuple[Path, Path]] = []
     for i, f in enumerate(non_muffled, 1):
         target = folder / f'{folder_name}_{i}.ogg'
-        if f.resolve() != target.resolve():
+        if f.name != target.name:  # case-sensitive: catches e.g. Bleed_1 -> bleed_1
             renames.append((f, target))
     for i, f in enumerate(muffled, 1):
         target = folder / f'm_{folder_name}_{i}.ogg'
-        if f.resolve() != target.resolve():
+        if f.name != target.name:
             renames.append((f, target))
 
     if not renames:

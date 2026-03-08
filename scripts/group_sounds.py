@@ -61,7 +61,7 @@ def main() -> int:
     parser.add_argument(
         'sounds_dir',
         nargs='?',
-        default='gamedata/sounds/characters_voice',
+        default='gamedata/sounds/characters_voice/commands_eng',
         help='Path to characters_voice directory (default: gamedata/sounds/characters_voice)',
     )
     parser.add_argument(

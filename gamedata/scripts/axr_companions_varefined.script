@@ -14,7 +14,7 @@ if not axr_companions then
             "[VARefined] zzz_monkey_axr_companions_varefined.script: xr_companions not found, aborting monkeypatch [Voiced Actor Refined mod]")
 end
 
-local commands_with_lang_muffle = agdd_voiced_actor.commands_with_lang_muffle
+local commands_with_lang_muffle = agdd_voiced_actor.commands_with_lang_muffle_random
 
 function axr_companions.squad_close()
     -- SQUAD IN CLOSE DISTANCE CHECKER (UP TO 12m)
@@ -87,19 +87,19 @@ function axr_companions.actors_command(file, sound_volume, cooldown, requires_sq
     if not db.actor then
         return
     end
-    if requires_squad_close == true and axr_companions.squad_close() == false then
+    if requires_squad_close  and not axr_companions.squad_close()  then
         return
     end
-    if requires_squad_near == true and axr_companions.squad_near() == false then
+    if requires_squad_near  and not axr_companions.squad_near()  then
         return
     end
-    if requires_squad_mid == true and axr_companions.squad_mid() == false then
+    if requires_squad_mid  and not axr_companions.squad_mid()  then
         return
     end
-    if requires_squad_far == true and axr_companions.squad_far() == false then
+    if requires_squad_far  and not axr_companions.squad_far()  then
         return
     end
-    if requires_squad_too_far == true and axr_companions.squad_too_far() == false then
+    if requires_squad_too_far  and not axr_companions.squad_too_far()  then
         return
     end
 
@@ -111,19 +111,19 @@ function axr_companions.voiceover_companion_hide_in_cover()
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
             -- IF ACTOR IS NOT IN COMBAT IT WILL PLAYS ONE OF THE FOLLOWING COMMANDS
 
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_ComClose"),  1.0, 2500, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_ComNear"),   1.0, 2500, false, true,  false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_ComMid"),    1.0, 2500, false, false, true,  false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_ComFar"),    1.0, 2500, false, false, false, true,  false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_Radio"),     1.0, 2500, false, false, false, false, true)  -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_close"),  1.0, 2500, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_near"),   1.0, 2500, false, true,  false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_mid"),    1.0, 2500, false, false, true,  false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_far"),    1.0, 2500, false, false, false, true,  false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_radio"),     1.0, 2500, false, false, false, false, true)  -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
         else
             -- IF ACTOR IS IN COMBAT IT WILL PLAYS ONE OF THE FOLLOWING COMMANDS
 
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_ComClose_AIC"),  1.0, 2500, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_ComNear_AIC"),   1.0, 2500, false, true,  false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_ComMid_AIC"),    1.0, 2500, false, false, true,  false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_ComFar_AIC"),    1.0, 2500, false, false, false, true,  false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("MoveToPoint", "MoveToPoint_ComTooFar_AIC"), 1.0, 2500, false, false, false, false, true)  -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_close_aic"),  1.0, 2500, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_near_aic"),   1.0, 2500, false, true,  false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_mid_aic"),    1.0, 2500, false, false, true,  false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_far_aic"),    1.0, 2500, false, false, false, true,  false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_too_far_aic"), 1.0, 2500, false, false, false, false, true)  -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
         end
     end -- filters disabled companion commands shouts from MCM
 end
@@ -140,19 +140,19 @@ function axr_companions.voiceover_companion_to_wait_state()
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
             -- SAME AS ABOVE
 
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_ComClose"), 1.0, 3500, true,  false, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_ComNear"),  1.0, 3500, false, true,  false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_ComMid"),   1.0, 3500, false, false, true,  false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_ComFar"),   1.0, 3500, false, false, false, true,  false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_Radio"),    1.0, 3500, false, false, false, false, true)  -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_com_close"), 1.0, 3500, true,  false, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_com_near"),  1.0, 3500, false, true,  false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_com_mid"),   1.0, 3500, false, false, true,  false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_com_far"),   1.0, 3500, false, false, false, true,  false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_radio"),    1.0, 3500, false, false, false, false, true)  -- SAME AS ABOVE BUT FOR WAIT COMMAND
         else
             -- SAME AS ABOVE
 
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_ComClose_AIC"),  1.0, 3500, true,  false, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_ComNear_AIC"),   1.0, 3500, false, true,  false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_ComMid_AIC"),    1.0, 3500, false, false, true,  false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_ComFar_AIC"),    1.0, 3500, false, false, false, true,  false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
-            axr_companions.actors_command(commands_with_lang_muffle("Wait", "Wait_ComTooFar_AIC"), 1.0, 3500, false, false, false, false, true)  -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_com_close_aic"),  1.0, 3500, true,  false, false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_com_near_aic"),   1.0, 3500, false, true,  false, false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_com_mid_aic"),    1.0, 3500, false, false, true,  false, false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_com_far_aic"),    1.0, 3500, false, false, false, true,  false) -- SAME AS ABOVE BUT FOR WAIT COMMAND
+            axr_companions.actors_command(commands_with_lang_muffle("wait_com_too_far_aic"), 1.0, 3500, false, false, false, false, true)  -- SAME AS ABOVE BUT FOR WAIT COMMAND
         end
     end -- filters disabled companion commands shouts from MCM
 end
@@ -166,7 +166,7 @@ end
 
 function axr_companions.voiceover_companion_to_patrol_state()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("Patrol", "StartPatrolling"), 1.0, 1700, true, false, false, false, false) -- START PATROLLING COMMAND
+        axr_companions.actors_command(commands_with_lang_muffle("start_patrolling"), 1.0, 1700, true, false, false, false, false) -- START PATROLLING COMMAND
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -180,18 +180,18 @@ function axr_companions.voiceover_companion_to_follow_state()
     if get_config("enable_companions_commands_shouts") then
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComClose"), 1.0, 3200, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComNear"),  1.0, 3200, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComMid"),   1.0, 3200, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComFar"),   1.0, 3200, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_Radio"),    1.0, 3200, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_com_close"), 1.0, 3200, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_com_near"),  1.0, 3200, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_com_mid"),   1.0, 3200, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_com_far"),   1.0, 3200, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_radio"),    1.0, 3200, false, false, false, false, true)
         else
 
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComClose_AIC"),  1.0, 3200, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComNear_AIC"),   1.0, 3200, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComMid_AIC"),    1.0, 3200, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComFar_AIC"),    1.0, 3200, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("Follow", "Follow_ComTooFar_AIC"), 1.0, 3200, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_com_close_aic"),  1.0, 3200, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_com_near_aic"),   1.0, 3200, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_com_mid_aic"),    1.0, 3200, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_com_far_aic"),    1.0, 3200, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("follow_com_too_far_aic"), 1.0, 3200, false, false, false, false, true)
         end
     end -- filters disabled companion commands shouts from MCM
 end
@@ -209,18 +209,18 @@ function axr_companions.voiceover_companion_to_attack_state()
     if get_config("enable_companions_commands_shouts") then
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComClose"), 1.0, 3000, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComNear"),  1.0, 3000, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComMid"),   1.0, 3000, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComFar"),   1.0, 3000, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_Radio"),    1.0, 3000, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_com_close"), 1.0, 3000, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_com_near"),  1.0, 3000, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_com_mid"),   1.0, 3000, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_com_far"),   1.0, 3000, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_radio"),    1.0, 3000, false, false, false, false, true)
         else
 
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComClose_AIC"),  1.0, 3000, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComNear_AIC"),   1.0, 3000, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComMid_AIC"),    1.0, 3000, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComFar_AIC"),    1.0, 3000, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("FireAtWill", "FireAtWill_ComTooFar_AIC"), 1.0, 3000, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_com_close_aic"),  1.0, 3000, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_com_near_aic"),   1.0, 3000, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_com_mid_aic"),    1.0, 3000, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_com_far_aic"),    1.0, 3000, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("fire_at_will_com_too_far_aic"), 1.0, 3000, false, false, false, false, true)
         end
     end -- filters disabled companion commands shouts from MCM
 end
@@ -236,18 +236,18 @@ function axr_companions.voiceover_companion_to_ignore_combat_state()
     if get_config("enable_companions_commands_shouts") then
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComClose"), 1.0, 2500, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComNear"),  1.0, 2500, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComMid"),   1.0, 2500, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComFar"),   1.0, 2500, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_Radio"),    1.0, 2500, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_com_close"), 1.0, 2500, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_com_near"),  1.0, 2500, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_com_mid"),   1.0, 2500, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_com_far"),   1.0, 2500, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_radio"),    1.0, 2500, false, false, false, false, true)
         else
 
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComClose_AIC"),  1.0, 2500, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComNear_AIC"),   1.0, 2500, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComMid_AIC"),    1.0, 2500, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComFar_AIC"),    1.0, 2500, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombat", "IgnoreCombat_ComTooFar_AIC"), 1.0, 2500, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_com_close_aic"),  1.0, 2500, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_com_near_aic"),   1.0, 2500, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_com_mid_aic"),    1.0, 2500, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_com_far_aic"),    1.0, 2500, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_com_too_far_aic"), 1.0, 2500, false, false, false, false, true)
         end
     end -- filters disabled companion commands shouts from MCM
 end
@@ -261,7 +261,7 @@ end
 
 function axr_companions.voiceover_companion_to_attack_only_actor_combat_enemy_state()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("IgnoreCombatButHelpMe", "IgnoreCombatButHelpMe"), 1.0, 1500, true, false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("ignore_combat_but_help_me"), 1.0, 1500, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -274,11 +274,11 @@ end
 
 function axr_companions.voiceover_companion_to_stealth_substate()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("Stealth", "Stealth_ComClose"), 1.0, 2300, true,  false, false, false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("Stealth", "Stealth_ComNear"),  1.0, 2300, false, true,  false, false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("Stealth", "Stealth_ComMid"),   1.0, 2300, false, false, true,  false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("Stealth", "Stealth_ComFar"),   1.0, 2300, false, false, false, true,  false)
-        axr_companions.actors_command(commands_with_lang_muffle("Stealth", "Stealth_Radio"),    1.0, 2300, false, false, false, false, true)
+        axr_companions.actors_command(commands_with_lang_muffle("stealth_com_close"), 1.0, 2300, true,  false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("stealth_com_near"),  1.0, 2300, false, true,  false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("stealth_com_mid"),   1.0, 2300, false, false, true,  false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("stealth_com_far"),   1.0, 2300, false, false, false, true,  false)
+        axr_companions.actors_command(commands_with_lang_muffle("stealth_radio"),    1.0, 2300, false, false, false, false, true)
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -290,11 +290,11 @@ end
 
 function axr_companions.voiceover_companion_to_default_substate()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("StopStealth", "StopStealth_ComClose"), 1.0, 1700, true,  false, false, false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("StopStealth", "StopStealth_ComNear"),  1.0, 1700, false, true,  false, false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("StopStealth", "StopStealth_ComMid"),   1.0, 1700, false, false, true,  false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("StopStealth", "StopStealth_ComFar"),   1.0, 1700, false, false, false, true,  false)
-        axr_companions.actors_command(commands_with_lang_muffle("StopStealth", "StopStealth_Radio"),    1.0, 1700, false, false, false, false, true)
+        axr_companions.actors_command(commands_with_lang_muffle("stop_stealth_com_close"), 1.0, 1700, true,  false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("stop_stealth_com_near"),  1.0, 1700, false, true,  false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("stop_stealth_com_mid"),   1.0, 1700, false, false, true,  false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("stop_stealth_com_far"),   1.0, 1700, false, false, false, true,  false)
+        axr_companions.actors_command(commands_with_lang_muffle("stop_stealth_radio"),    1.0, 1700, false, false, false, false, true)
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -307,11 +307,11 @@ end
 
 function axr_companions.voiceover_companion_to_loot_items_and_corpses()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComClose"), 1.0, 2200, true,  false, false, false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComNear"),  1.0, 2200, false, true,  false, false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComMid"),   1.0, 2200, false, false, true,  false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComFar"),   1.0, 2200, false, false, false, true,  false)
-        axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_Radio"),    1.0, 2200, false, false, false, false, true)
+        axr_companions.actors_command(commands_with_lang_muffle("loot_com_close"), 1.0, 2200, true,  false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("loot_com_near"),  1.0, 2200, false, true,  false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("loot_com_mid"),   1.0, 2200, false, false, true,  false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("loot_com_far"),   1.0, 2200, false, false, false, true,  false)
+        axr_companions.actors_command(commands_with_lang_muffle("loot_radio"),    1.0, 2200, false, false, false, false, true)
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -324,7 +324,7 @@ end
 
 function axr_companions.voiceover_companion_to_loot_items_only()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComClose"), 1.0, 2200, true, false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("loot_com_close"), 1.0, 2200, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -337,7 +337,7 @@ end
 
 function axr_companions.voiceover_companion_to_loot_corpses_only()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComNear"), 1.0, 2200, true, false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("loot_com_near"), 1.0, 2200, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -350,11 +350,11 @@ end
 
 function axr_companions.voiceover_companion_to_loot_nothing()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComClose"), 1.0, 3000, true,  false, false, false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComNear"),  1.0, 3000, false, true,  false, false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComMid"),   1.0, 3000, false, false, true,  false, false)
-        axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComFar"),   1.0, 3000, false, false, false, true,  false)
-        axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_Radio"),    1.0, 3000, false, false, false, false, true)
+        axr_companions.actors_command(commands_with_lang_muffle("dont_loot_com_close"), 1.0, 3000, true,  false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("dont_loot_com_near"),  1.0, 3000, false, true,  false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("dont_loot_com_mid"),   1.0, 3000, false, false, true,  false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("dont_loot_com_far"),   1.0, 3000, false, false, false, true,  false)
+        axr_companions.actors_command(commands_with_lang_muffle("dont_loot_radio"),    1.0, 3000, false, false, false, false, true)
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -369,18 +369,18 @@ function axr_companions.voiceover_companion_to_stay_close()
     if get_config("enable_companions_commands_shouts") then
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComClose"), 1.0, 3000, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComNear"),  1.0, 3000, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComMid"),   1.0, 3000, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComFar"),   1.0, 3000, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_Radio"),    1.0, 3000, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_close"), 1.0, 3000, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_near"),  1.0, 3000, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_mid"),   1.0, 3000, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_far"),   1.0, 3000, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_radio"),    1.0, 3000, false, false, false, false, true)
         else
 
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComClose_AIC"),  1.0, 3000, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComNear_AIC"),   1.0, 3000, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComMid_AIC"),    1.0, 3000, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComFar_AIC"),    1.0, 3000, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComTooFar_AIC"), 1.0, 3000, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_close_aic"),  1.0, 3000, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_near_aic"),   1.0, 3000, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_mid_aic"),    1.0, 3000, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_far_aic"),    1.0, 3000, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_too_far_aic"), 1.0, 3000, false, false, false, false, true)
         end
     end -- filters disabled companion commands shouts from MCM
 end
@@ -395,18 +395,18 @@ function axr_companions.voiceover_companion_to_stay_far()
     if get_config("enable_companions_commands_shouts") then
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
 
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComClose"), 1.0, 3300, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComNear"),  1.0, 3300, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComMid"),   1.0, 3300, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComFar"),   1.0, 3300, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_Radio"),    1.0, 3300, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_close"), 1.0, 3300, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_near"),  1.0, 3300, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_mid"),   1.0, 3300, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_far"),   1.0, 3300, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_radio"),    1.0, 3300, false, false, false, false, true)
         else
 
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComClose_AIC"),  1.0, 3300, true,  false, false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComNear_AIC"),   1.0, 3300, false, true,  false, false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComMid_AIC"),    1.0, 3300, false, false, true,  false, false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComFar_AIC"),    1.0, 3300, false, false, false, true,  false)
-            axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComTooFar_AIC"), 1.0, 3300, false, false, false, false, true)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_close_aic"),  1.0, 3300, true,  false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_near_aic"),   1.0, 3300, false, true,  false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_mid_aic"),    1.0, 3300, false, false, true,  false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_far_aic"),    1.0, 3300, false, false, false, true,  false)
+            axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_too_far_aic"), 1.0, 3300, false, false, false, false, true)
         end
     end -- filters disabled companion commands shouts from MCM
 end
@@ -419,13 +419,13 @@ end
 
 function axr_companions.voiceover_companion_to_come_closer()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("StayClose", "StayClose_ComClose"), 1.0, 3000, true, false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("stay_close_com_close"), 1.0, 3000, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
 
 function axr_companions.voiceover_companion_to_move_away()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("StayFar", "StayFar_ComClose"), 1.0, 3300, true, false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("stay_far_com_close"), 1.0, 3300, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -445,12 +445,12 @@ function axr_companions.switch_companion_patrol_mode(npc)
     if (npc:has_info("npcx_beh_patrol_mode")) then
         npc:disable_info_portion("npcx_beh_patrol_mode")
         if get_config("enable_companions_commands_shouts") then
-            axr_companions.actors_command(commands_with_lang_muffle("Patrol", "StopPatrolling"), 1.0, 1700, true, false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("stop_patrolling"), 1.0, 1700, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     else
         npc:give_info_portion("npcx_beh_patrol_mode")
         if get_config("enable_companions_commands_shouts") then
-            axr_companions.actors_command(commands_with_lang_muffle("Patrol", "StartPatrolling"), 1.0, 1700, true, false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("start_patrolling"), 1.0, 1700, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     end
 end
@@ -461,13 +461,13 @@ function axr_companions.switch_companion_gather_items(npc)
         actor_menu.set_msg(1, game.translate_string("st_disable_looting"), 8)
         npc:disable_info_portion("npcx_beh_gather_items")
         if get_config("enable_companions_commands_shouts") then
-            axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComClose"), 1.0, 3000, true, false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("dont_loot_com_close"), 1.0, 3000, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     else
         actor_menu.set_msg(1, game.translate_string("st_enable_looting"), 8)
         npc:give_info_portion("npcx_beh_gather_items")
         if get_config("enable_companions_commands_shouts") then
-            axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComClose"), 1.0, 2200, true, false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("loot_com_close"), 1.0, 2200, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     end
 end
@@ -477,19 +477,19 @@ function axr_companions.switch_companion_loot_corpses(npc)
     if (npc:has_info("npcx_beh_loot_corpses")) then
         npc:disable_info_portion("npcx_beh_loot_corpses")
         if get_config("enable_companions_commands_shouts") then
-            axr_companions.actors_command(commands_with_lang_muffle("DontLoot", "DontLoot_ComClose"), 1.0, 3000, true, false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("dont_loot_com_close"), 1.0, 3000, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     else
         npc:give_info_portion("npcx_beh_loot_corpses")
         if get_config("enable_companions_commands_shouts") then
-            axr_companions.actors_command(commands_with_lang_muffle("Loot", "Loot_ComNear"), 1.0, 2200, true, false, false, false, false)
+            axr_companions.actors_command(commands_with_lang_muffle("loot_com_near"), 1.0, 2200, true, false, false, false, false)
         end -- filters disabled companion commands shouts from MCM
     end
 end
 
 function axr_companions.voiceover_companion_remove_waypoints()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("Patrol", "ForgetAllWaypoints"), 1.0, 1700, true, false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("forget_all_waypoints"), 1.0, 1700, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
 
@@ -508,7 +508,7 @@ end
 
 function axr_companions.voiceover_companion_add_waypoints()
     if get_config("enable_companions_commands_shouts") then
-        axr_companions.actors_command(commands_with_lang_muffle("Patrol", "AddThisSpot"), 1.0, 1700, true, false, false, false, false)
+        axr_companions.actors_command(commands_with_lang_muffle("add_this_spot"), 1.0, 1700, true, false, false, false, false)
     end -- filters disabled companion commands shouts from MCM
 end
 

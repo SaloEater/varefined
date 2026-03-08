@@ -2,7 +2,7 @@ function on_game_start()
 	RegisterScriptCallback("on_key_press",on_key_press)
 end
 
-local commands_with_lang_muffle = agdd_voiced_actor.commands_with_lang_muffle
+local commands_with_lang_muffle = agdd_voiced_actor.commands_with_lang_muffle_random
 
 --local addonMenu=nil
 function on_key_press(key)
@@ -22,10 +22,10 @@ function on_key_press(key)
 		if chance > 50 then
 --			show_all_ui(false)
 			if agdd_voiced_actor.is_actor_in_combat() then
-				axr_companions.actors_command(commands_with_lang_muffle("Start", "Command_Start"),  1.0, 1000, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
+				axr_companions.actors_command(commands_with_lang_muffle("command_start"),  1.0, 1000, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
 			else
 				if chance > 50 then
-					axr_companions.actors_command(commands_with_lang_muffle("Stop", "Command_Stop"),  1.0, 1000, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
+					axr_companions.actors_command(commands_with_lang_muffle("command_stop"),  1.0, 1000, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
 				end
 			--				addonMenu:CloseTheMenu()
 			end
