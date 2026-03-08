@@ -109,7 +109,6 @@ All voice lines takes into account Actor conditions:
 | commands | follow_com_too_far_aic |  |
 | commands | follow_radio |  |
 | commands | forget_all_waypoints |  |
-| commands | ignore_combat | When companions are ordered to ignore combat |
 | commands | ignore_combat_but_help_me | When companions are ordered to ignore	combat but help the player |
 | commands | ignore_combat_com_close |  |
 | commands | ignore_combat_com_close_aic |  |
@@ -233,8 +232,12 @@ All voice lines takes into account Actor conditions:
 | player | on_item_before_use_bandage | When character uses a bandage |
 | player | on_item_before_use_bandage_last | When character uses the last bandage |
 | player | on_item_before_use_last | When character uses the last of an item |
+| player | on_item_before_use_type_drink | When character drinks something |
+| player | on_item_before_use_type_drink_last | When character drinks something |
 | player | on_item_before_use_type_food | When character eats food |
 | player | on_item_before_use_type_food_last | When character eats the last food |
+| player | on_item_before_use_type_meds | When character uses medicine |
+| player | on_item_before_use_type_meds_last | When character uses medicine |
 | player | pain | When character receives a hit |
 | player | pain_bad | When character receives a hit and health	is low |
 | player | reloading | When character is reloading and enemy close |
