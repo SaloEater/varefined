@@ -1016,61 +1016,61 @@ function interactive_comments_on_button(key)
         end -- IF ACTOR IS DEAD ALREADY IT WILL STOP FUNCTION
         if is_actor_in_combat() == true then
             -- IF ACTOR IS TARGETED BY ENEMY IN INNER PERIMETER IT WILL PLAYS ,FOR SQUAD IN HEARING DISTANCE INFORMATIVE BUT LOUD AND COCKY RESPONSES ,WITHOUT SQUAD OR WITH SQUAD TOO FAR JUST SIMPLE LOUD INVECTIVES
-            actor_speak_squad_near(button_comments_with_lang_muffle_random("Enemy_squad"), 1.0,
+            actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_enemy_squad"), 1.0,
                     3000, 100)
-            actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("Enemy_squad"), 1.0,
+            actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_enemy_squad"), 1.0,
                     3000, 100)
             actor_speak_squad_out(player_with_lang_muffle_random("kill_confirm_common_state1"), 1.0,
                     3500, 100)
         elseif outer_combat_checker() == true then
             -- IF ACTOR IS TARGETED BY ENEMY FROM OUTER PERIMETER IT WILL PLAYS ,FOR SQUAD IN HEARING DISTANCE LOUD INFORMATIVE BUT NOT COCKY RESPONSES ,WITHOUT SQUAD OR WITH SQUAD TOO FAR JUST SIMPLE INVECTIVES BUT NOT LOUD
-            actor_speak_squad_near(button_comments_with_lang_muffle_random("EnemyFar_squad"),
+            actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_enemy_far_squad"),
                     1.0, 2000, 100)
-            actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("EnemyFar_squad"),
+            actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_enemy_far_squad"),
                     1.0, 2000, 100)
-            actor_speak_squad_out(button_comments_with_lang_muffle_random("Enemy"), 1.0,
+            actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_enemy"), 1.0,
                     2000, 100)
         elseif not (is_actor_in_combat()) and not (outer_combat_checker()) then
             -- IF ACTOR IS NOT TARGETED BY ENEMY FROM INNER OR OUTER COMBAT PERIMETER ,CONDITION COMMENTS WILL BE PLAYED
             if hurt_bad_cond() == true then
                 -- IF ACTOR IS BADLY INJURED IT WILL PLAY DIFFERENT COMMENT FOR SQUAD UP TO NEAR DISTANCE (ADDRESSED TO COMPANIONS) AND DIFFERENT IF HE IS ALONE ,OR SQUAD IS NOT CLOSE ENOUGH
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("HurtBad_SquadNear"),
+                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_hurt_bad_squadnear"),
                         1.0, 3500, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("HurtBad"), 1.0,
+                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_hurt_bad"), 1.0,
                         3500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("HurtBad"), 1.0,
+                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_hurt_bad"), 1.0,
                         3500, 100)
             elseif hurt_cond() == true then
                 -- SAME AS BEFORE ,EXCEPT ACTOR IS NOT BADLY INJURED BUT STILL INJURED
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("Hurt_SquadNear"),
+                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_hurt_squadnear"),
                         1.0, 3500, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("Hurt"),
+                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_hurt"),
                         1.0, 3500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("Hurt"),
+                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_hurt"),
                         1.0, 3500, 100)
             elseif bleed_cond() == true then
                 -- SAME AS BEFORE ,EXCEPT ACTOR IS BLEEDING ,BUT NOT INJURED OR BADLY INJURED
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("Bleed_SquadNear"),
+                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_bleed_squadnear"),
                         1.0, 3000, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("Bleed"),
+                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_bleed"),
                         1.0, 3500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("Bleed"),
+                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_bleed"),
                         1.0, 3500, 100)
             elseif tired_cond() == true then
                 -- SAME AS BEFORE ,EXCEPT ACTOR IS TIRED ,BUT NOT INJURED OR BADLY INJURED OR BLEEDING
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("Tired_SquadNear"),
+                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_tired_squadnear"),
                         1.0, 3500, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("Tired"),
+                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_tired"),
                         1.0, 2500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("Tired"),
+                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_tired"),
                         1.0, 2500, 100)
             elseif ok_cond() == true then
                 -- IF ACTOR IS NOT INJURED OR BADLY INJURED OR BLEEDING OR TIRED (SIMPLY PUT ,HE IS RELATIVELY OK) ,IT WILL PLAY MUMBLE COMMENT ,DIFFERENT FOR SQUAD UP TO NEAR DISTANCE (ADDRESSED TO COMPANIONS) AND DIFFERENT IF HE IS ALONE ,OR SQUAD IS NOT CLOSE ENOUGH
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("Mumble_SquadNear"),
+                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_mumble_squadnear"),
                         1.0, 3500, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("Mumble"),
+                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_mumble"),
                         1.0, 3500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("Mumble"),
+                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_mumble"),
                         1.0, 3500, 100)
             end
         end
