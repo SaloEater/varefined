@@ -1219,7 +1219,7 @@ local TAB_TYPE = {
     --[3] = "armor",
     --[4] = "ammo",
     --[5] = "artefact",
-    [6] = "tools",
+    --[6] = "tools",
     [7] = "food",
     [8] = "meds",
     --[9] = "misc",
@@ -1228,7 +1228,7 @@ local TAB_TYPE = {
 local kind_to_type = {}
 
 local function build_item_type_cache()
-    for tab_id = 6, 8 do
+    for tab_id = 7, 8 do
         local kinds = parse_list(ini_sys, "button_sort_tab_" .. tab_id, "kinds", true)
         if kinds then
             for kind in pairs(kinds) do
