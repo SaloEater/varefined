@@ -80,6 +80,31 @@ function init_languages()
     end
 end
 
+local shuffle_bag = {}
+local last_shuffle_category = ""
+local last_shuffle_pick = -1
+
+--- Returns a random number from 1 to max_val for the given category, ensuring that the same number won't be returned again until all numbers have been used (shuffle bag system), if max_val is 1 or less, returns 1
+function get_shuffle(category, max_val)
+    if max_val <= 1 then return 1 end
+
+    local bag = shuffle_bag[category]
+
+    -- Initialize or Reset if empty
+    if not bag or #bag == 0 then
+        bag = {}
+        for i = 1, max_val do
+            bag[#bag + 1] = i
+        end
+        shuffle_bag[category] = bag
+    end
+
+    local pick = math.random(#bag)
+    last_shuffle_pick = bag[pick]
+    last_shuffle_category = category
+    return table.remove(bag, pick)
+end
+
 local combat_inertia = 0
 
 lang = "rus" -- initiates actor language condition
@@ -264,12 +289,25 @@ function actor_speak_squad_out(file, sound_volume, cooldown, max_chance)
     actor_speak(file, sound_volume, cooldown, max_chance, false, false, true, false, false, false)
 end
 
+--- Makes character to say specific line, also tries to refill shuffle bag if the line was not played
 function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear,
+                     requires_squad_out, has_priority, ignore_conditionals, is_state)
+    local actor_talks = actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear, requires_squad_out,
+            has_priority, ignore_conditionals, is_state)
+    if actor_talks or last_shuffle_pick == -1 or last_shuffle_category == "" or not shuffle_bag[last_shuffle_category] then return end
+
+    shuffle_bag[last_shuffle_category][#shuffle_bag[last_shuffle_category] + 1] = last_shuffle_pick
+    last_shuffle_category = ""
+    last_shuffle_pick = -1
+end
+
+--- Old actor_speak, makes character to say specific line. Returns true if the line was played
+function actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear,
                      requires_squad_out, has_priority, ignore_conditionals, is_state)
     -- (EDITED FUCTION  - ADDED SOME REQUIREMENTS) player function, plays the sound if all conditions are met. Argument "sound_volume" is overwriten by default from MCM shouts volume slider.
     printf("file to say: %s", file)
     if file == nil then
-        return
+        return false
     end
 
     if is_state == true then
@@ -277,29 +315,29 @@ function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, 
     end -- forces has_priority to be false if this is a state sound
 
     if not db.actor then
-        return
+        return false
     end -- this checks if actor exists
     if is_state == true and time_global() < state_cooldown then
-        return
+        return false
     end -- checks if this call is meant to play a state sound
     if is_state == false and has_priority == false and time_global() < speaking_cooldown then
-        return
+        return false
     end -- this checks for the cooldown, unless has_priority or is_state is true
     if ignore_conditionals == false and (db.actor:is_talking() or not db.actor:alive()) then
-        return
+        return false
     end -- checks if the actor is talking or is dead, unless ignore_conditionals is true
     local max_chance = math.random(1, 100) -- sets the max_chance value to compare chance with
     if chance < max_chance then
-        return
+        return false
     end -- does the comparasion
     if requires_squad_near == true and squad_near() == false then
-        return
+        return false
     end -- ADDED REQUIREMENT FOR SQUAD IN "NORMAL VOLUME SPEECH HEARING DISTANCE"
     if requires_squad_can_hear == true and squad_can_hear() == false then
-        return
+        return false
     end -- ADDED REQUIREMENT FOR SQUAD IN "LOUD VOLUME SPEECH HEARING DISTAMCE"
     if requires_squad_out == true and squad_out() == false then
-        return
+        return false
     end -- ADDED REQUIREMENT FOR SQUAD OUT OF HEARING DISTANCE
 
     if file_to_say then
@@ -324,6 +362,7 @@ function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, 
         speaking_cooldown = time_global() + cooldown -- applies the main cooldown
     end
 
+    return true
 end
 
 local combat_intensity = 0 -- main value that drives the combat status system
@@ -357,6 +396,7 @@ end
 
 -- format is characters_voice\[category][language]\[subcategory]\[muffle][line]_[line_index]
 local VOICE_FORMAT = "characters_voice\\%s%s\\%s\\%s%s_%d"
+
 local VOICE_CATEGORY_PLAYER = "player"
 local VOICE_CATEGORY_BUTTON_COMMENTS = "buttoncomments"
 local VOICE_CATEGORY_RANDOM_SHOUTS = "random_shouts"
@@ -393,7 +433,8 @@ function random_voice_line(category, subcategory, language_key, muffle_val, line
         return nil
     end
 
-    return string.format(VOICE_FORMAT, category, language_prefix(language_key), subcategory, muffle_val, line, math.random(lines))
+    local line_index = get_shuffle(line, lines)
+    return string.format(VOICE_FORMAT, category, language_prefix(language_key), subcategory, muffle_val, line, line_index)
 end
 
 --- Returns a voice line from `player` category
