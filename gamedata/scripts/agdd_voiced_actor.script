@@ -1320,6 +1320,44 @@ end
 -- ITEM USE REACTIONS PART ENDS HERE
 --------------------------------------
 
+--------------------------------------
+-- LOOT OPEN REACTIONS
+--------------------------------------
+
+local loot_opened_ids = {} -- container id -> number of times opened this session
+
+function on_ActorMenu_on_before_init_mode(mode_str, flags, obj)
+    if not obj then return end
+    if mode_str ~= "loot" then return end
+
+    local id = obj:id()
+    local count = loot_opened_ids[id] or 1
+
+    -- Chance decays with repeated opens: 100% on first open, 5% at 10+ opens
+    local chance = math.max(5, math.floor(100 - count * 9.5))
+    if math.random(100) > chance then return end
+    loot_opened_ids[id] = count + 1
+
+    local typed = IsInvbox(obj) and "loot_open_box" or "loot_open_npc"
+    local category = choose_random_category(typed, "loot_open")
+    actor_speak_default_ignore_conditionals(player_with_lang_muffle_random(category), 1.0, 3000, 100)
+end
+
+function monster_on_loot_init(victim, loot_table)
+    local id = victim:id()
+    local count = loot_opened_ids[id] or 1
+
+    -- Chance decays with repeated opens: 100% on first open, 5% at 10+ opens
+    local chance = math.max(5, math.floor(100 - count * 9.5))
+    if math.random(100) > chance then return end
+
+    local category = choose_random_category("loot_open_mutant", "loot_open")
+    actor_speak_default_ignore_conditionals(player_with_lang_muffle_random(category), 1.0, 3000, 100)
+end
+
+-- LOOT OPEN REACTIONS PART ENDS HERE
+--------------------------------------
+
 function save_state(mdata)
     local remaining = random_long_shout_cooldown - time_global()
     mdata.varefined_random_long_cd = remaining > 0 and remaining or 0
@@ -1347,6 +1385,8 @@ function on_game_start()
     RegisterScriptCallback("GUI_on_show", GUI_on_show) -- runs when a mutant is hit
     RegisterScriptCallback("GUI_on_hide", GUI_on_hide) -- runs when a mutant is hit
     RegisterScriptCallback("actor_on_item_before_use", actor_on_item_before_use) -- runs when actor uses an item
+    RegisterScriptCallback("ActorMenu_on_before_init_mode", on_ActorMenu_on_before_init_mode) -- runs when actor opens a container/inventory
+    RegisterScriptCallback("monster_on_loot_init", monster_on_loot_init) -- runs when actor opens a container/inventory
     RegisterScriptCallback("save_state", save_state)
     RegisterScriptCallback("load_state", load_state)
     build_item_type_cache()

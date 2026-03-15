@@ -229,6 +229,10 @@ All voice lines takes into account Actor conditions:
 | player | kill_confirm_stalker_state1 | While combat intensity is low and when character kills an npc close and squadmates are far from you |
 | player | kill_confirm_stalker_state2 | While combat intensity is medium and when character kills an npc close |
 | player | kill_confirm_stalker_state3 | While combat intensity is high and when character kills an npc close |
+| player | loot_open | When player opens a box or looting npc body or mutant |
+| player | loot_open_box | When player loots a box |
+| player | loot_open_mutant | When player loots a mutant |
+| player | loot_open_npc | When player loots an npc |
 | player | on_item_before_use | When character uses an item |
 | player | on_item_before_use_bandage | When character uses a bandage |
 | player | on_item_before_use_bandage_last | When character uses the last bandage |
