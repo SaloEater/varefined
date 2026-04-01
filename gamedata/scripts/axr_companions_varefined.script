@@ -111,19 +111,19 @@ function axr_companions.voiceover_companion_hide_in_cover()
         if not (agdd_voiced_actor.is_actor_in_combat()) or not (agdd_voiced_actor.outer_combat_checker()) then
             -- IF ACTOR IS NOT IN COMBAT IT WILL PLAYS ONE OF THE FOLLOWING COMMANDS
 
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_close"),  1.0, 2500, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_near"),   1.0, 2500, false, true,  false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_mid"),    1.0, 2500, false, false, true,  false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_far"),    1.0, 2500, false, false, false, true,  false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_radio"),     1.0, 2500, false, false, false, false, true)  -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_com_close"),      1.0, 2500, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_com_near"),       1.0, 2500, false, true,  false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_com_mid"),        1.0, 2500, false, false, true,  false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_com_far"),        1.0, 2500, false, false, false, true,  false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_radio"),          1.0, 2500, false, false, false, false, true)  -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
         else
             -- IF ACTOR IS IN COMBAT IT WILL PLAYS ONE OF THE FOLLOWING COMMANDS
 
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_close_aic"),  1.0, 2500, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_near_aic"),   1.0, 2500, false, true,  false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_mid_aic"),    1.0, 2500, false, false, true,  false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_far_aic"),    1.0, 2500, false, false, false, true,  false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
-            axr_companions.actors_command(commands_with_lang_muffle("move_to_point_com_too_far_aic"), 1.0, 2500, false, false, false, false, true)  -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_com_close_aic"),   1.0, 2500, true,  false, false, false, false) -- PLAYS COMMAND FOR SQUAD IN CLOSE DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_com_near_aic"),    1.0, 2500, false, true,  false, false, false) -- PLAYS COMMAND FOR SQUAD IN NEAR DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_com_mid_aic"),     1.0, 2500, false, false, true,  false, false) -- PLAYS COMMAND FOR SQUAD IN MID DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_com_far_aic"),     1.0, 2500, false, false, false, true,  false) -- PLAYS COMMAND FOR SQUAD IN FAR DISTANCE
+            axr_companions.actors_command(commands_with_lang_muffle("hide_in_cover_com_too_far_aic"), 1.0, 2500, false, false, false, false, true)  -- PLAYS COMMAND FOR SQUAD OUT OF HEARING DISTANCE
         end
     end -- filters disabled companion commands shouts from MCM
 end

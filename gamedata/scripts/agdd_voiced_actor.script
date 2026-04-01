@@ -61,6 +61,7 @@ Werwolf's Edits
 Additional voice lines and conditions with GAMMA weights
 --]]
 local get_config = varefined_mcm.get_config
+local hf_furniture_types_get_type = hf_furniture_types and hf_furniture_types.get_type
 
 --[[
     Structure of a lines_by_language entry:
@@ -294,8 +295,8 @@ function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, 
                      requires_squad_out, has_priority, ignore_conditionals, is_state)
     local actor_talks = actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear, requires_squad_out,
             has_priority, ignore_conditionals, is_state)
-    if actor_talks or last_shuffle_pick == -1 or last_shuffle_category == "" or not shuffle_bag[last_shuffle_category] then
-        printf("failed to say that")
+    if not actor_talks or last_shuffle_pick == -1 or last_shuffle_category == "" or not shuffle_bag[last_shuffle_category] then
+        printf("failed to say that %s, %s, %s, %s", actor_talks, last_shuffle_pick == -1, last_shuffle_category == "", not shuffle_bag[last_shuffle_category])
         return
     end
     printf("said that successfully")
@@ -901,7 +902,7 @@ function actor_on_weapon_jammed(wpn)
                 2500, 100)
         actor_speak_squad_can_hear(player_with_lang_muffle_random("gun_jam_squad"), 1.0,
                 2500, 100)
-        actor_speak_squad_out(player_with_lang_muffle_random("gun_jam_alone"), 1.0,
+        actor_speak(player_with_lang_muffle_random("gun_jam_alone"), 1.0,
                 2500, 100)
         add_action_intensity(30, 0.5, 125)
     elseif outer_combat_checker() == true and combat_intensity > combat_medium_threshold then
@@ -1329,6 +1330,11 @@ local loot_opened_ids = {} -- container id -> number of times opened this sessio
 function on_ActorMenu_on_before_init_mode(mode_str, flags, obj)
     if not obj then return end
     if mode_str ~= "loot" then return end
+
+    if hf_furniture_types_get_type and hf_furniture_types_get_type(obj) ~= nil then
+        printf("Furniture %s opened, skipping loot open reaction", obj:name())
+        return
+    end
 
     local id = obj:id()
     local count = loot_opened_ids[id] or 1

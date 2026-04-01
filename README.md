@@ -110,6 +110,16 @@ All voice lines takes into account Actor conditions:
 | commands | follow_com_too_far_aic |  |
 | commands | follow_radio |  |
 | commands | forget_all_waypoints |  |
+| commands | hide_in_cover_com_close |  |
+| commands | hide_in_cover_com_close_aic |  |
+| commands | hide_in_cover_com_far |  |
+| commands | hide_in_cover_com_far_aic |  |
+| commands | hide_in_cover_com_mid |  |
+| commands | hide_in_cover_com_mid_aic |  |
+| commands | hide_in_cover_com_near |  |
+| commands | hide_in_cover_com_near_aic |  |
+| commands | hide_in_cover_com_too_far_aic |  |
+| commands | hide_in_cover_radio |  |
 | commands | ignore_combat_but_help_me | When companions are ordered to ignore	combat but help the player |
 | commands | ignore_combat_com_close |  |
 | commands | ignore_combat_com_close_aic |  |
