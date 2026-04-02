@@ -106,6 +106,25 @@ function get_shuffle(category, max_val)
     return table.remove(bag, pick)
 end
 
+--- Returns a formatted random voice-line path.
+--- Replaces tokens \<l\>, \<m\>, \<n\> in `path_format` with actor language, muffle prefix and a single shuffled line index.
+--- @param category string Category key for the shuffle bag (used by `get_shuffle` and `last_shuffle_*`).
+--- @param lines number Number of available lines for the requested entry (max value for shuffle).
+--- @param path_format string Template path containing tokens \<l\>, \<m\>, \<n\> (example: `characters_voice\<category>\<lang>\<sub>\<muffle><line>_<n>`).
+--- @return string|nil formatted_path Formatted path to the chosen voice file, or `nil` if no lines are available.
+function get_shuffled_line(category, lines, path_format)
+    local lang = get_actor_lang()
+    local muffle_val = get_muffle_status()
+    local index = get_shuffle(category, lines)
+
+    local out = path_format
+    out = out:gsub("<l>", lang or "")
+    out = out:gsub("<m>", muffle_val or "")
+    out = out:gsub("<n>", tostring(index))
+
+    return out
+end
+
 local combat_inertia = 0
 
 lang = "rus" -- initiates actor language condition
@@ -259,73 +278,118 @@ local function get_long_shout_cooldown_ms()
 end
 
 local state_cooldown = 0 -- is set later
-local file_to_say = nil -- is set later
+file_to_say = nil -- is set later
 local mcm_sound_volume = get_config("shouts_volume") -- gets the volume value from MCM
 
 function actor_speak_default(file, sound_volume, cooldown, max_chance)
-    actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, false, false, false)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, false, false, false)
+end
+
+function actor_speak_if_silent(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, false, false, false, true)
 end
 
 function actor_speak_default_ignore_conditionals(file, sound_volume, cooldown, max_chance)
-    actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, false, true, false)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, false, true, false)
 end
 
-function actor_speak_default_state(file, sound_volume, cooldown, max_chance)
-    actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, false, false, true)
+function actor_state(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, false, false, true)
+end
+
+function actor_state_if_silent(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, false, false, true, true)
 end
 
 function actor_speak_with_priority_ignore_conditionals(file, sound_volume, cooldown, max_chance)
-    actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, true, true, false)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, true, true, false)
+end
+
+function actor_state_with_priority(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, true, false, true)
+end
+
+function actor_speak_with_priority(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, true, false, false)
 end
 
 function actor_speak_squad_near(file, sound_volume, cooldown, max_chance)
-    actor_speak(file, sound_volume, cooldown, max_chance, true, false, false, false, false, false)
+    return actor_speak(file, sound_volume, cooldown, max_chance, true, false, false, false, false, false)
 end
 
 function actor_speak_squad_can_hear(file, sound_volume, cooldown, max_chance)
-    actor_speak(file, sound_volume, cooldown, max_chance, false, true, false, false, false, false)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, true, false, false, false, false)
 end
 
 function actor_speak_squad_out(file, sound_volume, cooldown, max_chance)
-    actor_speak(file, sound_volume, cooldown, max_chance, false, false, true, false, false, false)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, true, false, false, false)
 end
 
---- Makes character to say specific line, also tries to refill shuffle bag if the line was not played
+function actor_speak_squad_near_if_silent(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, true, false, false, false, false, false, true)
+end
+
+function actor_speak_squad_can_hear_if_silent(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, true, false, false, false, false, true)
+end
+
+function actor_speak_squad_out_if_silent(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, true, false, false, false, true)
+end
+
+function actor_state_squad_near_if_silent(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, true, false, false, false, false, true, true)
+end
+
+function actor_state_squad_can_hear_if_silent(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, true, false, false, false, true, true)
+end
+
+function actor_state_squad_out_if_silent(file, sound_volume, cooldown, max_chance)
+    return actor_speak(file, sound_volume, cooldown, max_chance, false, false, true, false, false, true, true)
+end
+
+--- Makes character to say specific line, also tries to refill shuffle bag if the line was not played. Returns true if the line was played
 function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear,
-                     requires_squad_out, has_priority, ignore_conditionals, is_state)
+                     requires_squad_out, has_priority, ignore_conditionals, is_state, say_if_silent)
     local actor_talks = actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear, requires_squad_out,
-            has_priority, ignore_conditionals, is_state)
-    if not actor_talks or last_shuffle_pick == -1 or last_shuffle_category == "" or not shuffle_bag[last_shuffle_category] then
-        printf("failed to say that %s, %s, %s, %s", actor_talks, last_shuffle_pick == -1, last_shuffle_category == "", not shuffle_bag[last_shuffle_category])
-        return
+            has_priority, ignore_conditionals, is_state, say_if_silent)
+    if actor_talks then
+        printf("said that successfully")
+        return true
     end
-    printf("said that successfully")
+    if last_shuffle_pick == -1 or last_shuffle_category == "" or not shuffle_bag[last_shuffle_category] then
+        printf("failed to say that and file is not from shuffle bag")
+        return false
+    end
+    printf("failed to say that")
 
     shuffle_bag[last_shuffle_category][#shuffle_bag[last_shuffle_category] + 1] = last_shuffle_pick
     last_shuffle_category = ""
     last_shuffle_pick = -1
+    return false
 end
 
 --- Old actor_speak, makes character to say specific line. Returns true if the line was played
 function actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear,
-                     requires_squad_out, has_priority, ignore_conditionals, is_state)
+                     requires_squad_out, has_priority, ignore_conditionals, is_state, say_if_silent)
     -- (EDITED FUCTION  - ADDED SOME REQUIREMENTS) player function, plays the sound if all conditions are met. Argument "sound_volume" is overwriten by default from MCM shouts volume slider.
     printf("file to say: %s", file)
     if file == nil then
         return false
     end
 
-    if is_state == true then
-        has_priority = false
-    end -- forces has_priority to be false if this is a state sound
+    --if is_state == true then
+    --    has_priority = false
+    --end -- forces has_priority to be false if this is a state sound
 
     if not db.actor then
         return false
     end -- this checks if actor exists
-    if is_state == true and time_global() < state_cooldown then
+    if is_state == true and not has_priority and time_global() < state_cooldown and not (say_if_silent and not (file_to_say and file_to_say:playing()) ) then
         return false
     end -- checks if this call is meant to play a state sound
-    if is_state == false and has_priority == false and time_global() < speaking_cooldown then
+    if is_state == false and has_priority == false and time_global() < speaking_cooldown and not (say_if_silent and not (file_to_say and file_to_say:playing()) ) then
         return false
     end -- this checks for the cooldown, unless has_priority or is_state is true
     if ignore_conditionals == false and (db.actor:is_talking() or not db.actor:alive()) then
@@ -742,39 +806,39 @@ function actor_on_update(binder, delta)
         end
         if db.actor.health < 0.25 and hurt_volume > 0 then
             -- critically hurt state sound has the highest priority and will always play over any other state sound
-            actor_speak_default_state(player_with_lang_muffle_random("hurt_bad"),
+            actor_state(player_with_lang_muffle_random("hurt_bad"),
                     hurt_volume * 0.66, hurt_pause, 100) -- plays the critically wounded sound
 
         elseif arszi_psy.get_psy_health() < 0.4 and psy_volume > 0 then
             -- new citically psy-hurt sound
-            actor_speak_default_state(player_with_lang_muffle_random("sanity"), psy_volume,
-                    sanity_pause, 2000)
+            actor_state(player_with_lang_muffle_random("sanity"), psy_volume,
+                    sanity_pause, 100)
 
         elseif arszi_psy.get_psy_health() < 1.0 and psy_volume > 0 then
             -- new psy-hurt sound (weak psy)
-            actor_speak_default_state(player_with_lang_muffle_random("fear"), psy_volume,
+            actor_state(player_with_lang_muffle_random("fear"), psy_volume,
                     fear_pause, 100) -- plays the psy wounded sound
 
         elseif db.actor.power < 0.10 and sprint_volume > 0 and hurt_volume < sprint_volume and hurt_pause > sprint_pause then
             -- exhaustion state will only play if it has both longer pause and higher volume than the hurt sound
-            actor_speak_default_state(player_with_lang_muffle_random("exhausted"),
+            actor_state(player_with_lang_muffle_random("exhausted"),
                     sprint_volume, sprint_pause, 100) -- plays the exhausted sound
 
         elseif db.actor.health < 0.55 and hurt_volume > 0 then
             -- normal hurt state will play if everything else fails to meet the conditions
-            actor_speak_default_state(player_with_lang_muffle_random("hurt"), hurt_volume,
+            actor_state(player_with_lang_muffle_random("hurt"), hurt_volume,
                     hurt_pause, 100) -- plays the wounded sound
 
         elseif actor_status_thirst.get_water_deprivation(true) > 0.3 and thirst_volume > 0 then
-            actor_speak_default_state(player_with_lang_muffle_random("thirst"),
+            actor_state(player_with_lang_muffle_random("thirst"),
                     thirst_volume, thirst_pause, 100)
 
         elseif db.actor:cast_Actor():conditions():GetSatiety() < 0.3 and satiety_volume > 0 then
-            actor_speak_default_state(player_with_lang_muffle_random("hunger"),
+            actor_state(player_with_lang_muffle_random("hunger"),
                     satiety_volume, satiety_pause, 100) -- new satiety sound call, adjust filename and corresponding math factor
 
         elseif actor_status_sleep.get_sleep_deprivation(true) > 0 and sleep_volume > 0 then
-            actor_speak_default_state(player_with_lang_muffle_random("sleepiness"),
+            actor_state(player_with_lang_muffle_random("sleepiness"),
                     sleep_volume, sleep_pause, 100)
 
         end
@@ -1080,61 +1144,61 @@ function interactive_comments_on_button(key)
         end -- IF ACTOR IS DEAD ALREADY IT WILL STOP FUNCTION
         if is_actor_in_combat() == true then
             -- IF ACTOR IS TARGETED BY ENEMY IN INNER PERIMETER IT WILL PLAYS ,FOR SQUAD IN HEARING DISTANCE INFORMATIVE BUT LOUD AND COCKY RESPONSES ,WITHOUT SQUAD OR WITH SQUAD TOO FAR JUST SIMPLE LOUD INVECTIVES
-            actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_enemy_squad"), 1.0,
+            actor_speak_squad_near_if_silent(button_comments_with_lang_muffle_random("comment_enemy_squad"), 1.0,
                     3000, 100)
-            actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_enemy_squad"), 1.0,
+            actor_speak_squad_can_hear_if_silent(button_comments_with_lang_muffle_random("comment_enemy_squad"), 1.0,
                     3000, 100)
-            actor_speak_squad_out(player_with_lang_muffle_random("kill_confirm_common_state1"), 1.0,
+            actor_speak_squad_out_if_silent(player_with_lang_muffle_random("kill_confirm_common_state1"), 1.0,
                     3500, 100)
         elseif outer_combat_checker() == true then
             -- IF ACTOR IS TARGETED BY ENEMY FROM OUTER PERIMETER IT WILL PLAYS ,FOR SQUAD IN HEARING DISTANCE LOUD INFORMATIVE BUT NOT COCKY RESPONSES ,WITHOUT SQUAD OR WITH SQUAD TOO FAR JUST SIMPLE INVECTIVES BUT NOT LOUD
-            actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_enemy_far_squad"),
+            actor_speak_squad_near_if_silent(button_comments_with_lang_muffle_random("comment_enemy_far_squad"),
                     1.0, 2000, 100)
-            actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_enemy_far_squad"),
+            actor_speak_squad_can_hear_if_silent(button_comments_with_lang_muffle_random("comment_enemy_far_squad"),
                     1.0, 2000, 100)
-            actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_enemy"), 1.0,
+            actor_speak_squad_out_if_silent(button_comments_with_lang_muffle_random("comment_enemy"), 1.0,
                     2000, 100)
         elseif not (is_actor_in_combat()) and not (outer_combat_checker()) then
             -- IF ACTOR IS NOT TARGETED BY ENEMY FROM INNER OR OUTER COMBAT PERIMETER ,CONDITION COMMENTS WILL BE PLAYED
             if hurt_bad_cond() == true then
                 -- IF ACTOR IS BADLY INJURED IT WILL PLAY DIFFERENT COMMENT FOR SQUAD UP TO NEAR DISTANCE (ADDRESSED TO COMPANIONS) AND DIFFERENT IF HE IS ALONE ,OR SQUAD IS NOT CLOSE ENOUGH
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_hurt_bad_squadnear"),
+                actor_speak_squad_near_if_silent(button_comments_with_lang_muffle_random("comment_hurt_bad_squadnear"),
                         1.0, 3500, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_hurt_bad"), 1.0,
+                actor_speak_squad_can_hear_if_silent(button_comments_with_lang_muffle_random("comment_hurt_bad"), 1.0,
                         3500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_hurt_bad"), 1.0,
+                actor_speak_squad_out_if_silent(button_comments_with_lang_muffle_random("comment_hurt_bad"), 1.0,
                         3500, 100)
             elseif hurt_cond() == true then
                 -- SAME AS BEFORE ,EXCEPT ACTOR IS NOT BADLY INJURED BUT STILL INJURED
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_hurt_squadnear"),
+                actor_speak_squad_near_if_silent(button_comments_with_lang_muffle_random("comment_hurt_squadnear"),
                         1.0, 3500, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_hurt"),
+                actor_speak_squad_can_hear_if_silent(button_comments_with_lang_muffle_random("comment_hurt"),
                         1.0, 3500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_hurt"),
+                actor_speak_squad_out_if_silent(button_comments_with_lang_muffle_random("comment_hurt"),
                         1.0, 3500, 100)
             elseif bleed_cond() == true then
                 -- SAME AS BEFORE ,EXCEPT ACTOR IS BLEEDING ,BUT NOT INJURED OR BADLY INJURED
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_bleed_squadnear"),
+                actor_speak_squad_near_if_silent(button_comments_with_lang_muffle_random("comment_bleed_squadnear"),
                         1.0, 3000, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_bleed"),
+                actor_speak_squad_can_hear_if_silent(button_comments_with_lang_muffle_random("comment_bleed"),
                         1.0, 3500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_bleed"),
+                actor_speak_squad_out_if_silent(button_comments_with_lang_muffle_random("comment_bleed"),
                         1.0, 3500, 100)
             elseif tired_cond() == true then
                 -- SAME AS BEFORE ,EXCEPT ACTOR IS TIRED ,BUT NOT INJURED OR BADLY INJURED OR BLEEDING
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_tired_squadnear"),
+                actor_speak_squad_near_if_silent(button_comments_with_lang_muffle_random("comment_tired_squadnear"),
                         1.0, 3500, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_tired"),
+                actor_speak_squad_can_hear_if_silent(button_comments_with_lang_muffle_random("comment_tired"),
                         1.0, 2500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_tired"),
+                actor_speak_squad_out_if_silent(button_comments_with_lang_muffle_random("comment_tired"),
                         1.0, 2500, 100)
             elseif ok_cond() == true then
                 -- IF ACTOR IS NOT INJURED OR BADLY INJURED OR BLEEDING OR TIRED (SIMPLY PUT ,HE IS RELATIVELY OK) ,IT WILL PLAY MUMBLE COMMENT ,DIFFERENT FOR SQUAD UP TO NEAR DISTANCE (ADDRESSED TO COMPANIONS) AND DIFFERENT IF HE IS ALONE ,OR SQUAD IS NOT CLOSE ENOUGH
-                actor_speak_squad_near(button_comments_with_lang_muffle_random("comment_mumble_squadnear"),
+                actor_speak_squad_near_if_silent(button_comments_with_lang_muffle_random("comment_mumble_squadnear"),
                         1.0, 3500, 100)
-                actor_speak_squad_can_hear(button_comments_with_lang_muffle_random("comment_mumble"),
+                actor_speak_squad_can_hear_if_silent(button_comments_with_lang_muffle_random("comment_mumble"),
                         1.0, 3500, 100)
-                actor_speak_squad_out(button_comments_with_lang_muffle_random("comment_mumble"),
+                actor_speak_squad_out_if_silent(button_comments_with_lang_muffle_random("comment_mumble"),
                         1.0, 3500, 100)
             end
         end
@@ -1221,7 +1285,7 @@ function random_shouts(key)
         else
             chosen = "random"
         end
-        actor_speak_default(random_shout_with_lang_muffle_random(chosen), 1.0, 3500, 100)
+        actor_speak_if_silent(random_shout_with_lang_muffle_random(chosen), 1.0, 3500, 100)
         if chosen == "random_long" then
             random_long_shout_cooldown = time_global() + long_cooldown_ms
         end
