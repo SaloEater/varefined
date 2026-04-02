@@ -3,6 +3,10 @@ name: Create Release with 7z Archive
 on:
   workflow_dispatch:
     inputs:
+      branch:
+        description: 'Branch to build from'
+        required: true
+        default: 'main'
       version:
         description: 'Version tag'
         required: true
@@ -20,6 +24,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Prepare build structure
         run: |
@@ -32,7 +38,7 @@ jobs:
             --exclude='version' \
             --exclude=' /scripts' \
             ./* build_temp/
-      
+
           echo "? files to build:"
           ls -la build_temp/
 
@@ -50,6 +56,7 @@ jobs:
           tag_name: ${{ github.event.inputs.version }}
           name: Release ${{ github.event.inputs.version }}
           body: |
+            Branch: ${{ github.event.inputs.branch }}
             ${{ github.event.inputs.description }}
           files: varefined-${{ github.event.inputs.version }}.7z
         env:
