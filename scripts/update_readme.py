@@ -2,7 +2,7 @@
 """
 update_readme.py
 
-Scans characters_voice for .description files and inserts/replaces a markdown
+Scans gamedata/sounds for .description files and inserts/replaces a markdown
 table in README.md immediately after the "<voice lines start here>" marker.
 Everything after the marker is overwritten on each run.
 
@@ -18,7 +18,7 @@ Usage:
 import argparse
 from pathlib import Path
 
-_ROOT   = Path(__file__).parent.parent / 'gamedata/sounds/characters_voice'
+_ROOT = Path(__file__).parent.parent / 'gamedata/sounds'
 _README = Path(__file__).parent.parent / 'README.md'
 _MARKER = '<voice lines start here>'
 _LANG_SUFFIXES = ('_eng',)
@@ -28,11 +28,11 @@ def is_lang_variant(name: str) -> bool:
     return any(name.endswith(s) for s in _LANG_SUFFIXES)
 
 
-def collect_rows(root: Path) -> list[tuple[str, str, str]]:
+def collect_rows(root: Path) -> list[tuple[str, str, str, str]]:
     """
     Walk root, skip _eng subtrees.
-    Return (parent_folder, folder, description) for every folder with .description.
-    parent_folder is empty string for top-level folders.
+    Return (grandparent_folder, parent_folder, folder, description) for every folder with .description.
+    grandparent_folder and parent_folder are empty strings when not applicable.
     """
     rows = []
     for folder in sorted(root.rglob('*')):
@@ -45,20 +45,21 @@ def collect_rows(root: Path) -> list[tuple[str, str, str]]:
         if not desc_file.exists():
             continue
         description = desc_file.read_text(encoding='utf-8').strip()
+        grandparent = parts[-3] if len(parts) >= 3 else ''
         parent = parts[-2] if len(parts) >= 2 else ''
-        name   = parts[-1]
-        rows.append((parent, name, description))
+        name = parts[-1]
+        rows.append((grandparent, parent, name, description))
     return rows
 
 
-def build_table(rows: list[tuple[str, str, str]]) -> str:
+def build_table(rows: list[tuple[str, str, str, str]]) -> str:
     lines = [
-        '| Parent folder | Folder | Description |',
-        '|---|---|---|',
+        '| Grandparent folder | Parent folder | Folder | Description |',
+        '|---|---|---|---|',
     ]
-    for parent, folder, desc in rows:
+    for grandparent, parent, folder, desc in rows:
         cell = '<br>'.join(line.replace('|', '\\|') for line in desc.splitlines() if line.strip())
-        lines.append(f'| {parent} | {folder} | {cell} |')
+        lines.append(f'| {grandparent} | {parent} | {folder} | {cell} |')
     return '\n'.join(lines) + '\n'
 
 
@@ -88,7 +89,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description='Rebuild the voice-lines table in README.md.'
     )
-    parser.add_argument('--root',   default=str(_ROOT),   help='characters_voice directory')
+    parser.add_argument('--root', default=str(_ROOT), help='gamedata/sounds directory')
     parser.add_argument('--readme', default=str(_README), help='README.md path')
     parser.add_argument('--dry-run', action='store_true', help='Print output without writing')
     args = parser.parse_args()

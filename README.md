@@ -64,208 +64,211 @@ All voice lines takes into account Actor conditions:
 ## **Implemented reactions:**
 <voice lines start here>
 
-| Parent folder | Folder | Description |
-|---|---|---|
-|  | buttoncomments | Character comments about his wellbeing |
-| buttoncomments | comment_bleed | Comment when character is bleeding out and squadmates can hear you or far from you |
-| buttoncomments | comment_bleed_squadnear | Comment when character is bleeding out and squadmates near you |
-| buttoncomments | comment_enemy | Comment when there is an aggroed enemy far from you and squadmates far from you |
-| buttoncomments | comment_enemy_far_squad | Comment when there is an aggroed enemy far from you and squadmates near you or can	hear you |
-| buttoncomments | comment_enemy_squad | Comment when there is an aggroed enemy close and squadmates near you or can	hear you |
-| buttoncomments | comment_hurt | Comment when character has low health and squadmates can hear you or far from you |
-| buttoncomments | comment_hurt_bad | Comment when character has very low health and squadmates can hear you or far from you |
-| buttoncomments | comment_hurt_bad_squadnear | Comment when character has very low health and squadmates near you |
-| buttoncomments | comment_hurt_squadnear | Comment when character has low health and squadmates near you |
-| buttoncomments | comment_mumble | Comment when character is not hurt enough and squadmates can hear	you or far from you |
-| buttoncomments | comment_mumble_squadnear | Comment when character is not hurt enough and squadmates near you |
-| buttoncomments | comment_tired | Comment when character has low stamina and squadmates can hear you or far from you |
-| buttoncomments | comment_tired_squadnear | Comment when character has low stamina and squadmates near you |
-|  | commands | Commands to companions |
-| commands | add_this_spot |  |
-| commands | command_start | When player opens menu with companions during combat |
-| commands | command_stop | When player opens menu with companions and no combat is happening |
-| commands | dont_loot_com_close | When companions are ordered to don't loot |
-| commands | dont_loot_com_far | When companions are ordered to don't loot |
-| commands | dont_loot_com_mid | When companions are ordered to don't loot |
-| commands | dont_loot_com_near | When companions are ordered to don't loot |
-| commands | dont_loot_radio | .descriptionWhen companions are ordered to don't loot |
-| commands | fire_at_will_com_close |  |
-| commands | fire_at_will_com_close_aic |  |
-| commands | fire_at_will_com_far |  |
-| commands | fire_at_will_com_far_aic |  |
-| commands | fire_at_will_com_mid |  |
-| commands | fire_at_will_com_mid_aic |  |
-| commands | fire_at_will_com_near |  |
-| commands | fire_at_will_com_near_aic |  |
-| commands | fire_at_will_com_too_far_aic |  |
-| commands | fire_at_will_radio |  |
-| commands | follow_com_close |  |
-| commands | follow_com_close_aic |  |
-| commands | follow_com_far |  |
-| commands | follow_com_far_aic |  |
-| commands | follow_com_mid |  |
-| commands | follow_com_mid_aic |  |
-| commands | follow_com_near |  |
-| commands | follow_com_near_aic |  |
-| commands | follow_com_too_far_aic |  |
-| commands | follow_radio |  |
-| commands | forget_all_waypoints |  |
-| commands | hide_in_cover_com_close |  |
-| commands | hide_in_cover_com_close_aic |  |
-| commands | hide_in_cover_com_far |  |
-| commands | hide_in_cover_com_far_aic |  |
-| commands | hide_in_cover_com_mid |  |
-| commands | hide_in_cover_com_mid_aic |  |
-| commands | hide_in_cover_com_near |  |
-| commands | hide_in_cover_com_near_aic |  |
-| commands | hide_in_cover_com_too_far_aic |  |
-| commands | hide_in_cover_radio |  |
-| commands | ignore_combat_but_help_me | When companions are ordered to ignore	combat but help the player |
-| commands | ignore_combat_com_close |  |
-| commands | ignore_combat_com_close_aic |  |
-| commands | ignore_combat_com_far |  |
-| commands | ignore_combat_com_far_aic |  |
-| commands | ignore_combat_com_mid |  |
-| commands | ignore_combat_com_mid_aic |  |
-| commands | ignore_combat_com_near |  |
-| commands | ignore_combat_com_near_aic |  |
-| commands | ignore_combat_com_too_far_aic |  |
-| commands | ignore_combat_radio |  |
-| commands | loot_com_close |  |
-| commands | loot_com_far |  |
-| commands | loot_com_mid |  |
-| commands | loot_com_near |  |
-| commands | loot_radio |  |
-| commands | move_to_point_com_close |  |
-| commands | move_to_point_com_close_aic |  |
-| commands | move_to_point_com_far |  |
-| commands | move_to_point_com_far_aic |  |
-| commands | move_to_point_com_mid |  |
-| commands | move_to_point_com_mid_aic |  |
-| commands | move_to_point_com_near |  |
-| commands | move_to_point_com_near_aic |  |
-| commands | move_to_point_com_too_far_aic |  |
-| commands | move_to_point_radio |  |
-| commands | start_patrolling |  |
-| commands | stay_close_com_close |  |
-| commands | stay_close_com_close_aic |  |
-| commands | stay_close_com_far |  |
-| commands | stay_close_com_far_aic |  |
-| commands | stay_close_com_mid |  |
-| commands | stay_close_com_mid_aic |  |
-| commands | stay_close_com_near |  |
-| commands | stay_close_com_near_aic |  |
-| commands | stay_close_com_too_far_aic |  |
-| commands | stay_close_radio |  |
-| commands | stay_far_com_close |  |
-| commands | stay_far_com_close_aic |  |
-| commands | stay_far_com_far |  |
-| commands | stay_far_com_far_aic |  |
-| commands | stay_far_com_mid |  |
-| commands | stay_far_com_mid_aic |  |
-| commands | stay_far_com_near |  |
-| commands | stay_far_com_near_aic |  |
-| commands | stay_far_com_too_far_aic |  |
-| commands | stay_far_radio |  |
-| commands | stealth_com_close |  |
-| commands | stealth_com_far |  |
-| commands | stealth_com_mid |  |
-| commands | stealth_com_near |  |
-| commands | stealth_radio |  |
-| commands | stop_patrolling |  |
-| commands | stop_stealth_com_close |  |
-| commands | stop_stealth_com_far |  |
-| commands | stop_stealth_com_mid |  |
-| commands | stop_stealth_com_near |  |
-| commands | stop_stealth_radio |  |
-| commands | wait_com_close |  |
-| commands | wait_com_close_aic |  |
-| commands | wait_com_far |  |
-| commands | wait_com_far_aic |  |
-| commands | wait_com_mid |  |
-| commands | wait_com_mid_aic |  |
-| commands | wait_com_near |  |
-| commands | wait_com_near_aic | When companions are ordered to wait |
-| commands | wait_com_too_far_aic | When companions are ordered to wait |
-| commands | wait_radio | When companions are ordered to wait |
-|  | dialogs | Story IDs can be fetched from files like this https://github.com/Tosox/STALKER-Anomaly-gamedata/blob/v1.5.2/gamedata/configs/creatures/spawn_sections_bar.ltx |
-| dialogs | end_regular | When player closes the dialog with non-unique NPC |
-| dialogs | end_unique | When player closes the dialog with NPC that has story_id |
-| dialogs | end_unique_bar_visitors_stalker_mechanic | When player closes the dialog with NPC that has story_id "bar_visitors_stalker_mechanic" |
-| dialogs | start_regular | When player starts the dialog with non-unique NPC |
-| dialogs | start_unique | When player starts the dialog with NPC that has story_id |
-| dialogs | start_unique_bar_visitors_stalker_mechanic | When player starts the dialog with NPC that has story_id "bar_visitors_stalker_mechanic" |
-|  | player | Character reactions |
-| player | death | When character dies |
-| player | exhausted | When character is exhausted |
-| player | fear | When character has low psy health |
-| player | grenade_throw | When grenade is thrown and enemy close and squadmates far |
-| player | grenade_throw_squad | When grenade is thrown and enemy close and squadmates near or can hear you<br>When grenade is thrown and enemy far and squadmates near or can hear you |
-| player | gun_jam | When gun jams and enemy is far or there is no enemy |
-| player | gun_jam_alone | When enemy close and gun jams and squadmates are far<br>When combat intensity is medium and enemy is far and gun jams |
-| player | gun_jam_squad | When enemy close and gun jams and squadmates near or can hear you |
-| player | hit_by_burn | After some time after character was hit by damage with burn type |
-| player | hit_by_chemical_burn | After some time after character was hit by damage with chemical burn type |
-| player | hit_by_explosion | After some time after character was hit by damage with explosion type |
-| player | hit_by_fire_wound | After some time after character was hit by damage with fire wound type |
-| player | hit_by_light_burn | After some time after character was hit by damage with light burn type |
-| player | hit_by_shock | After some time after character was hit by damage with shock type |
-| player | hit_by_strike | After some time after character was hit by damage with strike type |
-| player | hit_by_wound | After some time after character was hit by damage with wound type |
-| player | hunger | Player voice (Russian) — hunger |
-| player | hurt | When character is hungry |
-| player | hurt_bad | When character has very low health |
-| player | kill_comment_common_squad | While combat intensity is medium and when character kills anything far and squadmates near you |
-| player | kill_comment_common_state1 | While combat intensity is low and when character kills anything far |
-| player | kill_comment_common_state2 | While combat intensity is medium and when character kills anything far and squadmates can hear you or far from you |
-| player | kill_comment_common_state3 | While combat intensity is high and when character kills anything far and squadmates are far |
-| player | kill_comment_mutant_squad | While combat intensity is medium and when character kills a mutant far and squadmates near you |
-| player | kill_comment_mutant_state1 | While combat intensity is low and when character kills a mutant far |
-| player | kill_comment_mutant_state2 | While combat intensity is medium and when character kills a mutant far and squadmates can hear you or far from you |
-| player | kill_comment_mutant_state3 | While combat intensity is high and when character kills a mutant far and squadmates are far |
-| player | kill_comment_stalker_squad | While combat intensity is medium and when character kills an npc far and squadmates near you |
-| player | kill_comment_stalker_state1 | While combat intensity is low and when character kills an npc far |
-| player | kill_comment_stalker_state2 | While combat intensity is medium and when character kills an npc far and squadmates can hear you or far from you |
-| player | kill_comment_stalker_state3 | While combat intensity is high and when character kills an npc far and squadmates are far |
-| player | kill_confirm_common_squad | While combat intensity is low and when character kills anything close and squadmates near or can hear you<br>While combat intensity is high and when character kills anything far and squadmates near or can hear you |
-| player | kill_confirm_common_state1 | While combat intensity is low and when character kills anything close and squadmates are far from you |
-| player | kill_confirm_common_state2 | While combat intensity is medium and when character kills anything close |
-| player | kill_confirm_common_state3 | While combat intensity is high and when character kills anything close |
-| player | kill_confirm_mutant_squad | While combat intensity is low and when character kills a mutant close and squadmates near or can hear you<br>While combat intensity is high and when character kills a mutant far and squadmates near or can hear you |
-| player | kill_confirm_mutant_state1 | While combat intensity is low and when character kills a mutant close and squadmates are far from you |
-| player | kill_confirm_mutant_state2 | While combat intensity is medium and when character kills a mutant close |
-| player | kill_confirm_mutant_state3 | While combat intensity is high and when character kills a mutant close |
-| player | kill_confirm_stalker_squad | While combat intensity is low and when character kills an npc close and squadmates near or can hear you<br>While combat intensity is high and when character kills an npc far and squadmates near or can hear you |
-| player | kill_confirm_stalker_state1 | While combat intensity is low and when character kills an npc close and squadmates are far from you |
-| player | kill_confirm_stalker_state2 | While combat intensity is medium and when character kills an npc close |
-| player | kill_confirm_stalker_state3 | While combat intensity is high and when character kills an npc close |
-| player | loot_open | When player opens a box or looting npc body or mutant |
-| player | loot_open_box | When player loots a box |
-| player | loot_open_mutant | When player loots a mutant |
-| player | loot_open_npc | When player loots an npc |
-| player | on_item_before_use | When character uses an item |
-| player | on_item_before_use_bandage | When character uses a bandage |
-| player | on_item_before_use_bandage_last | When character uses the last bandage |
-| player | on_item_before_use_last | When character uses the last of an item |
-| player | on_item_before_use_type_drink | When character drinks something |
-| player | on_item_before_use_type_drink_last | When character drinks something |
-| player | on_item_before_use_type_food | When character eats food |
-| player | on_item_before_use_type_food_last | When character eats the last food |
-| player | on_item_before_use_type_meds | When character uses medicine |
-| player | on_item_before_use_type_meds_last | When character uses medicine |
-| player | pain | When character receives a hit |
-| player | pain_bad | When character receives a hit and health	is low |
-| player | reloading | When character is reloading and enemy close |
-| player | reloading_ammo_low | When character is reloading last magazine |
-| player | reloading_ammo_out | When character is reloading and runs out of ammo (configured in configs) |
-| player | sanity | When character has very low psy health |
-| player | sleepiness | When character	is sleepy |
-| player | thirst | When character is thirsty |
-|  | random_shouts | Random shouts |
-| random_shouts | random | Just random shouts |
-| random_shouts | random_long | Random shouts with especially long duration, have personal cooldown to make these rare |
-|  | squad | Reactions to squad changes |
-| squad | squadmate_died | When squadmate dies |
-| squad | squadmate_hit | When squadmate receives damage |
-| squad | squadmate_joined | When new squadmate joins |
-| squad | squadmate_left | When squadmate left |
+| Grandparent folder | Parent folder | Folder | Description |
+|---|---|---|---|
+|  |  | bhs | Contains pain_N sounds for BHS mod |
+|  | characters_voice | buttoncomments | Character comments about his wellbeing |
+| characters_voice | buttoncomments | comment_bleed | Comment when character is bleeding out and squadmates can hear you or far from you |
+| characters_voice | buttoncomments | comment_bleed_squadnear | Comment when character is bleeding out and squadmates near you |
+| characters_voice | buttoncomments | comment_enemy | Comment when there is an aggroed enemy far from you and squadmates far from you |
+| characters_voice | buttoncomments | comment_enemy_far_squad | Comment when there is an aggroed enemy far from you and squadmates near you or can	hear you |
+| characters_voice | buttoncomments | comment_enemy_squad | Comment when there is an aggroed enemy close and squadmates near you or can	hear you |
+| characters_voice | buttoncomments | comment_hurt | Comment when character has low health and squadmates can hear you or far from you |
+| characters_voice | buttoncomments | comment_hurt_bad | Comment when character has very low health and squadmates can hear you or far from you |
+| characters_voice | buttoncomments | comment_hurt_bad_squadnear | Comment when character has very low health and squadmates near you |
+| characters_voice | buttoncomments | comment_hurt_squadnear | Comment when character has low health and squadmates near you |
+| characters_voice | buttoncomments | comment_mumble | Comment when character is not hurt enough and squadmates can hear	you or far from you |
+| characters_voice | buttoncomments | comment_mumble_squadnear | Comment when character is not hurt enough and squadmates near you |
+| characters_voice | buttoncomments | comment_tired | Comment when character has low stamina and squadmates can hear you or far from you |
+| characters_voice | buttoncomments | comment_tired_squadnear | Comment when character has low stamina and squadmates near you |
+|  | characters_voice | commands | Commands to companions |
+| characters_voice | commands | add_this_spot |  |
+| characters_voice | commands | command_start | When player opens menu with companions during combat |
+| characters_voice | commands | command_stop | When player opens menu with companions and no combat is happening |
+| characters_voice | commands | dont_loot_com_close | When companions are ordered to don't loot |
+| characters_voice | commands | dont_loot_com_far | When companions are ordered to don't loot |
+| characters_voice | commands | dont_loot_com_mid | When companions are ordered to don't loot |
+| characters_voice | commands | dont_loot_com_near | When companions are ordered to don't loot |
+| characters_voice | commands | dont_loot_radio | .descriptionWhen companions are ordered to don't loot |
+| characters_voice | commands | fire_at_will_com_close |  |
+| characters_voice | commands | fire_at_will_com_close_aic |  |
+| characters_voice | commands | fire_at_will_com_far |  |
+| characters_voice | commands | fire_at_will_com_far_aic |  |
+| characters_voice | commands | fire_at_will_com_mid |  |
+| characters_voice | commands | fire_at_will_com_mid_aic |  |
+| characters_voice | commands | fire_at_will_com_near |  |
+| characters_voice | commands | fire_at_will_com_near_aic |  |
+| characters_voice | commands | fire_at_will_com_too_far_aic |  |
+| characters_voice | commands | fire_at_will_radio |  |
+| characters_voice | commands | follow_com_close |  |
+| characters_voice | commands | follow_com_close_aic |  |
+| characters_voice | commands | follow_com_far |  |
+| characters_voice | commands | follow_com_far_aic |  |
+| characters_voice | commands | follow_com_mid |  |
+| characters_voice | commands | follow_com_mid_aic |  |
+| characters_voice | commands | follow_com_near |  |
+| characters_voice | commands | follow_com_near_aic |  |
+| characters_voice | commands | follow_com_too_far_aic |  |
+| characters_voice | commands | follow_radio |  |
+| characters_voice | commands | forget_all_waypoints |  |
+| characters_voice | commands | hide_in_cover_com_close |  |
+| characters_voice | commands | hide_in_cover_com_close_aic |  |
+| characters_voice | commands | hide_in_cover_com_far |  |
+| characters_voice | commands | hide_in_cover_com_far_aic |  |
+| characters_voice | commands | hide_in_cover_com_mid |  |
+| characters_voice | commands | hide_in_cover_com_mid_aic |  |
+| characters_voice | commands | hide_in_cover_com_near |  |
+| characters_voice | commands | hide_in_cover_com_near_aic |  |
+| characters_voice | commands | hide_in_cover_com_too_far_aic |  |
+| characters_voice | commands | hide_in_cover_radio |  |
+| characters_voice | commands | ignore_combat_but_help_me | When companions are ordered to ignore	combat but help the player |
+| characters_voice | commands | ignore_combat_com_close |  |
+| characters_voice | commands | ignore_combat_com_close_aic |  |
+| characters_voice | commands | ignore_combat_com_far |  |
+| characters_voice | commands | ignore_combat_com_far_aic |  |
+| characters_voice | commands | ignore_combat_com_mid |  |
+| characters_voice | commands | ignore_combat_com_mid_aic |  |
+| characters_voice | commands | ignore_combat_com_near |  |
+| characters_voice | commands | ignore_combat_com_near_aic |  |
+| characters_voice | commands | ignore_combat_com_too_far_aic |  |
+| characters_voice | commands | ignore_combat_radio |  |
+| characters_voice | commands | loot_com_close |  |
+| characters_voice | commands | loot_com_far |  |
+| characters_voice | commands | loot_com_mid |  |
+| characters_voice | commands | loot_com_near |  |
+| characters_voice | commands | loot_radio |  |
+| characters_voice | commands | move_to_point_com_close |  |
+| characters_voice | commands | move_to_point_com_close_aic |  |
+| characters_voice | commands | move_to_point_com_far |  |
+| characters_voice | commands | move_to_point_com_far_aic |  |
+| characters_voice | commands | move_to_point_com_mid |  |
+| characters_voice | commands | move_to_point_com_mid_aic |  |
+| characters_voice | commands | move_to_point_com_near |  |
+| characters_voice | commands | move_to_point_com_near_aic |  |
+| characters_voice | commands | move_to_point_com_too_far_aic |  |
+| characters_voice | commands | move_to_point_radio |  |
+| characters_voice | commands | start_patrolling |  |
+| characters_voice | commands | stay_close_com_close |  |
+| characters_voice | commands | stay_close_com_close_aic |  |
+| characters_voice | commands | stay_close_com_far |  |
+| characters_voice | commands | stay_close_com_far_aic |  |
+| characters_voice | commands | stay_close_com_mid |  |
+| characters_voice | commands | stay_close_com_mid_aic |  |
+| characters_voice | commands | stay_close_com_near |  |
+| characters_voice | commands | stay_close_com_near_aic |  |
+| characters_voice | commands | stay_close_com_too_far_aic |  |
+| characters_voice | commands | stay_close_radio |  |
+| characters_voice | commands | stay_far_com_close |  |
+| characters_voice | commands | stay_far_com_close_aic |  |
+| characters_voice | commands | stay_far_com_far |  |
+| characters_voice | commands | stay_far_com_far_aic |  |
+| characters_voice | commands | stay_far_com_mid |  |
+| characters_voice | commands | stay_far_com_mid_aic |  |
+| characters_voice | commands | stay_far_com_near |  |
+| characters_voice | commands | stay_far_com_near_aic |  |
+| characters_voice | commands | stay_far_com_too_far_aic |  |
+| characters_voice | commands | stay_far_radio |  |
+| characters_voice | commands | stealth_com_close |  |
+| characters_voice | commands | stealth_com_far |  |
+| characters_voice | commands | stealth_com_mid |  |
+| characters_voice | commands | stealth_com_near |  |
+| characters_voice | commands | stealth_radio |  |
+| characters_voice | commands | stop_patrolling |  |
+| characters_voice | commands | stop_stealth_com_close |  |
+| characters_voice | commands | stop_stealth_com_far |  |
+| characters_voice | commands | stop_stealth_com_mid |  |
+| characters_voice | commands | stop_stealth_com_near |  |
+| characters_voice | commands | stop_stealth_radio |  |
+| characters_voice | commands | wait_com_close |  |
+| characters_voice | commands | wait_com_close_aic |  |
+| characters_voice | commands | wait_com_far |  |
+| characters_voice | commands | wait_com_far_aic |  |
+| characters_voice | commands | wait_com_mid |  |
+| characters_voice | commands | wait_com_mid_aic |  |
+| characters_voice | commands | wait_com_near |  |
+| characters_voice | commands | wait_com_near_aic | When companions are ordered to wait |
+| characters_voice | commands | wait_com_too_far_aic | When companions are ordered to wait |
+| characters_voice | commands | Wait_Radio | When companions are ordered to wait |
+|  | characters_voice | dialogs | Story IDs can be fetched from files like this https://github.com/Tosox/STALKER-Anomaly-gamedata/blob/v1.5.2/gamedata/configs/creatures/spawn_sections_bar.ltx |
+| characters_voice | dialogs | end_regular | When player closes the dialog with non-unique NPC |
+| characters_voice | dialogs | end_unique | When player closes the dialog with NPC that has story_id |
+| characters_voice | dialogs | end_unique_bar_visitors_stalker_mechanic | When player closes the dialog with NPC that has story_id "bar_visitors_stalker_mechanic" |
+| characters_voice | dialogs | start_regular | When player starts the dialog with non-unique NPC |
+| characters_voice | dialogs | start_unique | When player starts the dialog with NPC that has story_id |
+| characters_voice | dialogs | start_unique_bar_visitors_stalker_mechanic | When player starts the dialog with NPC that has story_id "bar_visitors_stalker_mechanic" |
+|  | characters_voice | player | Character reactions |
+| characters_voice | player | death | When character dies |
+| characters_voice | player | exhausted | When character is exhausted |
+| characters_voice | player | fear | When character has low psy health |
+| characters_voice | player | grenade_throw | When grenade is thrown and enemy close and squadmates far |
+| characters_voice | player | grenade_throw_squad | When grenade is thrown and enemy close and squadmates near or can hear you<br>When grenade is thrown and enemy far and squadmates near or can hear you |
+| characters_voice | player | gun_jam | When gun jams and enemy is far or there is no enemy |
+| characters_voice | player | gun_jam_alone | When enemy close and gun jams and squadmates are far<br>When combat intensity is medium and enemy is far and gun jams |
+| characters_voice | player | gun_jam_squad | When enemy close and gun jams and squadmates near or can hear you |
+| characters_voice | player | hit_by_burn | After some time after character was hit by damage with burn type |
+| characters_voice | player | hit_by_chemical_burn | After some time after character was hit by damage with chemical burn type |
+| characters_voice | player | hit_by_explosion | After some time after character was hit by damage with explosion type |
+| characters_voice | player | hit_by_fire_wound | After some time after character was hit by damage with fire wound type |
+| characters_voice | player | hit_by_light_burn | After some time after character was hit by damage with light burn type |
+| characters_voice | player | hit_by_shock | After some time after character was hit by damage with shock type |
+| characters_voice | player | hit_by_strike | After some time after character was hit by damage with strike type |
+| characters_voice | player | hit_by_wound | After some time after character was hit by damage with wound type |
+| characters_voice | player | hunger | Player voice (Russian) — hunger |
+| characters_voice | player | hurt | When character is hungry |
+| characters_voice | player | hurt_bad | When character has very low health |
+| characters_voice | player | kill_comment_common_squad | While combat intensity is medium and when character kills anything far and squadmates near you |
+| characters_voice | player | kill_comment_common_state1 | While combat intensity is low and when character kills anything far |
+| characters_voice | player | kill_comment_common_state2 | While combat intensity is medium and when character kills anything far and squadmates can hear you or far from you |
+| characters_voice | player | kill_comment_common_state3 | While combat intensity is high and when character kills anything far and squadmates are far |
+| characters_voice | player | kill_comment_mutant_squad | While combat intensity is medium and when character kills a mutant far and squadmates near you |
+| characters_voice | player | kill_comment_mutant_state1 | While combat intensity is low and when character kills a mutant far |
+| characters_voice | player | kill_comment_mutant_state2 | While combat intensity is medium and when character kills a mutant far and squadmates can hear you or far from you |
+| characters_voice | player | kill_comment_mutant_state3 | While combat intensity is high and when character kills a mutant far and squadmates are far |
+| characters_voice | player | kill_comment_stalker_squad | While combat intensity is medium and when character kills an npc far and squadmates near you |
+| characters_voice | player | kill_comment_stalker_state1 | While combat intensity is low and when character kills an npc far |
+| characters_voice | player | kill_comment_stalker_state2 | While combat intensity is medium and when character kills an npc far and squadmates can hear you or far from you |
+| characters_voice | player | kill_comment_stalker_state3 | While combat intensity is high and when character kills an npc far and squadmates are far |
+| characters_voice | player | kill_confirm_common_squad | While combat intensity is low and when character kills anything close and squadmates near or can hear you<br>While combat intensity is high and when character kills anything far and squadmates near or can hear you |
+| characters_voice | player | kill_confirm_common_state1 | While combat intensity is low and when character kills anything close and squadmates are far from you |
+| characters_voice | player | kill_confirm_common_state2 | While combat intensity is medium and when character kills anything close |
+| characters_voice | player | kill_confirm_common_state3 | While combat intensity is high and when character kills anything close |
+| characters_voice | player | kill_confirm_mutant_squad | While combat intensity is low and when character kills a mutant close and squadmates near or can hear you<br>While combat intensity is high and when character kills a mutant far and squadmates near or can hear you |
+| characters_voice | player | kill_confirm_mutant_state1 | While combat intensity is low and when character kills a mutant close and squadmates are far from you |
+| characters_voice | player | kill_confirm_mutant_state2 | While combat intensity is medium and when character kills a mutant close |
+| characters_voice | player | kill_confirm_mutant_state3 | While combat intensity is high and when character kills a mutant close |
+| characters_voice | player | kill_confirm_stalker_squad | While combat intensity is low and when character kills an npc close and squadmates near or can hear you<br>While combat intensity is high and when character kills an npc far and squadmates near or can hear you |
+| characters_voice | player | kill_confirm_stalker_state1 | While combat intensity is low and when character kills an npc close and squadmates are far from you |
+| characters_voice | player | kill_confirm_stalker_state2 | While combat intensity is medium and when character kills an npc close |
+| characters_voice | player | kill_confirm_stalker_state3 | While combat intensity is high and when character kills an npc close |
+| characters_voice | player | loot_open | When player opens a box or looting npc body or mutant |
+| characters_voice | player | loot_open_box | When player loots a box |
+| characters_voice | player | loot_open_mutant | When player loots a mutant |
+| characters_voice | player | loot_open_npc | When player loots an npc |
+| characters_voice | player | on_item_before_use | When character uses an item |
+| characters_voice | player | on_item_before_use_bandage | When character uses a bandage |
+| characters_voice | player | on_item_before_use_bandage_last | When character uses the last bandage |
+| characters_voice | player | on_item_before_use_last | When character uses the last of an item |
+| characters_voice | player | on_item_before_use_type_drink | When character drinks something |
+| characters_voice | player | on_item_before_use_type_drink_last | When character drinks something |
+| characters_voice | player | on_item_before_use_type_food | When character eats food |
+| characters_voice | player | on_item_before_use_type_food_last | When character eats the last food |
+| characters_voice | player | on_item_before_use_type_meds | When character uses medicine |
+| characters_voice | player | on_item_before_use_type_meds_last | When character uses medicine |
+| characters_voice | player | pain | When character receives a hit |
+| characters_voice | player | pain_bad | When character receives a hit and health	is low |
+| characters_voice | player | reloading | When character is reloading and enemy close |
+| characters_voice | player | reloading_ammo_low | When character is reloading last magazine |
+| characters_voice | player | reloading_ammo_out | When character is reloading and runs out of ammo (configured in configs) |
+| characters_voice | player | sanity | When character has very low psy health |
+| characters_voice | player | sleepiness | When character	is sleepy |
+| characters_voice | player | thirst | When character is thirsty |
+|  | characters_voice | random_shouts | Random shouts |
+| characters_voice | random_shouts | random | Just random shouts |
+| characters_voice | random_shouts | random_long | Random shouts with especially long duration, have personal cooldown to make these rare |
+|  | characters_voice | squad | Reactions to squad changes |
+| characters_voice | squad | squadmate_died | When squadmate dies |
+| characters_voice | squad | squadmate_hit | When squadmate receives damage |
+| characters_voice | squad | squadmate_joined | When new squadmate joins |
+| characters_voice | squad | squadmate_left | When squadmate left |
+|  |  | grok | Contains sounds for doom-like inspection mod |
+|  | gunslinger_controller | actor | Contains sounds for struggling from controller suicide |

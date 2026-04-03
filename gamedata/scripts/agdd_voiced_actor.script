@@ -235,7 +235,7 @@ function squad_near()
     if (not (xv) or commander and commander.position:distance_to(db.actor:position()) > 24) then
         -- CHECKS IF THERE IS A SQUAD AND IF ITS CLOSE ENOUGH
         return false -- IF THERE IS NO SQUAD OR SQUAD IS NOT CLOSE ENOUGH GIVE FALSE VALUE
-    elseif commander.position:distance_to(db.actor:position()) <= 24 then
+    elseif commander and commander.position:distance_to(db.actor:position()) <= 24 then
         -- IF THERE IS A SQUAD THEN CHECKS DISTANCE
         return true -- IF CONDITIONS ARE MET IT RETURNS TRUE
     else
@@ -251,7 +251,7 @@ function squad_can_hear()
     if (not (yv) or commander.position:distance_to(db.actor:position()) <= 24 or
             commander.position:distance_to(db.actor:position()) > 60) then
         return false
-    elseif commander.position:distance_to(db.actor:position()) > 24 and
+    elseif commander and commander.position:distance_to(db.actor:position()) > 24 and
             commander.position:distance_to(db.actor:position()) <= 60 then
         return true
     else
