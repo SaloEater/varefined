@@ -534,7 +534,7 @@ end
 
 local old_axr_companions_add_to_actor_squad = axr_companions.add_to_actor_squad
 function axr_companions.add_to_actor_squad(npc)
-    printf("Adding %s to actor squad", npc:id())
+    --printf("Adding %s to actor squad", npc:id())
     old_axr_companions_add_to_actor_squad(npc)
     actor_speak_npc_joined()
 end

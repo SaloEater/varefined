@@ -74,11 +74,11 @@ language_prefixes = {
     ["eng"] = nil
 }
 function init_languages()
-    printf("i")
+    --printf("i")
     local languages = ini:collect_section("language")
     for lang_key, value in pairs(languages) do
         language_prefixes[lang_key] = value
-        printf("Language %s has prefix: %s", lang_key, language_prefixes[lang_key])
+        --printf("Language %s has prefix: %s", lang_key, language_prefixes[lang_key])
     end
 end
 
@@ -356,14 +356,14 @@ function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, 
     local actor_talks = actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear, requires_squad_out,
             has_priority, ignore_conditionals, is_state, say_if_silent)
     if actor_talks then
-        printf("said that successfully")
+        --printf("said that successfully")
         return true
     end
     if last_shuffle_pick == -1 or last_shuffle_category == "" or not shuffle_bag[last_shuffle_category] then
-        printf("failed to say that and file is not from shuffle bag")
+        --printf("failed to say that and file is not from shuffle bag")
         return false
     end
-    printf("failed to say that")
+    --printf("failed to say that")
 
     shuffle_bag[last_shuffle_category][#shuffle_bag[last_shuffle_category] + 1] = last_shuffle_pick
     last_shuffle_category = ""
@@ -375,7 +375,7 @@ end
 function actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_near, requires_squad_can_hear,
                      requires_squad_out, has_priority, ignore_conditionals, is_state, say_if_silent)
     -- (EDITED FUCTION  - ADDED SOME REQUIREMENTS) player function, plays the sound if all conditions are met. Argument "sound_volume" is overwriten by default from MCM shouts volume slider.
-    printf("file to say: %s", file)
+    --printf("file to say: %s", file)
     if file == nil then
         return false
     end
@@ -388,7 +388,7 @@ function actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_n
     if _reaction then
         local _mcm_chance = get_generated_chance(_reaction)
         if _mcm_chance ~= nil then
-            printf("chance after MCM multiplier for reaction: base=%s, new=%s, result=%s", chance, _mcm_chance, chance * _mcm_chance)
+            --printf("chance after MCM multiplier for reaction: base=%s, new=%s, result=%s", chance, _mcm_chance, chance * _mcm_chance)
             chance = chance * _mcm_chance
         end
     end
@@ -511,8 +511,8 @@ end
 function random_voice_line(category, subcategory, language_key, muffle_val, line)
     local lines = get_lines_amount_for_line(line, language_key)
     if lines == 0 then
-        printf("no lines found for line %s, language %s, category %s, subcategory %s, muffle %s", line, language_key, category,
-                subcategory, muffle_val)
+        --printf("no lines found for line %s, language %s, category %s, subcategory %s, muffle %s", line, language_key, category,
+                --subcategory, muffle_val)
         return nil
     end
 
@@ -563,14 +563,14 @@ function choose_random_category(...)
         total_lines = total_lines + count
         choices = choices .. category .. ", "
     end
-    printf("choose random from %s", choices)
+    --printf("choose random from %s", choices)
 
     local random = math.random(1, total_lines)
     local cumulative = 0
     for i, count in ipairs(lines) do
         cumulative = cumulative + count
         if random <= cumulative then
-            printf("Chose category %s with %s lines (random number was %s)", categories[i], count, random)
+            --printf("Chose category %s with %s lines (random number was %s)", categories[i], count, random)
             return categories[i]
         end
     end
@@ -927,7 +927,7 @@ function actor_on_before_hit(hitinfo, bone_id, flags)
         end
 
         if cooldown ~= nil then
-            printf("hit by %s, cooldown: %s, timer %s", hit_type, cooldown, hit_timer1)
+            --printf("hit by %s, cooldown: %s, timer %s", hit_type, cooldown, hit_timer1)
             CreateTimeEvent("varefined", "before_hit_comment", (cooldown + 150) / 1000, function(hit_type)
                 actor_speak_about_hit(hit_type)
                 return true
@@ -1293,7 +1293,7 @@ function random_shouts(key)
         end
         local chosen
         local long_cooldown_ms = get_long_shout_cooldown_ms()
-        printf("%s", random_long_shout_cooldown - time_global())
+        --printf("%s", random_long_shout_cooldown - time_global())
         if time_global() >= random_long_shout_cooldown then
             chosen = choose_random_category("random", "random_long")
         else
@@ -1410,19 +1410,19 @@ function on_ActorMenu_on_before_init_mode(mode_str, flags, obj)
     if mode_str ~= "loot" then return end
 
     if hf_furniture_types_get_type and hf_furniture_types_get_type(obj) ~= nil then
-        printf("Furniture %s opened, skipping loot open reaction", obj:name())
+        --printf("Furniture %s opened, skipping loot open reaction", obj:name())
         return
     end
 
     local id = obj:id()
     local m_data = alife_storage_manager.get_state()
     if m_data and m_data.player_created_stashes and m_data.player_created_stashes[id] then
-        printf("Player stash %s opened, skipping loot open reaction", obj:name())
+        --printf("Player stash %s opened, skipping loot open reaction", obj:name())
         return
     end
 
     if latest_loot_id == id then
-        printf("Loot %s opened again, skipping loot open reaction", obj:name())
+        --printf("Loot %s opened again, skipping loot open reaction", obj:name())
         return
     end
 
