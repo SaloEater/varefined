@@ -7,10 +7,16 @@
     <string id="ui_mcm_varefined_title">
         <text>Voiced Actor Refined</text>
     </string>
-    <string id="ui_mcm_varefined_voice_language_description">
+    <string id="ui_mcm_menu_varefined_main">
+        <text>General</text>
+    </string>
+    <string id="ui_mcm_menu_varefined_generated_chance">
+        <text>Reaction chances</text>
+    </string>
+    <string id="ui_mcm_varefined_varefined_main_voice_language_description">
         <text>Actor voice lines language. By faction - ISG and Mercenaries with English voice lines, other factions with Russian. Only Russian and only English is self explanatory. Can be changed during play session.</text>
     </string>
-    <string id="ui_mcm_varefined_voice_language">
+    <string id="ui_mcm_varefined_varefined_main_voice_language">
         <text>Actor voice language</text>
     </string>
     <string id="ui_mcm_lst_voice_language_by_faction">
@@ -22,49 +28,49 @@
     <string id="ui_mcm_lst_voice_language_english">
         <text>English</text>
     </string>
-    <string id="ui_mcm_varefined_shouts_description">
+    <string id="ui_mcm_varefined_varefined_main_shouts_description">
         <text>Enables/Disables various shouts by actor in different circumstances. Profanity warning. Can be changed during play session. WARNING! If "WPO->Taunts on jaming" was enabled - VA Refined will disable it, so no duplicated and differently sounded voice lines played.</text>
     </string>
-    <string id="ui_mcm_varefined_enable_on_kill_shouts">
+    <string id="ui_mcm_varefined_varefined_main_enable_on_kill_shouts">
         <text>Shouts on kills</text>
     </string>
-    <string id="ui_mcm_varefined_enable_on_weapon_jam_shouts">
+    <string id="ui_mcm_varefined_varefined_main_enable_on_weapon_jam_shouts">
         <text>Shouts on weapon jamming</text>
     </string>
-    <string id="ui_mcm_varefined_enable_on_weapon_reload_shouts">
+    <string id="ui_mcm_varefined_varefined_main_enable_on_weapon_reload_shouts">
         <text>Shouts on weapon reloading</text>
     </string>
-    <string id="ui_mcm_varefined_enable_on_grenade_throw_shouts">
+    <string id="ui_mcm_varefined_varefined_main_enable_on_grenade_throw_shouts">
         <text>Shouts on grenade throw</text>
     </string>
-    <string id="ui_mcm_varefined_enable_companions_commands_shouts">
+    <string id="ui_mcm_varefined_varefined_main_enable_companions_commands_shouts">
         <text>Companion commands voice lines</text>
     </string>
-    <string id="ui_mcm_varefined_shouts_pain_muffled_description">
+    <string id="ui_mcm_varefined_varefined_main_shouts_pain_muffled_description">
         <text>Actor pain and muffled voice lines with mask/helmet on. Can be changed during play session.</text>
     </string>
-    <string id="ui_mcm_varefined_enable_pain_shouts">
+    <string id="ui_mcm_varefined_varefined_main_enable_pain_shouts">
         <text>ACtor in pain voice lines</text>
     </string>
-    <string id="ui_mcm_varefined_enable_muffled_shouts">
+    <string id="ui_mcm_varefined_varefined_main_enable_muffled_shouts">
         <text>Muffled voice lines with mask/helmet on</text>
     </string>
-    <string id="ui_mcm_varefined_comments_shouts_key_description">
+    <string id="ui_mcm_varefined_varefined_main_comments_shouts_key_description">
         <text>Actor voice commentaries by keybind, that take into account the surrounding environment and condition. Profanity warning. Can be changed during play session.</text>
     </string>
-    <string id="ui_mcm_varefined_comments_shouts_key">
+    <string id="ui_mcm_varefined_varefined_main_comments_shouts_key">
         <text>VA commentaries</text>
     </string>
-    <string id="ui_mcm_varefined_random_shouts_key_description">
+    <string id="ui_mcm_varefined_varefined_main_random_shouts_key_description">
         <text>Random actor shouts and phrases by keybind, that not take into account the surrounding environment and condition. Profanity warning. Can be changed during play session.</text>
     </string>
-    <string id="ui_mcm_varefined_random_shouts_key">
+    <string id="ui_mcm_varefined_varefined_main_random_shouts_key">
         <text>VA Random shouts</text>
     </string>
-    <string id="ui_mcm_varefined_shouts_volume_description">
+    <string id="ui_mcm_varefined_varefined_main_shouts_volume_description">
         <text>Volume level regulation for all sounds, provided by this mod.</text>
     </string>
-    <string id="ui_mcm_varefined_shouts_volume">
+    <string id="ui_mcm_varefined_varefined_main_shouts_volume">
         <text>VA volume level</text>
     </string>
 </string_table>

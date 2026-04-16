@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-sync_ltx_lines.py
+sync_lines.py
 
 Rewrites the [lines_*] sections in gamedata/configs/plugins/varefined.ltx
 based on actual .ogg files found in gamedata/sounds/characters_voice.
+Also regenerates varefined_mcm_generated.script and _ui_mcm_varefined_generated.xml
+from the union of all discovered reaction names.
 
 Rules:
 - Language is determined by category folder suffix (e.g. player -> rus, player_eng -> eng)
@@ -111,7 +113,8 @@ def scan_counts(sounds_root: Path, lang_suffixes: dict[str, str]) -> dict[str, d
 def format_section(lang_key: str, counts: dict[str, int]) -> str:
     lines = [f'[lines_{lang_key}]']
     for key in sorted(counts, key=str.casefold):
-        lines.append(f'{key} = {counts[key]}')
+        if counts[key] > 0:
+            lines.append(f'{key} = {counts[key]}')
     return '\n'.join(lines)
 
 
@@ -161,9 +164,52 @@ def report_differences(counts: dict[str, dict[str, int]], lang_suffixes: dict[st
         print('\nAll languages have identical keys.')
 
 
+def reaction_title(name: str) -> str:
+    """Convert reaction name to a human-readable title.
+
+    'loot_open_box' -> 'Loot open box'
+    """
+    words = name.replace('_', ' ').lower()
+    return words[:1].upper() + words[1:]
+
+
+def write_generated_script(path: Path, reactions: list[str]) -> None:
+    """Write varefined_mcm_generated.script with all reactions."""
+    entries = ',\n'.join(f'        "{r}"' for r in reactions)
+    content = (
+        'function load_generated()\n'
+        '    return {\n'
+        f'{entries}\n'
+        '    }\n'
+        'end\n'
+    )
+    path.write_text(content, encoding='utf-8')
+
+
+def write_generated_xml(path: Path, reactions: list[str]) -> None:
+    """Write _ui_mcm_varefined_generated.xml with a title entry per reaction."""
+    entries = []
+    for r in reactions:
+        string_id = f'ui_mcm_varefined_varefined_generated_chance_{r}'
+        title = reaction_title(r)
+        entries.append(
+            f'    <string id="{string_id}">\n'
+            f'        <text>{title}</text>\n'
+            f'    </string>'
+        )
+    content = (
+        '<?xml version="1.0" encoding="windows-1251"?>\n\n'
+        '<string_table>\n'
+        + '\n'.join(entries)
+        + '\n</string_table>\n'
+    )
+    path.write_text(content, encoding='windows-1251')
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description='Sync [lines_*] sections in varefined.ltx from actual .ogg files.'
+        description='Sync [lines_*] sections in varefined.ltx from actual .ogg files '
+                    'and regenerate MCM generated files.'
     )
     parser.add_argument(
         '--ltx',
@@ -176,14 +222,24 @@ def main() -> int:
         help='Path to characters_voice sounds directory',
     )
     parser.add_argument(
+        '--generated-script',
+        default='gamedata/scripts/varefined_mcm_generated.script',
+        help='Path to varefined_mcm_generated.script to regenerate',
+    )
+    parser.add_argument(
+        '--generated-xml',
+        default='gamedata/configs/text/eng/_ui_mcm_varefined_generated.xml',
+        help='Path to _ui_mcm_varefined_generated.xml to regenerate',
+    )
+    parser.add_argument(
         '--dry-run',
         action='store_true',
-        help='Print the resulting ltx without writing it',
+        help='Print results without writing any files',
     )
     parser.add_argument(
         '--diff-only',
         action='store_true',
-        help='Only report differences between languages, do not rewrite the ltx',
+        help='Only report differences between languages, do not rewrite files',
     )
     args = parser.parse_args()
 
@@ -214,14 +270,31 @@ def main() -> int:
     if args.diff_only:
         return 0
 
-    new_content = rewrite_ltx(original, lang_suffixes, counts)
+    all_reactions = sorted(
+        {key for lang_counts in counts.values() for key, cnt in lang_counts.items() if cnt > 0},
+        key=str.casefold,
+    )
+
+    new_ltx = rewrite_ltx(original, lang_suffixes, counts)
 
     if args.dry_run:
-        print('\n--- result ---')
-        print(new_content)
+        print('\n--- varefined.ltx result ---')
+        print(new_ltx)
+        print('\n--- varefined_mcm_generated.script ---')
+        entries = ',\n'.join(f'        "{r}"' for r in all_reactions)
+        print(f'function load_generated()\n    return {{\n{entries}\n    }}\nend')
+        print('\n--- _ui_mcm_varefined_generated.xml ---')
+        for r in all_reactions:
+            print(f'  {r!r}  ->  {reaction_title(r)!r}')
     else:
-        ltx_path.write_text(new_content, encoding='utf-8')
+        ltx_path.write_text(new_ltx, encoding='utf-8')
         print(f'Written: {ltx_path}')
+
+        write_generated_script(Path(args.generated_script), all_reactions)
+        print(f'Written: {args.generated_script}  ({len(all_reactions)} reactions)')
+
+        write_generated_xml(Path(args.generated_xml), all_reactions)
+        print(f'Written: {args.generated_xml}')
 
     return 0
 
