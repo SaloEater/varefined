@@ -13,13 +13,11 @@ function on_xml_read()
 
         -- Check if its the file i want to change
         if xml_file_name == xml_to_change then
-            printf("VA: Modifying XML file: %s", xml_file_name)
             local reaction_template = [[<string id="ui_mcm_varefined_varefined_generated_chance_%s"><text>%s</text></string>]]
             local reactions = varefined_mcm_generated.load_generated()
 
             for _, reaction in pairs(reactions) do
                 local reaction_str = string.format(reaction_template, reaction, to_human_readable(reaction))
-                printf("VA: Adding reaction: %s", reaction_str)
                 xml_obj:insertFromXMLString(reaction_str)
             end
         end
