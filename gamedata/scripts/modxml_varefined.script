@@ -1,0 +1,25 @@
+function to_human_readable(str)
+    -- Convert snake_case to Title Case
+    local result = str:gsub("_", " "):gsub("(%a)(%w*)", function(first, rest)
+        return first:upper() .. rest:lower()
+    end)
+    return result
+end
+
+function on_xml_read()
+    RegisterScriptCallback("on_xml_read", function(xml_file_name, xml_obj)
+        -- XML file i want to change
+        local xml_to_change = [[text\eng\_ui_mcm_varefined_generated.xml]]
+
+        -- Check if its the file i want to change
+        if xml_file_name == xml_to_change then
+            local reaction_template = [[<string id="ui_mcm_varefined_varefined_generated_chance_%s"><text>%s</text></string>]]
+            local reactions = varefined_mcm_generated.load_generated()
+
+            for _, reaction in pairs(reactions) do
+                local reaction_str = string.format(reaction_template, reaction, to_human_readable(reaction))
+                xml_obj:insertFromXMLString(reaction_str)
+            end
+        end
+    end)
+end

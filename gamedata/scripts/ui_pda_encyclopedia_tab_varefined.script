@@ -1,0 +1,17 @@
+local interaction_key, interaction_section
+
+local ui_pda_encyclopedia_tab_create_interaction = ui_pda_encyclopedia_tab.create_interaction
+function ui_pda_encyclopedia_tab.create_interaction(key, section)
+    interaction_key, interaction_section = key, section
+    local ret = ui_pda_encyclopedia_tab_create_interaction(key, section)
+    interaction_key, interaction_section = nil, nil
+    return ret
+end
+
+--unlock_article
+local ui_pda_encyclopedia_tab_unlock_article = ui_pda_encyclopedia_tab.unlock_article
+function ui_pda_encyclopedia_tab.unlock_article(section)
+    local ret = ui_pda_encyclopedia_tab_unlock_article(section)
+    agdd_voiced_actor.actor_speak_default(agdd_voiced_actor.article_with_lang_muffle(interaction_key .. "_" .. interaction_section), 1.0, 2500, 100)
+    return ret
+end
