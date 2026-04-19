@@ -383,7 +383,7 @@ function actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_n
     -- MCM per-reaction chance gate
     local _reaction = file:match("([^/\\]+)$")
     if _reaction then
-        _reaction = _reaction:match("(.+)_[^_]*$") or _reaction
+        _reaction = (_reaction:match("(.+)_[^_]*$") or _reaction):gsub("^m_", "")
     end
     if _reaction then
         local _mcm_chance = get_generated_chance(_reaction)
