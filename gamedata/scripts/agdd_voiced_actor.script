@@ -488,6 +488,7 @@ local VOICE_CATEGORY_RANDOM_SHOUTS = "random_shouts"
 local VOICE_CATEGORY_COMMANDS = "commands"
 local VOICE_CATEGORY_DIALOGS = "dialogs"
 local VOICE_CATEGORY_SQUAD = "squad"
+local VOICE_CATEGORY_ARTICLE = "article"
 
 --- A helper function to random_voice_line when category and subcategory are the same, which is the most common case, for example player\death contains only death_ files
 --- Returns a random voice line
@@ -550,6 +551,11 @@ end
 --- Returns a voice line from `squad` category
 function squad_with_lang_muffle(subcategory)
     return random_voice_line_and_subcategory_same(VOICE_CATEGORY_SQUAD, lang, muffle, subcategory)
+end
+
+--- Returns a voice line from `squad` category
+function article_with_lang_muffle(subcategory)
+    return random_voice_line_and_subcategory_same(VOICE_CATEGORY_ARTICLE, lang, muffle, subcategory)
 end
 
 --- Takes a list of categories and chooses one based on how many lines there are in each of them for the current language.
