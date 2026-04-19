@@ -63,6 +63,7 @@ Additional voice lines and conditions with GAMMA weights
 local get_config = varefined_mcm.get_config
 local get_generated_chance = varefined_mcm.get_generated_chance
 local hf_furniture_types_get_type = hf_furniture_types and hf_furniture_types.get_type
+local should_skip_tri_state_reload_comment = false -- this is a flag to prevent several reload comments in a row if actor reloads tri state weapon
 
 --[[
     Structure of a lines_by_language entry:
@@ -357,6 +358,7 @@ function actor_speak(file, sound_volume, cooldown, chance, requires_squad_near, 
             has_priority, ignore_conditionals, is_state, say_if_silent)
     if actor_talks then
         printf("said that successfully")
+        should_skip_tri_state_reload_comment = false
         return true
     end
     if last_shuffle_pick == -1 or last_shuffle_category == "" or not shuffle_bag[last_shuffle_category] then
@@ -1009,6 +1011,11 @@ function actor_on_weapon_reload(wpn, ammo_total)
         return
     end -- filters disabled reload shouts from MCM
     if is_actor_in_combat() == true then
+        local is_tri_state_reload = ini_sys:r_string_ex(wpn:section(), "tri_state_reload")
+        if is_tri_state_reload then
+            if should_skip_tri_state_reload_comment then return end
+        end
+
         -- only plays reload shouts if actor is in combat ,has a squad IN HEARING DISTANCE AND IF ENEMIES ARE IN INNER COMBAT PERIMETER
         local line_category
         local mag_size = math.floor(ini_sys:r_float_ex(wpn:section(), "ammo_mag_size") or 30)
@@ -1025,11 +1032,13 @@ function actor_on_weapon_reload(wpn, ammo_total)
                 line_category = "reloading"
             end
         end
-        actor_speak_squad_near(player_with_lang_muffle_random(line_category), 1.0, 2500, 100)
-        actor_speak_squad_can_hear(player_with_lang_muffle_random(line_category), 1.0, 2500, 100)
+        local spoke = actor_speak_squad_near(player_with_lang_muffle_random(line_category), 1.0, 2500, 100)
+        spoke = actor_speak_squad_can_hear(player_with_lang_muffle_random(line_category), 1.0, 2500, 100) and spoke
+        if spoke then
+            should_skip_tri_state_reload_comment = true
+        end
         add_action_intensity(40, 0.5, 175)
     end
-
 end
 
 local actor_weapon = 0 -- is set later
