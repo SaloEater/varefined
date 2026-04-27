@@ -1183,7 +1183,7 @@ function worst_possible_fix()
 	return true
 end
 
-local function on_key_press(dik)
+function on_key_press(dik)
 	if dik == HUD_TOGGLE_KEYBIND then
 		 -- if healthstatus then
 				-- healthstatus=false
