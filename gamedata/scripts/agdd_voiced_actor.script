@@ -1267,7 +1267,7 @@ function dialog_with_unique_npc(story_id, unique_category)
         return
     end
 
-    local unique_npc_category = unique_category .. "_" .. story_id
+    local unique_npc_category = story_id .. "_" .. unique_category
 
     actor_speak_default_ignore_conditionals(dialogs_with_lang_muffle(choose_random_category(unique_category, unique_npc_category)), 1.0, 3500, 100)
 end
