@@ -38,7 +38,7 @@ jobs:
           args: 7z a -t7z -mx=9 release.7z ./build_temp/gamedata -r
 
       - name: Rename archive
-        run: mv "release.7z" "479- Voiced Actor Refined - SaloEater.7z"
+        run: mv "release.7z" "479-_Voiced_Actor_Refined-SaloEater.7z"
 
       - name: Clean up
         run: rm -rf fomod
@@ -48,6 +48,6 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: Release for Gamma
-          files: "479- Voiced Actor Refined - SaloEater.7z"
+          files: "479-_Voiced_Actor_Refined-SaloEater.7z"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
