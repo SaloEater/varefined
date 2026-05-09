@@ -38,7 +38,7 @@ jobs:
           args: 7z a -t7z -mx=9 release.7z ./build_temp/gamedata -r
 
       - name: Rename archive
-        run: mv "479-Voiced_Actor_Refined-SaloEater.7z" "479- Voiced Actor Refined - SaloEater.7z"
+        run: mv "release.7z" "479- Voiced Actor Refined - SaloEater.7z"
 
       - name: Clean up
         run: rm -rf fomod
