@@ -6,7 +6,7 @@ on:
       version:
         description: 'Version tag'
         required: true
-        default: 'auto-release'
+        default: 'gamma'
 
 jobs:
   release:
@@ -35,7 +35,10 @@ jobs:
       - name: Create 7z archive
         uses: edgarrc/action-7z@v1
         with:
-          args: 7z a -t7z -mx=9 "479- Voiced Actor Refined - SaloEater.7z" ./build_temp/gamedata -r
+          args: 7z a -t7z -mx=9 release.7z ./build_temp/gamedata -r
+
+      - name: Rename archive
+        run: mv "479-Voiced_Actor_Refined-SaloEater.7z" "479- Voiced Actor Refined - SaloEater.7z"
 
       - name: Clean up
         run: rm -rf fomod
