@@ -48,7 +48,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.event.inputs.version }}
-          name: Release ${{ github.event.inputs.version }}
+          name: 479- Voiced Actor Refined - SaloEater
           body: |
             ${{ github.event.inputs.description }}
           files: varefined-${{ github.event.inputs.version }}.7z
