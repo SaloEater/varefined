@@ -28,9 +28,6 @@ jobs:
             --exclude='version' \
             --exclude=' /scripts' \
             ./* build_temp/
-          
-          echo "? files to build:"
-          ls -la build_temp/
 
       - name: Create 7z archive
         uses: edgarrc/action-7z@v1
