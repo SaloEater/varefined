@@ -42,6 +42,6 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: Release for Gamma
-          files: release-gamma.7z
+          files: varefined-gamma.7z
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
