@@ -32,7 +32,7 @@ jobs:
       - name: Create 7z archive
         uses: edgarrc/action-7z@v1
         with:
-          args: 7z a -t7z -mx=9 release-gamma.7z ./build_temp/gamedata -r
+          args: 7z a -t7z -mx=9 varefined-gamma.7z ./build_temp/gamedata -r
 
       - name: Clean up
         run: rm -rf fomod
