@@ -35,10 +35,7 @@ jobs:
       - name: Create 7z archive
         uses: edgarrc/action-7z@v1
         with:
-          args: 7z a -t7z -mx=9 release.7z ./build_temp/gamedata -r
-
-      - name: Rename archive
-        run: mv "release.7z" "479-_Voiced_Actor_Refined-SaloEater.7z"
+          args: 7z a -t7z -mx=9 release-gamma.7z ./build_temp/gamedata -r
 
       - name: Clean up
         run: rm -rf fomod
@@ -48,6 +45,6 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: Release for Gamma
-          files: "479-_Voiced_Actor_Refined-SaloEater.7z"
+          files: release-gamma.7z
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
