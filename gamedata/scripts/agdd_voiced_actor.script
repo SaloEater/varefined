@@ -275,7 +275,7 @@ end
 local speaking_cooldown = 0 -- is set later
 local random_long_shout_cooldown = 0
 
-local function get_long_shout_cooldown_ms()
+function get_long_shout_cooldown_ms()
     return ini:r_value("config", "random_long_shout_cooldown_ms", 2, 30000)
 end
 
@@ -1343,7 +1343,7 @@ local TAB_TYPE = {
 
 local kind_to_type = {}
 
-local function build_item_type_cache()
+function build_item_type_cache()
     for tab_id = 7, 8 do
         local kinds = parse_list(ini_sys, "button_sort_tab_" .. tab_id, "kinds", true)
         if kinds then
@@ -1354,7 +1354,7 @@ local function build_item_type_cache()
     end
 end
 
-local function get_item_type(sec)
+function get_item_type(sec)
     local kind = ini_sys:r_string_ex(sec, "kind") or ""
     local tab_type = kind_to_type[kind]
     if not tab_type then
