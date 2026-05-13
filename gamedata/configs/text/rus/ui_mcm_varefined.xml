@@ -73,4 +73,10 @@
     <string id="ui_mcm_varefined_varefined_main_shouts_volume">
         <text>Громкость фраз</text>
     </string>
+    <string id="ui_mcm_varefined_varefined_main_va_global_volume_influence_description">
+        <text>Насколько глобальная громкость звука влияет на фразы ГГ. 0 = громкость фраз не зависит от глобальной громкости. 1 = громкость фраз полностью масштабируется с глобальной громкостью.</text>
+    </string>
+    <string id="ui_mcm_varefined_varefined_main_va_global_volume_influence">
+        <text>Влияние глобальной громкости на фразы ГГ</text>
+    </string>
 </string_table>
