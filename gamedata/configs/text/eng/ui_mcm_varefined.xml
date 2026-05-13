@@ -73,4 +73,10 @@
     <string id="ui_mcm_varefined_varefined_main_shouts_volume">
         <text>VA volume level</text>
     </string>
+    <string id="ui_mcm_varefined_varefined_main_va_global_volume_influence_description">
+        <text>How much the global sound volume affects VA voice lines. 0 = VA volume is independent of global sound volume. 1 = VA volume fully scales with global sound volume.</text>
+    </string>
+    <string id="ui_mcm_varefined_varefined_main_va_global_volume_influence">
+        <text>VA Volume Affected by global sound volume</text>
+    </string>
 </string_table>

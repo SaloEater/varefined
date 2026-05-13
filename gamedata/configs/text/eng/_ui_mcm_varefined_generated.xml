@@ -499,10 +499,10 @@
     <string id="ui_mcm_varefined_varefined_generated_chance_wait_com_too_far_aic">
         <text>Wait com too far aic</text>
     </string>
-    <string id="ui_mcm_varefined_varefined_generated_chance_wait_radio">
+    <string id="ui_mcm_varefined_varefined_generated_chance_Wait_Radio">
         <text>Wait radio</text>
     </string>
-    <string id="ui_mcm_varefined_varefined_generated_chance_Wait_Radio">
+    <string id="ui_mcm_varefined_varefined_generated_chance_wait_radio">
         <text>Wait radio</text>
     </string>
 </string_table>

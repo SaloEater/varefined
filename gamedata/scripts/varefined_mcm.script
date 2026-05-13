@@ -10,7 +10,8 @@ local defaults = {
     ["enable_muffled_shouts"] = true, -- Enables muffled shouts in helmets
     ["comments_shouts_key"] = DIK_keys.DIK_O, -- Keybind for comments shouts
     ["random_shouts_key"] = DIK_keys.DIK_P, -- Keybind for randomized shouts
-    ["shouts_volume"] = 2 -- Volume of the shouts
+    ["shouts_volume"] = 2, -- Volume of the shouts
+    ["va_global_volume_influence"] = 0.5 -- How much global sound volume affects VA voice lines (0 = no effect, 1 = full effect)
 }
 local ui_mcm_get = ui_mcm.get
 
@@ -35,9 +36,8 @@ function actor_on_first_update()
 end
 
 function on_option_change()
-    if ui_mcm then
-        mcm_enable_on_weapon_jam_shouts = ui_mcm_get("varefined/enable_on_weapon_jam_shouts")
-        if mcm_enable_on_weapon_jam_shouts and a_arti_jamming_mcm then
+    if ui_mcm and a_arti_jamming_mcm then
+        if ui_mcm_get("varefined/varefined_main/enable_on_weapon_jam_shouts") then
             if ui_mcm_get("wpo/profanity") then
                 ui_mcm.set("wpo/profanity", false) -- Suppresing WPO jam shouts to use Voiced Actor Refined ones
             end
@@ -144,10 +144,22 @@ function on_mcm_load()
                         id = "shouts_volume",
                         type = "track",
                         val = 2,
-                        min = 0.5,
+                        min = 0,
                         max = 2,
-                        step = 0.01,
+                        step = 0.05,
                         def = defaults["shouts_volume"]
+                    }, {
+                        id = "va_global_volume_influence_description",
+                        type = "desc",
+                        text = "ui_mcm_varefined_varefined_main_va_global_volume_influence_description"
+                    }, {
+                        id = "va_global_volume_influence",
+                        type = "track",
+                        val = 2,
+                        min = 0,
+                        max = 1,
+                        step = 0.05,
+                        def = defaults["va_global_volume_influence"]
                     }
                 }
             },
