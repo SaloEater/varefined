@@ -60,7 +60,6 @@ Werwolf's Edits
 
 Additional voice lines and conditions with GAMMA weights
 --]]
-local get_config = varefined_mcm.get_config
 local get_generated_chance = varefined_mcm.get_generated_chance
 local hf_furniture_types_get_type = hf_furniture_types and hf_furniture_types.get_type
 local should_skip_tri_state_reload_comment = false -- this is a flag to prevent several reload comments in a row if actor reloads tri state weapon
@@ -129,10 +128,23 @@ end
 
 local combat_inertia = 0
 
+local mcm_voice_language                 = 0
+local mcm_enable_muffled_shouts          = true
+local mcm_shouts_volume                  = 2
+local mcm_enable_on_kill_shouts          = true
+local mcm_enable_pain_shouts             = true
+local mcm_enable_on_weapon_jam_shouts    = true
+local mcm_enable_on_weapon_reload_shouts = true
+local mcm_enable_on_grenade_throw_shouts = true
+local mcm_comments_shouts_key            = DIK_keys.DIK_O
+local mcm_random_shouts_key              = DIK_keys.DIK_P
+local mcm_va_global_volume_influence     = 0
+local mcm_master_volume                  = 1
+
 lang = "rus" -- initiates actor language condition
 
 function get_actor_lang()
-    if get_config("voice_language") == 0 then
+    if mcm_voice_language == 0 then
         local faction = get_actor_true_community()
         if faction == "isg" or faction == "killer" then
             lang = "eng"
@@ -140,7 +152,7 @@ function get_actor_lang()
             lang = "rus"
         end
         return get_current_language_prefix()
-    elseif get_config("voice_language") == 1 then
+    elseif mcm_voice_language == 1 then
         lang = "rus"
         return get_current_language_prefix()
     else
@@ -153,7 +165,7 @@ muffle = "" -- initiates muffling condition
 
 function get_muffle_status()
     -- changes muffle condition of the sound
-    if not get_config("enable_muffled_shouts") then
+    if not mcm_enable_muffled_shouts then
         muffle = ""
         return muffle
     end
@@ -281,7 +293,6 @@ end
 
 local state_cooldown = 0 -- is set later
 file_to_say = nil -- is set later
-local mcm_sound_volume = get_config("shouts_volume") -- gets the volume value from MCM
 
 function actor_speak_default(file, sound_volume, cooldown, max_chance)
     return actor_speak(file, sound_volume, cooldown, max_chance, false, false, false, false, false, false)
@@ -434,11 +445,8 @@ function actor_speak_base(file, sound_volume, cooldown, chance, requires_squad_n
 
     file_to_say = sound_object(file) -- sets the file to play
     file_to_say:play(db.actor, 0, sound_object.s2d) -- plays it
-    if mcm_sound_volume then
-        file_to_say.volume = mcm_sound_volume * sound_volume
-    else
-        file_to_say.volume = sound_volume -- sets how loud the sound should be
-    end
+    local effective_global = 1 + (mcm_master_volume - 1) * mcm_va_global_volume_influence
+    file_to_say.volume = mcm_shouts_volume * sound_volume * effective_global
 
     -- DEBUG--	printf("actor sound played: " .. file) --prints out played files to the console log, debug purposes
 
@@ -601,7 +609,7 @@ function monster_on_death_callback(victim, killer)
     if db.actor:is_talking() then
         return
     end
-    if not get_config("enable_on_kill_shouts") then
+    if not mcm_enable_on_kill_shouts then
         return
     end -- filters disabled kill shouts from MCM
 
@@ -669,7 +677,7 @@ function npc_on_death_callback(victim, killer)
     if killer:id() ~= db.actor:id() then
         return
     end
-    if not get_config("enable_on_kill_shouts") then
+    if not mcm_enable_on_kill_shouts then
         return
     end -- filters disabled kill shouts from MCM
 
@@ -892,7 +900,7 @@ function actor_on_before_hit(hitinfo, bone_id, flags)
         -- prevents too many pain sounds from playing in a short succession
         local cooldown = nil
 
-        if get_config("enable_pain_shouts") then
+        if mcm_enable_pain_shouts then
             if last_health < db.actor.health then
                 last_health = (db.actor.health - 0.0001)
             end -- if player's health value is higher than whatever we last noted down - reset it
@@ -979,7 +987,7 @@ function actor_on_weapon_jammed(wpn)
     if db.actor:is_talking() then
         return
     end
-    if not get_config("enable_on_weapon_jam_shouts") then
+    if not mcm_enable_on_weapon_jam_shouts then
         return
     end -- filters disabled jam shouts from MCM
     if is_actor_in_combat() == true then
@@ -1013,7 +1021,7 @@ function actor_on_weapon_reload(wpn, ammo_total)
     if db.actor:is_talking() then
         return
     end
-    if not get_config("enable_on_weapon_reload_shouts") then
+    if not mcm_enable_on_weapon_reload_shouts then
         return
     end -- filters disabled reload shouts from MCM
     if is_actor_in_combat() == true then
@@ -1079,7 +1087,7 @@ function on_key_release(key)
             if not (is_actor_in_combat()) and not (outer_combat_checker()) then
                 return
             end -- IF ACTOR IS NOT IN COMBAT (FOR BOTH PERIMETERS) IT WILL STOP FUNCTION
-            if not get_config("enable_on_grenade_throw_shouts") then
+            if not mcm_enable_on_grenade_throw_shouts then
                 return
             end -- filters disabled grenade thrown shouts from MCM
             if is_actor_in_combat() == true then
@@ -1163,7 +1171,7 @@ function interactive_comments_on_button(key)
     -------------------------------------------------------------------------------------------
     -- HERE IN BELOW LINE YOU CAN CHANGE INTERACTIVE BUTTON FOR WHATEVER YOU WANT ,DEFAULT IS V
     -------------------------------------------------------------------------------------------
-    if (key == get_config("comments_shouts_key")) then
+    if (key == mcm_comments_shouts_key) then
         -- RUNS IF CERTAIN KEY IS PRESSED
         if db.actor:is_talking() then
             return
@@ -1299,7 +1307,7 @@ end
 --------------------------------------
 
 function random_shouts(key)
-    if (key == get_config("random_shouts_key")) then
+    if (key == mcm_random_shouts_key) then
         if not db.actor:alive() then
             return
         end
@@ -1480,8 +1488,32 @@ function load_state(mdata)
     random_long_shout_cooldown = time_global() + remaining
 end
 
+function on_option_change()
+    if ui_mcm then
+        local get_config = varefined_mcm.get_config
+        mcm_voice_language = get_config("voice_language")
+        mcm_enable_muffled_shouts = get_config("enable_muffled_shouts")
+        mcm_shouts_volume = get_config("shouts_volume")
+        mcm_enable_on_kill_shouts = get_config("enable_on_kill_shouts")
+        mcm_enable_pain_shouts = get_config("enable_pain_shouts")
+        mcm_enable_on_weapon_jam_shouts = get_config("enable_on_weapon_jam_shouts")
+        mcm_enable_on_weapon_reload_shouts = get_config("enable_on_weapon_reload_shouts")
+        mcm_enable_on_grenade_throw_shouts = get_config("enable_on_grenade_throw_shouts")
+        mcm_comments_shouts_key = get_config("comments_shouts_key")
+        mcm_random_shouts_key = get_config("random_shouts_key")
+        mcm_va_global_volume_influence = get_config("va_global_volume_influence")
+        mcm_master_volume = ui_options.get("sound/general/master_volume")
+    end
+end
+
+function actor_on_first_update()
+    on_option_change()
+end
+
 function on_game_start()
     -- lets the engine know we want these function to run when certain things happen
+    RegisterScriptCallback("on_option_change", on_option_change)
+    RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
     RegisterScriptCallback("actor_on_update", actor_on_update) -- runs every tick
     RegisterScriptCallback("actor_on_before_hit", actor_on_before_hit) -- runs right before the actor gets damaged
     RegisterScriptCallback("actor_on_before_death", actor_on_before_death) -- runs right before the actor dies
